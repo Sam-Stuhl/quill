@@ -238,6 +238,11 @@ sealed class EditorImage extends ChangeNotifier {
     return shouldLoadOut;
   }
 
+  /// Prepares a bitmap that [buildImageWidget] draws synchronously, so a
+  /// screenshot taken without the editor on screen (Quill sync's PDF export)
+  /// includes the image. [width] is the page width in pixels.
+  Future<void> prerender({required int width}) async {}
+
   /// Adds the image to Flutter's image cache.
   Future<void> precache(BuildContext context);
 

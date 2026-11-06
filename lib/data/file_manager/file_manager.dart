@@ -15,6 +15,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:saber/components/home/sort_button.dart';
 import 'package:saber/data/nextcloud/saber_syncer.dart';
 import 'package:saber/data/prefs.dart';
+import 'package:saber/data/quill_sync/quill_sync.dart';
 import 'package:saber/i18n/strings.g.dart';
 import 'package:saber/pages/editor/editor.dart';
 import 'package:saver_gallery/saver_gallery.dart';
@@ -265,6 +266,7 @@ class FileManager {
     void afterWrite() {
       broadcastFileWrite(FileOperationType.write, filePath);
       if (alsoUpload) syncer.uploader.enqueueRel(filePath);
+      QuillSync.instance?.onWrite(filePath);
       if (filePath.endsWith(Editor.extension)) {
         _removeReferences(
           '${filePath.substring(0, filePath.length - Editor.extension.length)}'
@@ -403,6 +405,8 @@ class FileManager {
 
     syncer.uploader.enqueueRel(fromPath);
     syncer.uploader.enqueueRel(toPath);
+    QuillSync.instance?.onDelete(fromPath);
+    QuillSync.instance?.onWrite(toPath);
 
     _renameReferences(fromPath, toPath);
     broadcastFileWrite(FileOperationType.delete, fromPath);
@@ -451,6 +455,7 @@ class FileManager {
     await file.delete();
 
     if (alsoUpload) syncer.uploader.enqueueRel(filePath);
+    QuillSync.instance?.onDelete(filePath);
 
     _removeReferences(filePath);
     broadcastFileWrite(FileOperationType.delete, filePath);
@@ -515,6 +520,8 @@ class FileManager {
 
     for (final child in children) {
       _renameReferences(directoryPath + child, newPath + child);
+      QuillSync.instance?.onDelete(directoryPath + child);
+      QuillSync.instance?.onWrite(newPath + child);
       broadcastFileWrite(FileOperationType.delete, directoryPath + child);
       broadcastFileWrite(FileOperationType.write, newPath + child);
     }

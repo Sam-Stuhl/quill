@@ -13,6 +13,27 @@ class PdfEditorImage extends EditorImage {
 
   final _pdfDocument = ValueNotifier<PdfDocument?>(null);
 
+  /// A bitmap of the page from [prerender], drawn instead of [PdfPageView],
+  /// which renders asynchronously: too late for a headless screenshot.
+  ui.Image? _raster;
+
+  /// Renders the page to a bitmap [width] pixels wide, so that exports made
+  /// without the editor on screen (Quill sync) include it. The document's
+  /// pages must be loading (PdfDocument.loadPagesProgressively).
+  @override
+  Future<void> prerender({required int width}) async {
+    final document = _pdfDocument.value ??= await assetCache.pdfDocumentCache
+        .load(pdfFile?.path ?? 'inline_pdf_$id.pdf', pdfBytes: pdfBytes);
+    final page = await document.pages[pdfPage].ensureLoaded();
+    final image = await page.renderForDisplay(
+      fullWidth: width.toDouble(),
+      fullHeight: (width * page.height / page.width).roundToDouble(),
+      backgroundColor: 0xffffffff,
+    );
+    _raster?.dispose();
+    _raster = image;
+  }
+
   static final log = Logger('PdfEditorImage');
 
   new({
@@ -172,6 +193,12 @@ class PdfEditorImage extends EditorImage {
     required bool isBackground,
     required bool invert,
   }) {
+    if (_raster case final raster?) {
+      return InvertWidget(
+        invert: invert,
+        child: RawImage(image: raster, fit: BoxFit.fill),
+      );
+    }
     return ValueListenableBuilder(
       valueListenable: _pdfDocument,
       builder: (context, pdfDocument, child) {
@@ -214,6 +241,8 @@ class PdfEditorImage extends EditorImage {
 
   @override
   void dispose() {
+    _raster?.dispose();
+    _raster = null;
     pdfBytes = null;
     _pdfDocument.dispose();
     super.dispose();

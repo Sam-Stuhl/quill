@@ -162,6 +162,35 @@ class PngEditorImage extends EditorImage {
     }
   }
 
+  /// The decoded image from [prerender], drawn instead of [Image], which
+  /// decodes asynchronously: too late for a headless screenshot.
+  ui.Image? _raster;
+
+  @override
+  Future<void> prerender({required int width}) async {
+    final provider = imageProvider;
+    final Uint8List bytes;
+    if (provider is MemoryImage) {
+      bytes = provider.bytes;
+    } else if (provider is FileImage) {
+      bytes = await provider.file.readAsBytes();
+    } else {
+      return;
+    }
+    final codec = await ui.instantiateImageCodec(bytes);
+    final frame = await codec.getNextFrame();
+    codec.dispose();
+    _raster?.dispose();
+    _raster = frame.image;
+  }
+
+  @override
+  void dispose() {
+    _raster?.dispose();
+    _raster = null;
+    super.dispose();
+  }
+
   @override
   Future<void> loadIn() async => await super.loadIn();
   @override
@@ -190,7 +219,9 @@ class PngEditorImage extends EditorImage {
 
     return InvertWidget(
       invert: invert,
-      child: Image(image: imageProvider, fit: boxFit),
+      child: _raster != null
+          ? RawImage(image: _raster, fit: boxFit)
+          : Image(image: imageProvider, fit: boxFit),
     );
   }
 
