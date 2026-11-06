@@ -33,10 +33,14 @@ List<Offset> zigzag({
   return polyline(corners);
 }
 
-void main() { 
+void main() {
   group('scribble detector: scratches', () {
     test('a tight vertical zigzag is a scribble', () {
       expect(ScribbleDetector.isScribble(zigzag()), isTrue);
+    });
+
+    test('a short scratch of six passes is a scribble', () {
+      expect(ScribbleDetector.isScribble(zigzag(passes: 6)), isTrue);
     });
 
     test('a horizontal and a diagonal scratch are scribbles', () {

@@ -13,8 +13,8 @@ abstract final class ScribbleDetector {
   static const minReversalDistance = 8.0;
 
   /// Handwriting reverses at most four times in one stroke ("m", "w"):
-  /// a scratch needs more.
-  static const minReversals = 6;
+  /// a scratch needs more (five turns, six quick passes).
+  static const minReversals = 5;
 
   /// Path length divided by the size of the stroke. A scratch
   /// covers the same ground again and again, handwriting moves along.
