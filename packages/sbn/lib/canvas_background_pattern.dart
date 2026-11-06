@@ -38,7 +38,15 @@ enum CanvasBackgroundPattern(
   tablature('tablature'),
 
   /// Cornell notes
-  cornell('cornell');
+  cornell('cornell'),
+
+  /// Full-page horizontal lines in grey, 27 to a page width, like the
+  /// reMarkable "Lined" template. Ignores the line height setting.
+  remarkableLined('remarkable-lined', requiresClipping: true),
+
+  /// Full-page grid of squares in grey, 27 to a page width, like the
+  /// reMarkable "Grid" template. Ignores the line height setting.
+  remarkableGraph('remarkable-graph', requiresClipping: true);
 
   static CanvasBackgroundPattern fromName(String? name) {
     return values.firstWhere(

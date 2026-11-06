@@ -12,5 +12,8 @@ extension CanvasBackgroundPatternLocalized on CanvasBackgroundPattern {
     .staffs => t.editor.menu.bgPatterns.staffs,
     .tablature => t.editor.menu.bgPatterns.tablature,
     .cornell => t.editor.menu.bgPatterns.cornell,
+    // Not translated: these are specific to this fork.
+    .remarkableLined => 'reMarkable lined',
+    .remarkableGraph => 'reMarkable graph',
   };
 }

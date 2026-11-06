@@ -40,6 +40,7 @@
 > - **Tap gestures, as in Notability.** A two-finger tap undoes, a three-finger tap redoes. A tap is a touch where no finger moves more than 10 px and everything lifts within 250 ms, so panning, pinch-zoom and drawing are not mistaken for one. Only finger touches count, never the Pencil or a mouse.
 > - **Custom gestures (Settings, Gestures).** Every combination of 1 to 4 fingers and single, double or triple tap (11 in all; a lone one-finger tap is drawing) can be mapped to: undo, redo, eraser (toggles back to the previous tool), pen, highlighter, lasso select, toggle finger drawing, next page, previous page, or nothing. Defaults: 2 fingers = undo, 3 fingers = redo, 1-finger double tap = eraser toggle. A tap waits 300 ms only if a longer tap with the same fingers is mapped. One-finger gestures are ignored while finger drawing is on, since that finger is drawing.
 > - **Scribble to erase** (Settings, Gestures, on by default). Scratching back and forth over ink with the pen (five or more sharp reversals in a small area) erases the strokes it touches and drops the scratch itself, as one undo step. Highlighter and shape pen are exempt, and a scratch that touches nothing stays as ink.
+> - **reMarkable background patterns.** Two extra choices in the background picker, "reMarkable lined" and "reMarkable graph": full-page grey lines or squares, 27 across the page like the reMarkable's own templates, so no PDF import is needed. They ignore the line height setting. Notes using them show a blank background in upstream Saber.
 > - Its own app: bundle id `com.samstuhl.saber`, name "Saber Gestures", so it installs next to the App Store Saber.
 >
 > The code is in `lib/data/touch_gestures.dart` (tap classifier and mapping), `lib/data/scribble_erase.dart` (scribble detector), the pointer wiring in `lib/components/canvas/canvas_gesture_detector.dart` and `lib/pages/editor/editor.dart`, and the settings in `lib/pages/home/settings.dart`. Tests: `test/touch_gestures_test.dart`, `test/scribble_erase_test.dart`. The Gestures labels are English only.
@@ -54,7 +55,7 @@
 >
 > Tests: `flutter test test/touch_gestures_test.dart test/scribble_erase_test.dart`.
 >
-> `templates/` holds Sam's two reMarkable page templates (graph and lined, 612 x 818 pt PDFs, exported from Notability). In Saber, import a PDF as a note to use it as a background, and duplicate that note for each new one.
+> `templates/` holds the two original reMarkable templates (graph and lined, 612 x 818 pt PDFs, exported from Notability) that the patterns above imitate.
 >
 > Sign in to Nextcloud in Settings the same way as the App Store Saber to get your notes back.
 

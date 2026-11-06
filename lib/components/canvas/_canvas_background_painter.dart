@@ -37,7 +37,10 @@ class CanvasBackgroundPainter extends CustomPainter {
     paint.color = backgroundColor.withInversion(invert);
     canvas.drawRect(canvasRect, paint);
 
-    paint.strokeWidth = lineThickness.toDouble();
+    final isRemarkable =
+        backgroundPattern == .remarkableLined ||
+        backgroundPattern == .remarkableGraph;
+    paint.strokeWidth = isRemarkable ? 1 : lineThickness.toDouble();
 
     if (backgroundPattern.requiresClipping) {
       canvas.save();
@@ -49,7 +52,9 @@ class CanvasBackgroundPainter extends CustomPainter {
       size: size,
       lineHeight: lineHeight,
     )) {
-      if (element.secondaryColor) {
+      if (isRemarkable) {
+        paint.color = Colors.grey.withValues(alpha: preview ? 0.7 : 0.45);
+      } else if (element.secondaryColor) {
         paint.color = secondaryColor.withValues(alpha: preview ? 0.5 : 0.2);
       } else {
         paint.color = primaryColor.withValues(alpha: preview ? 0.5 : 0.2);
@@ -76,6 +81,10 @@ class CanvasBackgroundPainter extends CustomPainter {
       oldDelegate.lineHeight != lineHeight ||
       oldDelegate.primaryColor != primaryColor ||
       oldDelegate.secondaryColor != secondaryColor;
+
+  /// How many squares (or line gaps) of the reMarkable patterns fit across
+  /// the page, as in the reMarkable's own templates.
+  static const remarkableSquaresPerWidth = 27;
 
   static Iterable<PatternElement> getPatternElements({
     required CanvasBackgroundPattern pattern,
@@ -127,6 +136,25 @@ class CanvasBackgroundPainter extends CustomPainter {
             Offset(x, size.height),
             isLine: true,
           );
+        }
+      case .remarkableLined:
+      case .remarkableGraph:
+        final spacing = size.width / remarkableSquaresPerWidth;
+        for (double y = 0; y < size.height; y += spacing) {
+          yield PatternElement(
+            Offset(0, y),
+            Offset(size.width, y),
+            isLine: true,
+          );
+        }
+        if (pattern == .remarkableGraph) {
+          for (double x = 0; x < size.width; x += spacing) {
+            yield PatternElement(
+              Offset(x, 0),
+              Offset(x, size.height),
+              isLine: true,
+            );
+          }
         }
       case .dots:
         for (double y = lineHeight * 2; y <= size.height; y += lineHeight) {

@@ -66,6 +66,10 @@ void _testPatternWithLineHeight(
       );
     }
 
+    // The reMarkable patterns are full-bleed and ignore the line height:
+    // see the reMarkable test below.
+    if (pattern == .remarkableLined || pattern == .remarkableGraph) return;
+
     // Check we have 2 lineHeights of space at the top
     for (final element in elements) {
       if (element.secondaryColor) return; // ignore secondary elements
@@ -181,4 +185,33 @@ void _testRtlPattern(CanvasBackgroundPattern pattern) {
       reason: 'Lines should be on the left in ltr and on the right in rtl',
     );
   });
+
+  test(
+    'reMarkable patterns are 27 squares across, whatever the line height',
+    () {
+      const size = Size(1000, 1400);
+      for (final lineHeight in [10, 40, 50]) {
+        final lined = CanvasBackgroundPainter.getPatternElements(
+          pattern: .remarkableLined,
+          size: size,
+          lineHeight: lineHeight,
+        ).toList();
+        final graph = CanvasBackgroundPainter.getPatternElements(
+          pattern: .remarkableGraph,
+          size: size,
+          lineHeight: lineHeight,
+        ).toList();
+
+        final spacing = size.width / 27;
+        final rows = lined.where((e) => e.start.dy == e.end.dy).toList();
+        expect(rows.length, (size.height / spacing).ceil());
+        expect(rows[1].start.dy - rows[0].start.dy, closeTo(spacing, 1e-9));
+        expect(lined.every((e) => e.start.dy == e.end.dy), true);
+
+        final columns = graph.where((e) => e.start.dx == e.end.dx).toList();
+        expect(columns, hasLength(27));
+        expect(graph.length, rows.length + 27);
+      }
+    },
+  );
 }
