@@ -54,6 +54,8 @@
 >
 > Tests: `flutter test test/touch_gestures_test.dart test/scribble_erase_test.dart`.
 >
+> `templates/` holds Sam's two reMarkable page templates (graph and lined, 612 x 818 pt PDFs, exported from Notability). In Saber, import a PDF as a note to use it as a background, and duplicate that note for each new one.
+>
 > Sign in to Nextcloud in Settings the same way as the App Store Saber to get your notes back.
 
 Saber is the notes app built for handwriting.
