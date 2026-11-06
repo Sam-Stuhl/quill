@@ -224,7 +224,10 @@ class Inbox:
                     self.store.log("inbox.unsupported", file=rel)
                 continue
             if self._seen.get(rel) != sig:
-                self._since[rel] = time.monotonic()
+                # Unchanged since its mtime: a file moved in whole (or sent
+                # with `put`, which keeps the source's mtime) is ready at once.
+                age = max(0.0, time.time() - sig[1] / 1e9)
+                self._since[rel] = time.monotonic() - (age if rel not in self._seen else 0)
             if sig[0] == 0 or time.monotonic() - self._since.get(rel, 0) < STABLE_FOR:
                 continue  # may still be being written: offer it on a later scan
             ident = hashlib.sha1(f"{rel}\0{sig[0]}\0{sig[1]}".encode()).hexdigest()[:20]
@@ -478,6 +481,9 @@ def cmd_put(args):
         sys.exit(f"already waiting in the inbox: {dest}")
     tmp = dest_dir / f".{src.name}.tmp"
     shutil.copyfile(src, tmp)
+    # An mtime in the past tells the watcher the file is complete.
+    old = time.time() - 2 * STABLE_FOR
+    os.utime(tmp, (old, old))
     os.replace(tmp, dest)
     rel = dest.relative_to(store.inbox).as_posix()
     print(f"queued for Quill: Inbox/{rel}")

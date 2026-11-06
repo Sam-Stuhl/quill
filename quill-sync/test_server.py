@@ -156,6 +156,17 @@ class ServerTest(unittest.TestCase):
         _, body = self.req("GET", "/v1/inbox?wait=1")
         self.assertEqual(body["items"][0]["size"], len(PDF) + 4000)
 
+    def test_inbox_offers_old_files_at_once(self):
+        f = self.root / "Inbox/moved.pdf"
+        f.write_bytes(PDF)
+        os.utime(f, (time.time() - 60, time.time() - 60))
+        _, body = self.req("GET", "/v1/inbox?wait=0")
+        version = body["version"]
+        t0 = time.monotonic()
+        _, body = self.req("GET", f"/v1/inbox?wait=5&since={version}" if not body["items"] else "/v1/inbox?wait=0")
+        self.assertEqual([i["name"] for i in body["items"]], ["moved.pdf"])
+        self.assertLess(time.monotonic() - t0, 0.2 + server.STABLE_FOR / 2)
+
     # 7
     def test_manifest(self):
         self.put("/x/y.sbn2", b"abc", 1700000000123)
