@@ -42,6 +42,7 @@
 > - **Scribble to erase** (Settings, Gestures, on by default). Scratching back and forth over ink with the pen (five or more sharp reversals in a small area) erases the strokes it touches and drops the scratch itself, as one undo step. Highlighter and shape pen are exempt, and a scratch that touches nothing stays as ink.
 > - **reMarkable background patterns.** Two extra choices in the background picker, "reMarkable lined" and "reMarkable graph": full-page grey lines or squares, 27 across the page like the reMarkable's own templates, so no PDF import is needed. They ignore the line height setting. Notes using them show a blank background in upstream Saber.
 > - Its own app: bundle id `com.samstuhl.saber`, name "Quill", so it installs next to the App Store Saber.
+> - **Quill sync** to a folder on the Mac mini (`docs/quill-sync.md`). Every note lands in `~/quill/Notes/` as a PDF (plus a native copy in `~/quill/.quill/store/`) within a few seconds of each pause in writing, and anything put in `~/quill/Inbox/<folder>/` (PDF, image, `.sbn2`, `.sba`) shows up in Quill in that folder as a new note. No dialogs; it queues offline and catches up on its own. The server is `quill-sync/server.py` (LaunchAgent `com.samstuhl.quill-sync`, tailnet only); send a file from the mini with `python3 ~/repos/saber/quill-sync/server.py put FILE --to "School/CS 114"`. Autosave in this fork is 1 s (at least every 4 s while writing), and the editor saves when the app is backgrounded.
 >
 > The code is in `lib/data/touch_gestures.dart` (tap classifier and mapping), `lib/data/scribble_erase.dart` (scribble detector), the pointer wiring in `lib/components/canvas/canvas_gesture_detector.dart` and `lib/pages/editor/editor.dart`, and the settings in `lib/pages/home/settings.dart`. Tests: `test/touch_gestures_test.dart`, `test/scribble_erase_test.dart`. The Gestures labels are English only.
 >
@@ -53,7 +54,9 @@
 > scripts/install-on-ipad.sh            # Sam's iPad; pass a udid and devicectl id for another device
 > ```
 >
-> Tests: `flutter test test/touch_gestures_test.dart test/scribble_erase_test.dart`.
+> The install script compiles in Quill sync's address and token (read from the mini over ssh); `QUILL_SYNC=off` builds without it.
+>
+> Tests: `flutter test test/touch_gestures_test.dart test/scribble_erase_test.dart test/quill_sync_test.dart` (with `PDFIUM_PATH=build/native_assets/macos/libpdfium.dylib` for the PDF tests), `python3 -m unittest test_server` in `quill-sync/`, and `quill-sync/run-e2e-sim.sh` for the real app on a simulator against the live server.
 >
 > `templates/` holds the two original reMarkable templates (graph and lined, 612 x 818 pt PDFs, exported from Notability) that the patterns above imitate.
 >
