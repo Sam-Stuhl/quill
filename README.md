@@ -33,6 +33,29 @@
 [Tiếng Việt](https://github.com/saber-notes/saber/blob/main/README-vi.md) |
 [Bahasa Indonesia](https://github.com/saber-notes/saber/blob/main/README-id.md)
 
+> **This is Sam Stuhl's fork of Saber** (`Sam-Stuhl/saber`, branch `touch-gestures`), built for his iPad. It is GPL-3.0 like upstream. Nothing here is sent upstream.
+>
+> ### What the fork adds
+>
+> - **Tap gestures, as in Notability.** A two-finger tap undoes, a three-finger tap redoes. A tap is a touch where no finger moves more than 10 px and everything lifts within 250 ms, so panning, pinch-zoom and drawing are not mistaken for one. Only finger touches count, never the Pencil or a mouse.
+> - **Custom gestures (Settings, Gestures).** Every combination of 1 to 4 fingers and single, double or triple tap (11 in all; a lone one-finger tap is drawing) can be mapped to: undo, redo, eraser (toggles back to the previous tool), pen, highlighter, lasso select, toggle finger drawing, next page, previous page, or nothing. Defaults: 2 fingers = undo, 3 fingers = redo, 1-finger double tap = eraser toggle. A tap waits 300 ms only if a longer tap with the same fingers is mapped. One-finger gestures are ignored while finger drawing is on, since that finger is drawing.
+> - **Scribble to erase** (Settings, Gestures, on by default). Scratching back and forth over ink with the pen (six or more sharp reversals in a small area) erases the strokes it touches and drops the scratch itself, as one undo step. Highlighter and shape pen are exempt, and a scratch that touches nothing stays as ink.
+> - Its own app: bundle id `com.samstuhl.saber`, name "Saber Gestures", so it installs next to the App Store Saber.
+>
+> The code is in `lib/data/touch_gestures.dart` (tap classifier and mapping), `lib/data/scribble_erase.dart` (scribble detector), the pointer wiring in `lib/components/canvas/canvas_gesture_detector.dart` and `lib/pages/editor/editor.dart`, and the settings in `lib/pages/home/settings.dart`. Tests: `test/touch_gestures_test.dart`, `test/scribble_erase_test.dart`. The Gestures labels are English only.
+>
+> ### Build and install on the iPad
+>
+> Flutter 3.47 or newer (upstream's `submodules/flutter` pin is not needed), CocoaPods, Rust (rustup, for `super_native_extensions`) and Xcode signed in as team `W2X4GVG63F`. Plug the iPad in by USB, unlock and trust it, then in a Terminal window on the Mac's desktop (not over ssh, which cannot read the login keychain):
+>
+> ```bash
+> scripts/install-on-ipad.sh            # Sam's iPad; pass a udid and devicectl id for another device
+> ```
+>
+> Tests: `flutter test test/touch_gestures_test.dart test/scribble_erase_test.dart`.
+>
+> Sign in to Nextcloud in Settings the same way as the App Store Saber to get your notes back.
+
 Saber is the notes app built for handwriting.
 
 It's designed to be as simple and intuitive as possible, while still delivering unique features that you'll actually use. Additionally, Saber is available across all your devices, large and small, and syncs between them seamlessly.
