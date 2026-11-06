@@ -173,3 +173,25 @@ to appear; airplane mode, write, reconnect, check nothing is lost or duplicated.
 5. Client tests; full test run of the touched areas.
 6. System map (service, store, secret) and docs.
 7. Install on the iPad (USB, Terminal on the MacBook); measure end to end.
+
+## Measured (2026-11-06)
+
+Real app (this fork, iOS 26 simulator on the MacBook, off campus Wi-Fi over
+Tailscale) against the live server on the mini, `quill-sync/run-e2e-sim.sh`:
+
+| What | Result |
+| --- | --- |
+| Pen up to the note's PDF current on the mini (6 strokes, two runs) | p50 1.9 s, max 2.5 s (1 s of it is the autosave delay) |
+| Native file upload, server side | well under 0.4 s |
+| PDF upload, server side (`measure.py`) | p50 0.52 s, p95 0.89 s |
+| File dropped in `Inbox/` to imported in the app and acked | p50 0.32 s, max 0.55 s |
+| Imported PDF and image notes rendered back to `Notes/` | yes, original page content included |
+
+Over the tailnet alone (`quill-sync/e2e.py`, MacBook as client): native 60 kB
+upload p50 0.13 s, 200 kB PDF p50 0.19 s.
+
+Not yet measured on the iPad itself (A14, real Pencil, home Wi-Fi), PDF render
+cost for long notes, or behavior after hours offline. The simulator run's only
+failure is the test harness under `--no-dds` (integration_test's golden
+comparator stream), which `--no-dds` is needed to avoid a Flutter DDS start
+failure; every app check in it passed.

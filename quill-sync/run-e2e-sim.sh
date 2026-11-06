@@ -35,7 +35,7 @@ ssh -o BatchMode=yes mac-mini-sam "
   done" &
 dropper=$!
 
-flutter test integration_test/quill_sync_e2e_test.dart -d "$sim" \
-  --dart-define-from-file="$defines_file" 2>&1 | grep -E 'QUILL_E2E|All tests|Some tests|\[E\]|Expected|Error' || true
+flutter test integration_test/quill_sync_e2e_test.dart -d "$sim" --no-dds \
+  --dart-define-from-file="$defines_file" 2>&1 | tee /tmp/qs-e2e-flutter.log | grep -E 'QUILL_E2E|All tests|Some tests|\[E\]|Expected|Error' || true
 wait "$dropper" 2>/dev/null || true
 ssh -o BatchMode=yes mac-mini-sam '/usr/local/bin/python3 ~/repos/saber/quill-sync/measure.py --since 15'
