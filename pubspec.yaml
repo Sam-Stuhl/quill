@@ -164,6 +164,7 @@ dependencies:
   pool: ^1.5.2
 
 dev_dependencies:
+  fake_async: ^1.3.0
   flutter_test:
     sdk: flutter
   integration_test:

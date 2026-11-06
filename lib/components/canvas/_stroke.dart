@@ -20,6 +20,11 @@ class Stroke {
   @protected
   final List<PointVector> points = [];
 
+  /// The raw points of this stroke, in page coordinates.
+  List<Offset> get pointOffsets => [
+    for (final point in points) Offset(point.x, point.y),
+  ];
+
   bool get isEmpty => points.isEmpty;
   int get length => points.length;
 

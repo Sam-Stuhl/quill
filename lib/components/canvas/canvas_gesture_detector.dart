@@ -13,6 +13,7 @@ import 'package:saber/data/editor/page.dart';
 import 'package:saber/data/extensions/change_notifier_extensions.dart';
 import 'package:saber/data/extensions/matrix4_extensions.dart';
 import 'package:saber/data/prefs.dart';
+import 'package:saber/data/touch_gestures.dart';
 import 'package:saber/pages/editor/editor.dart';
 import 'package:vector_math/vector_math_64.dart';
 
@@ -31,6 +32,7 @@ class CanvasGestureDetector extends StatefulWidget {
     required this.onStylusButtonChanged,
     required this.undo,
     required this.redo,
+    required this.onTouchAction,
     required this.pages,
     required this.initialPageIndex,
     required this.pageBuilder,
@@ -58,6 +60,9 @@ class CanvasGestureDetector extends StatefulWidget {
 
   final VoidCallback undo;
   final VoidCallback redo;
+
+  /// Called when a mapped tap gesture (Settings, Gestures) is performed.
+  final ValueChanged<TouchAction> onTouchAction;
 
   final List<EditorPage> pages;
   final int? initialPageIndex;
@@ -418,6 +423,40 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
         transformation;
   }
 
+  late final _tapClassifier = TouchTapClassifier();
+  late final _tapResolver = TouchGestureResolver(
+    actionFor: (gesture) => stows.touchGestureActions[gesture]!.value,
+    onAction: widget.onTouchAction,
+  );
+
+  void _classifyTouch(PointerEvent event) {
+    if (event.kind != PointerDeviceKind.touch) return;
+    if (event is PointerDownEvent) {
+      _tapClassifier.pointerDown(
+        event.pointer,
+        event.position,
+        event.timeStamp,
+      );
+    } else if (event is PointerMoveEvent) {
+      _tapClassifier.pointerMove(
+        event.pointer,
+        event.position,
+        event.timeStamp,
+      );
+    } else if (event is PointerUpEvent) {
+      final fingers = _tapClassifier.pointerUp(event.pointer, event.timeStamp);
+      if (fingers == null) return;
+      // With finger drawing on, a lone finger draws: leave it alone.
+      if (fingers == 1 && stows.editorFingerDrawing.value) {
+        _tapResolver.flush();
+        return;
+      }
+      _tapResolver.onTap(fingers);
+    } else if (event is PointerCancelEvent) {
+      _tapClassifier.pointerCancel(event.pointer);
+    }
+  }
+
   void _listenerPointerEvent(PointerEvent event) {
     final isStylus =
         event.kind == PointerDeviceKind.stylus ||
@@ -477,6 +516,7 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
   }
 
   void _listenerPointerUpEvent(PointerEvent event) {
+    _classifyTouch(event);
     widget.updatePointerData(event.kind, null);
     if (stylusButtonWasPressed) {
       stylusButtonWasPressed = false;
@@ -491,9 +531,16 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
     return Stack(
       children: [
         Listener(
-          onPointerDown: _listenerPointerEvent,
-          onPointerMove: _listenerPointerEvent,
+          onPointerDown: (event) {
+            _classifyTouch(event);
+            _listenerPointerEvent(event);
+          },
+          onPointerMove: (event) {
+            _classifyTouch(event);
+            _listenerPointerEvent(event);
+          },
           onPointerUp: _listenerPointerUpEvent,
+          onPointerCancel: _classifyTouch,
           onPointerHover: _listenerPointerHoverEvent,
           child: GestureDetector(
             child: LayoutBuilder(
@@ -574,6 +621,7 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
     widget._transformationController.removeListener(onTransformChanged);
     widget._transformationController.dispose();
     _removeKeybindings();
+    _tapResolver.dispose();
     super.dispose();
   }
 

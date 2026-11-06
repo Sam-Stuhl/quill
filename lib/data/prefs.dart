@@ -14,6 +14,7 @@ import 'package:saber/data/quota.dart';
 import 'package:saber/data/sentry/sentry_consent.dart';
 import 'package:saber/data/tools/highlighter.dart';
 import 'package:saber/data/tools/pen.dart';
+import 'package:saber/data/touch_gestures.dart';
 import 'package:sbn/canvas_background_pattern.dart';
 import 'package:sbn/tool_id.dart';
 import 'package:stow/stow.dart';
@@ -138,6 +139,24 @@ class Stows {
   );
   final editorFingerDrawing = PlainStow(
     'editorFingerDrawing',
+    true,
+    volatile: !_isOnMainIsolate,
+  );
+
+  /// What each touch gesture does (Settings, Gestures).
+  final touchGestureActions = {
+    for (final gesture in TouchGesture.values)
+      gesture: PlainStow(
+        'touchAction_${gesture.id}',
+        gesture.defaultAction,
+        codec: const EnumCodec(TouchAction.values),
+        volatile: !_isOnMainIsolate,
+      ),
+  };
+
+  /// Whether a quick back-and-forth scratch with the pen erases the ink under it.
+  final scribbleToErase = PlainStow(
+    'scribbleToErase',
     true,
     volatile: !_isOnMainIsolate,
   );

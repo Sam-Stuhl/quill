@@ -30,6 +30,7 @@ import 'package:saber/data/prefs.dart';
 import 'package:saber/data/routes.dart';
 import 'package:saber/data/sentry/sentry_init.dart';
 import 'package:saber/data/tools/shape_pen.dart';
+import 'package:saber/data/touch_gestures.dart';
 import 'package:saber/i18n/strings.g.dart';
 import 'package:stow/stow.dart';
 
@@ -546,6 +547,37 @@ class _SettingsPageState extends State<SettingsPage> {
                   icon: Icons.straighten,
                   pref: stows.autoStraightenLines,
                 ),
+                // Not translated (yet): this section is specific to this fork.
+                const SettingsSubtitle(subtitle: 'Gestures'),
+                SettingsSwitch(
+                  title: 'Scribble to erase',
+                  subtitle: 'Scratch back and forth over ink with the pen to erase it',
+                  icon: FontAwesomeIcons.eraser,
+                  pref: stows.scribbleToErase,
+                ),
+                ValueListenableBuilder(
+                  valueListenable: stows.editorFingerDrawing,
+                  builder: (context, fingerDrawing, _) {
+                    if (!fingerDrawing) return const SizedBox.shrink();
+                    return const Padding(
+                      padding: .symmetric(horizontal: 16, vertical: 8),
+                      child: Text(
+                        'Finger drawing is on, so one-finger gestures are '
+                        'ignored. Turn it off in the editor toolbar to use them.',
+                      ),
+                    );
+                  },
+                ),
+                for (final gesture in TouchGesture.values)
+                  SettingsDropdown<TouchAction>(
+                    title: gesture.label,
+                    icon: Icons.touch_app,
+                    pref: stows.touchGestureActions[gesture]!,
+                    options: [
+                      for (final action in TouchAction.values)
+                        ToggleButtonsOption(action, Text(action.label)),
+                    ],
+                  ),
                 SettingsSubtitle(subtitle: t.settings.prefCategories.advanced),
                 if (isSentryAvailable) const SettingsSentryConsent(),
                 if (Platform.isAndroid)

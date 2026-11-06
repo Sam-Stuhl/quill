@@ -40,6 +40,7 @@ import 'package:saber/data/extensions/matrix4_extensions.dart';
 import 'package:saber/data/file_manager/file_manager.dart';
 import 'package:saber/data/nextcloud/saber_syncer.dart';
 import 'package:saber/data/prefs.dart';
+import 'package:saber/data/scribble_erase.dart';
 import 'package:saber/data/tools/_tool.dart';
 import 'package:saber/data/tools/eraser.dart';
 import 'package:saber/data/tools/highlighter.dart';
@@ -48,6 +49,7 @@ import 'package:saber/data/tools/pen.dart';
 import 'package:saber/data/tools/pencil.dart';
 import 'package:saber/data/tools/select.dart';
 import 'package:saber/data/tools/shape_pen.dart';
+import 'package:saber/data/touch_gestures.dart';
 import 'package:saber/i18n/strings.g.dart';
 import 'package:saber/pages/home/whiteboard.dart';
 import 'package:sbn/change.dart';
@@ -339,6 +341,48 @@ class EditorState extends State<Editor> {
         );
       }
     }
+  }
+
+  /// Runs the action a touch gesture is mapped to (Settings, Gestures).
+  void performTouchAction(TouchAction action) {
+    if (!mounted) return;
+    switch (action) {
+      case .none:
+        return;
+      case .undo:
+        undo();
+      case .redo:
+        redo();
+      case .eraser:
+        currentTool = currentTool is Eraser ? _lastNonEraserTool : Eraser();
+      case .pen:
+        currentTool = Pen.currentPen;
+      case .highlighter:
+        currentTool = Highlighter.currentHighlighter;
+      case .select:
+        currentTool = Select.currentSelect;
+      case .toggleFingerDrawing:
+        stows.editorFingerDrawing.value = !stows.editorFingerDrawing.value;
+        lastSeenPointerCount = 0;
+      case .nextPage:
+        _scrollToPageOffset(1);
+      case .previousPage:
+        _scrollToPageOffset(-1);
+    }
+    setState(() {});
+  }
+
+  void _scrollToPageOffset(int offset) {
+    final pageIndex = (currentPageIndex + offset).clamp(
+      0,
+      coreInfo.pages.length - 1,
+    );
+    CanvasGestureDetector.scrollToPage(
+      pageIndex: pageIndex,
+      pages: coreInfo.pages,
+      screenWidth: MediaQuery.sizeOf(context).width,
+      transformationController: _transformationController,
+    );
   }
 
   void undo([Historic? historic]) {
@@ -730,6 +774,26 @@ class EditorState extends State<Editor> {
     });
   }
 
+  /// If [scratch] is a scribble, removes from [page] every stroke it touches
+  /// and returns them. Returns an empty list if it isn't one, or touches nothing.
+  List<Stroke> _eraseUnderScribble(EditorPage page, Stroke scratch) {
+    final points = scratch.pointOffsets;
+    if (!ScribbleDetector.isScribble(points)) return const [];
+
+    final eraser = Eraser();
+    final erased = <Stroke>{};
+    Offset? last;
+    for (final point in points) {
+      // check every few pixels only, as the eraser itself reaches 10 px
+      if (last != null && (point - last).distance < 4) continue;
+      last = point;
+      erased.addAll(eraser.checkForOverlappingStrokes(point, page.strokes));
+    }
+    eraser.onDragEnd();
+    page.strokes.removeWhere(erased.contains);
+    return erased.toList();
+  }
+
   void onDrawEnd(ScaleEndDetails details) {
     if (dragPageIndex == null) {
       return;
@@ -741,6 +805,18 @@ class EditorState extends State<Editor> {
         final newStroke = (currentTool as Pen).onDragEnd();
         if (newStroke == null) return;
         if (newStroke.isEmpty) return;
+
+        if (stows.scribbleToErase.value &&
+            currentTool is! Highlighter &&
+            currentTool is! ShapePen) {
+          final erased = _eraseUnderScribble(page, newStroke);
+          if (erased.isNotEmpty) {
+            // the scratch itself is dropped, and the erase is one undo step
+            history.recordChange(HistoricDelete(strokes: erased, images: []));
+            removeExcessPages();
+            return;
+          }
+        }
 
         if (stows.autoStraightenLines.value &&
             currentTool is! ShapePen &&
@@ -1464,6 +1540,7 @@ class EditorState extends State<Editor> {
       updatePointerData: updatePointerData,
       undo: undo,
       redo: redo,
+      onTouchAction: performTouchAction,
       pages: coreInfo.pages,
       initialPageIndex: coreInfo.initialPageIndex,
       pageBuilder: pageBuilder,
