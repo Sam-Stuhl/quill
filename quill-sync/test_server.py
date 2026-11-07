@@ -168,6 +168,25 @@ class ServerTest(unittest.TestCase):
         self.assertEqual([i["name"] for i in body["items"]], ["moved.pdf"])
         self.assertLess(time.monotonic() - t0, 0.2 + server.STABLE_FOR / 2)
 
+    def test_same_file_dropped_again_is_a_new_item(self):
+        # Delivered, then the very same file (size and mtime) moved back in:
+        # a new id, or the app takes it for a redelivery and skips it.
+        f = self.root / "Inbox/again.pdf"
+        f.write_bytes(PDF)
+        os.utime(f, (time.time() - 60, time.time() - 60))
+        mtime = f.stat().st_mtime
+        _, body = self.req("GET", "/v1/inbox?wait=2")
+        first = body["items"][0]["id"]
+        self.req("POST", f"/v1/inbox/{first}/ack", json.dumps({"note": "/again"}).encode())
+        held = self.root / "held.pdf"
+        os.replace(next((self.root / ".quill/delivered").rglob("again.pdf")), held)
+        time.sleep(0.05)
+        os.utime(held, (mtime, mtime))
+        os.replace(held, f)
+        _, body = self.req("GET", "/v1/inbox?wait=2")
+        self.assertEqual([i["name"] for i in body["items"]], ["again.pdf"])
+        self.assertNotEqual(body["items"][0]["id"], first)
+
     # 7
     def test_manifest(self):
         self.put("/x/y.sbn2", b"abc", 1700000000123)

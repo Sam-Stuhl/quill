@@ -192,7 +192,9 @@ the gap per file. The inbound side logs file seen to ack.
   30 s) and immediately on resume. The long poll reconnects on its own. Reconcile
   on start and resume catches anything else.
 - **Duplicates.** An inbound item is marked delivered on the iPad before it is
-  acked; a redelivered id is acked without importing again.
+  acked; a redelivered id is acked without importing again. An item's id is
+  its path, size, mtime and ctime: moving a file into `Inbox/` sets the ctime, so
+  the same file dropped again after delivery is a new item, not a redelivery.
 - **Deletes are never inferred.** A note missing on the iPad is not deleted on
   the mini (a reinstall would otherwise trash everything); only an actual delete in
   Quill trashes it, and the trash is kept.
