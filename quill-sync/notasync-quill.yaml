@@ -43,6 +43,9 @@ companion_notes:
     ---
     ![[{name}]]
 
-# Quill already writes each PDF whole and atomically, so a short settle is safe.
-poll_interval: 2
-settle_seconds: 2
+# Quill already writes each PDF whole and atomically, so the shortest settle
+# notasync allows (whole seconds) is safe. quill-stage keeps the PDF's mtime,
+# which is already about a second old when staged, so a file is filed on the
+# second pass that sees it: about 1 to 2 s after staging.
+poll_interval: 1
+settle_seconds: 1

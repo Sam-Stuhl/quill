@@ -95,7 +95,7 @@ into its week folder.
 ```
 ~sam/quill/Notes ──quill-stage──► ~console/Quill/staging ──notasync-quill──► vault ingest ──► LiveSync
  (quill-sync)     (console agent,   (mtime kept,          (notasync's image,     (container,
-                   every 1 s)        never deletes)        second instance)       I6)
+                   every 0.25 s)     never deletes)        second instance)       I6)
 ```
 
 - `stage.py` is a LaunchAgent in the `console` account, because the router is a
@@ -215,9 +215,12 @@ Over the tailnet alone (`quill-sync/e2e.py`, MacBook as client): native 60 kB
 upload p50 0.13 s, 200 kB PDF p50 0.19 s.
 
 Into the vault (2026-11-07, a PDF uploaded through the server's API on the
-mini): in the vault ingest folder with its companion note 3.9 s later, in the
-vault bridge's export (what Obsidian clients sync from) 8.4 s later. Pen up to
-the vault is about 6 s, to Obsidian about 10 s plus the device's own sync.
+mini, four runs): in the vault ingest folder with its companion note 1.9 to
+2.3 s later (3.9 s before quill-stage went to 0.25 s and the router to 1 s
+polls and settle), in the vault bridge's export 5.8 to 7.4 s later. The rest is
+the bridge noticing the new file about 4 s after it lands, its own watcher,
+shared with Notability and not changed here. Pen up to the vault is about 4 s,
+to Obsidian about 8 s plus the device's own sync.
 
 Not yet measured on the iPad itself (A14, real Pencil, home Wi-Fi), PDF render
 cost for long notes, or behavior after hours offline. The simulator run's only
