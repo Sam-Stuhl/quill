@@ -193,14 +193,20 @@ abstract class QuillImport {
           for (final image in [?page.backgroundImage, ...page.images])
             image.loadIn().then((_) => image.loadIn()),
       ]);
-      // Same resolution as the exporter's screenshot (pixel ratio 2).
-      await Future.wait([
-        for (final page in pages)
-          for (final image in [?page.backgroundImage, ...page.images])
-            image.prerender(width: (page.size.width * 2).round()),
-      ]);
-      final pdf = await EditorExporter.generatePdf(
+      // One page at a time, at the exporter's resolution (pixel ratio 2):
+      // a page's bitmaps exist only while it is drawn, so a long note fits
+      // in the memory iOS gives the app.
+      final pdf = await EditorExporter.generatePdfLowMemory(
         coreInfo.copyWith(pages: pages),
+        beforePage: (i) => Future.wait([
+          for (final image in [?pages[i].backgroundImage, ...pages[i].images])
+            image.prerender(width: (pages[i].size.width * 2).round()),
+        ]),
+        afterPage: (i) {
+          for (final image in [?pages[i].backgroundImage, ...pages[i].images]) {
+            image.releasePrerender();
+          }
+        },
       );
       return await pdf.save();
     } finally {
