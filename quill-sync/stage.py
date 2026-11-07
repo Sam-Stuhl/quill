@@ -25,8 +25,13 @@ Imported notes: notes brought into Quill from elsewhere (the Notability
 library, 2026-11-07) already have their PDF in the vault. Their paths are listed
 in ~sam/quill/.quill/imported (one PDF path under Notes per line), and such a
 note is not staged until its PDF changes after the first one Quill renders,
-that is, until Sam writes in it. Then it goes to the vault like any note (as
-"<name> (Quill).pdf", next to the original).
+that is, until Sam writes in it. Then it replaces the Notability original in
+place (no duplicate): the vault file notasync placed, found through notasync's
+own manifest, wherever the nightly sorter has since filed it, keeping its
+companion note. The write goes through the vault-ingest container (invariant
+I6), and notasync's staged copy of that note moves to ~/Notability/retired,
+so notasync never puts the old version back. Only if no original can be found
+does the note go through the Quill router like a new one.
 
     stage.py [--once] [--interval 0.25]
 
@@ -36,6 +41,7 @@ Python 3.9 compatible (console's /usr/bin/python3). Standard library only.
 import argparse
 import json
 import os
+import subprocess
 import sys
 import tempfile
 import time
@@ -49,6 +55,35 @@ STAGING = Path(os.environ.get("QUILL_STAGING", HOME / "Quill/staging"))
 VAULT = Path(os.environ.get("QUILL_VAULT", HOME / "console-volumes/vault-ingest/ingest"))
 STATE_DIR = Path(os.environ.get("QUILL_STATE_DIR", HOME / ".local/state/quill-stage"))
 IMPORTED = Path(os.environ.get("QUILL_IMPORTED", "/Users/sam/quill/.quill/imported"))
+NOTASYNC_MANIFEST = Path(
+    os.environ.get("QUILL_NOTASYNC_MANIFEST", HOME / ".local/state/notasync/manifest.json")
+)
+NOTABILITY_STAGING = Path(os.environ.get("QUILL_NOTABILITY_STAGING", HOME / "Notability/staging"))
+RETIRED = Path(os.environ.get("QUILL_RETIRED", HOME / "Notability/retired"))
+INGEST_IN_CONTAINER = "/data/ingest"
+DOCKER = "/usr/local/bin/docker"
+
+
+def trimmed(rel):
+    d, n = os.path.split(rel)
+    return os.path.join(d, n[: -len(".pdf")].strip() + ".pdf")
+
+
+def docker_write(src, vault_path, vault_root):
+    """Write src over vault_path from inside the vault-ingest container (I6)."""
+    env = {**os.environ, "PATH": "/usr/local/bin:/usr/bin:/bin"}
+    names = subprocess.run([DOCKER, "ps", "--format", "{{.Names}}"], check=True,
+                           capture_output=True, text=True, env=env).stdout.split()
+    container = next(n for n in names if n.startswith("vault-ingest-"))
+    inside = INGEST_IN_CONTAINER + "/" + Path(vault_path).relative_to(vault_root).as_posix()
+    with open(src, "rb") as data:
+        subprocess.run(
+            [DOCKER, "exec", "-i", "-u", "1993", container, "sh", "-c",
+             'd=$(dirname "$1"); t="$d/.$(basename "$1").quill-tmp"; cat > "$t" && mv "$t" "$1"',
+             "sh", inside],
+            stdin=data, check=True, capture_output=True, env=env, timeout=60)
+
+
 ROUTER_MANIFEST = Path(
     os.environ.get("QUILL_ROUTER_MANIFEST", HOME / ".local/state/notasync-quill/manifest.json")
 )
@@ -61,7 +96,9 @@ def log(event, **fields):
 
 class Stager:
     def __init__(self, source=SOURCE, staging=STAGING, vault=VAULT, state_dir=STATE_DIR,
-                 router_manifest=ROUTER_MANIFEST, imported=IMPORTED):
+                 router_manifest=ROUTER_MANIFEST, imported=IMPORTED,
+                 notasync_manifest=NOTASYNC_MANIFEST, notability_staging=NOTABILITY_STAGING,
+                 retired=RETIRED, writer=docker_write):
         self.source = source
         self.staging = staging
         self.vault = vault
@@ -79,6 +116,15 @@ class Stager:
         self._imported = set()
         self._imported_mtime = None
         # imported rel path -> [size, mtime_ns] of its first PDF, or "live" once written in
+        self.notasync_manifest = notasync_manifest
+        self.notability_staging = notability_staging
+        self.retired = retired
+        self.writer = writer
+        # Quill rel path -> {"vault": path, "size": n, "mtime": ns} once it replaced its original
+        self.takeover_file = state_dir / "takeover.json"
+        self.takeover = {}
+        if self.takeover_file.exists():
+            self.takeover = json.loads(self.takeover_file.read_text(encoding="utf-8"))
         self.baseline_file = state_dir / "imported-baseline.json"
         self.baseline = {}
         if self.baseline_file.exists():
@@ -94,6 +140,68 @@ class Stager:
             self._imported = {l for l in lines if l.strip()}
             self._imported_mtime = m
         return self._imported
+
+    def _original_rel(self, rel):
+        """The Notability path a Quill note was imported from (Quill trims names)."""
+        paths = self._imported_paths()
+        candidates = sorted((p for p in paths if trimmed(p) == rel), key=lambda p: p == rel)
+        return candidates[0] if candidates else rel
+
+    def _find_original(self, rel):
+        orig = self._original_rel(rel)
+        try:
+            entries = json.loads(self.notasync_manifest.read_text(encoding="utf-8"))["entries"]
+        except (OSError, ValueError, KeyError):
+            entries = {}
+        entry = entries.get("Notability/" + orig) or entries.get(orig) or {}
+        vp = entry.get("vault_path")
+        if vp and Path(vp).exists():
+            return Path(vp), orig
+        return self._find_by_name(os.path.basename(vp or orig)), orig
+
+    def _find_by_name(self, name):
+        hits = []
+        for dirpath, dirnames, filenames in os.walk(self.vault):
+            dirnames[:] = [d for d in dirnames if not d.startswith(".")]
+            if name in filenames:
+                hits.append(Path(dirpath) / name)
+        return hits[0] if len(hits) == 1 else None
+
+    def _replace_original(self, rel, src, st):
+        """Write an edited imported note over its Notability original. False if none."""
+        t = self.takeover.get(rel)
+        if t and t["size"] == st.st_size and t["mtime"] == st.st_mtime_ns:
+            return True
+        vault_path = Path(t["vault"]) if t else None
+        if vault_path is None or not vault_path.exists():
+            if t:
+                vault_path = self._find_by_name(Path(t["vault"]).name)
+            else:
+                vault_path, orig = self._find_original(rel)
+                if vault_path is not None:
+                    self._retire(orig)
+        if vault_path is None:
+            log("no-original", source=rel, note="staged like a new note")
+            return False
+        now = time.monotonic()
+        if now - self._last_staged.get(rel, -HOLD) < HOLD:
+            return True
+        self.writer(src, vault_path, self.vault)
+        self._last_staged[rel] = now
+        self.takeover[rel] = {"vault": str(vault_path), "size": st.st_size, "mtime": st.st_mtime_ns}
+        tmp = self.takeover_file.with_name(self.takeover_file.name + ".tmp")
+        tmp.write_text(json.dumps(self.takeover, ensure_ascii=False, indent=1), encoding="utf-8")
+        os.replace(tmp, self.takeover_file)
+        log("replaced-original", source=rel, vault=str(vault_path), bytes=st.st_size)
+        return True
+
+    def _retire(self, orig):
+        staged = self.notability_staging / "Notability" / orig
+        if staged.exists():
+            dest = self.retired / "Notability" / orig
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            os.replace(staged, dest)
+            log("retired-notability-copy", source=orig, to=str(dest))
 
     def _hold_imported(self, rel, st):
         """True while an imported note still has only the PDF Quill rendered on import."""
@@ -179,6 +287,13 @@ class Stager:
                     continue
                 if self._hold_imported(rel, st):
                     continue
+                if rel in self._imported_paths():
+                    try:
+                        if self._replace_original(rel, src, st):
+                            continue
+                    except Exception as e:  # retried next pass; never a duplicate meanwhile
+                        log("replace-failed", source=rel, error=repr(e))
+                        continue
                 dest = self.staging / self._staged_name(rel)
                 try:
                     dst = dest.stat()

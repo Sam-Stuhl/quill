@@ -20,8 +20,18 @@ class StageTest(unittest.TestCase):
             d.mkdir()
         self.manifest = r / "router/manifest.json"
         self.imported = r / "imported"
+        self.nmanifest = r / "notasync/manifest.json"
+        self.nstaging = r / "nstaging"
+        self.retired = r / "retired"
+        self.writes = []
+
+        def writer(src, vault_path, vault_root):
+            self.writes.append(Path(vault_path).relative_to(vault_root).as_posix())
+            Path(vault_path).write_bytes(Path(src).read_bytes())
+
         self.make = lambda: stage.Stager(self.src, self.stg, self.vault, r / "state", self.manifest,
-                                         self.imported)
+                                         self.imported, self.nmanifest, self.nstaging,
+                                         self.retired, writer)
 
     def tearDown(self):
         self.tmp.cleanup()
@@ -87,22 +97,58 @@ class StageTest(unittest.TestCase):
         self.write("m.pdf", b"%PDF m")
         self.assertEqual(s.pass_once(), 1)
 
-    def test_imported_note_waits_until_written_in(self):
-        self.imported.write_text("Fall 26/CS 114/Old lec.pdf\n")
-        (self.vault / "School").mkdir()
-        (self.vault / "School/Old lec.pdf").write_bytes(b"notability's")
+    def test_imported_note_replaces_its_original_in_place(self):
+        # Notability's "Old lec .pdf" (trailing space), sorted into a week folder.
+        orig = "Fall 26/CS 114/Old lec .pdf"
+        self.imported.write_text(orig + "\nFall 26/CS 114/Old lec.pdf\n")
+        week = self.vault / "School/CS 114/Wk 03"
+        week.mkdir(parents=True)
+        (week / "Old lec .pdf").write_bytes(b"notability's")
+        (week / "Old lec .md").write_text("companion")
+        self.nmanifest.parent.mkdir(parents=True)
+        self.nmanifest.write_text(json.dumps({"entries": {"Notability/" + orig: {
+            "vault_path": str(week / "Old lec .pdf")}}}))
+        (self.nstaging / "Notability/Fall 26/CS 114").mkdir(parents=True)
+        (self.nstaging / "Notability" / orig).write_bytes(b"notability's")
         s = self.make()
         self.write("Fall 26/CS 114/Old lec.pdf", b"%PDF import render", 1_700_000_000)
         self.write("Fall 26/CS 114/New lec.pdf", b"%PDF new", 1_700_000_000)
-        self.assertEqual(s.pass_once(), 1)  # only the new note
+        self.assertEqual(s.pass_once(), 1)  # only the new note is staged
         self.assertEqual(self.make().pass_once(), 0)  # still held after a restart
+        self.assertEqual(self.writes, [])
+        # Sam writes in it: the original is replaced where it is, no duplicate.
         self.write("Fall 26/CS 114/Old lec.pdf", b"%PDF import render + ink", 1_700_000_050)
-        self.assertEqual(s.pass_once(), 1)
-        self.assertEqual((self.stg / "Fall 26/CS 114/Old lec (Quill).pdf").read_bytes(),
-                         b"%PDF import render + ink")
+        s.pass_once()
+        self.assertEqual((week / "Old lec .pdf").read_bytes(), b"%PDF import render + ink")
+        self.assertEqual((week / "Old lec .md").read_text(), "companion")
+        self.assertEqual(self.writes, ["School/CS 114/Wk 03/Old lec .pdf"])
+        self.assertFalse(any("Old lec" in p.name for p in self.stg.rglob("*")))
+        # notasync's copy is retired so it never puts the old version back
+        self.assertFalse((self.nstaging / "Notability" / orig).exists())
+        self.assertTrue((self.retired / "Notability" / orig).exists())
+        # unchanged: no rewrite; changed again: rewritten, even after a restart
+        s.pass_once()
+        self.assertEqual(len(self.writes), 1)
         self.write("Fall 26/CS 114/Old lec.pdf", b"%PDF more ink", 1_700_000_090)
-        self.assertEqual(self.make().pass_once(), 1)  # live for good
+        self.make().pass_once()
+        self.assertEqual((week / "Old lec .pdf").read_bytes(), b"%PDF more ink")
+        # the sorter moved it: found by name and followed
+        (self.vault / "School/CS 114/Wk 04").mkdir()
+        os.replace(week / "Old lec .pdf", self.vault / "School/CS 114/Wk 04/Old lec .pdf")
+        self.write("Fall 26/CS 114/Old lec.pdf", b"%PDF even more", 1_700_000_120)
+        self.make().pass_once()
+        self.assertEqual((self.vault / "School/CS 114/Wk 04/Old lec .pdf").read_bytes(),
+                         b"%PDF even more")
 
+    def test_imported_note_without_an_original_goes_through_the_router(self):
+        self.imported.write_text("Other/Lost.pdf\n")
+        s = self.make()
+        self.write("Other/Lost.pdf", b"%PDF render", 1_700_000_000)
+        self.assertEqual(s.pass_once(), 0)
+        self.write("Other/Lost.pdf", b"%PDF render + ink", 1_700_000_050)
+        self.assertEqual(s.pass_once(), 1)
+        self.assertTrue((self.stg / "Other/Lost.pdf").exists())
+        self.assertEqual(self.writes, [])
 
 if __name__ == "__main__":
     unittest.main()
