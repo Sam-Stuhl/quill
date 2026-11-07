@@ -49,8 +49,15 @@ iPad: Quill                                    mini (sam): quill-sync
   (the queue holds the latest operation per path, persisted as JSON, so it
   survives a crash or a kill) and uploaded in full; a PDF of the note is rendered
   with the app's own exporter (`EditorExporter.generatePdf`, headless) and
-  uploaded, debounced per note. A long poll on the inbox delivers new files the
-  moment they appear. On every start and resume it reconciles against the
+  uploaded, debounced per note. The render goes one page at a time
+  (`EditorExporter.generatePdfLowMemory`), each page's bitmaps freed once it is
+  drawn: holding every page raw (about 20 MB each) got the app killed by iOS on
+  long notes. A note imported from a PDF is not rendered at all: the PDF itself
+  is uploaded as its PDF. A long poll on the inbox delivers new files the
+  moment they appear, and delete requests from the mini (`server.py delete
+  NOTE...`, kept in `.quill/delete-requests.json`): the app deletes the note,
+  which sends it to the server's trash like any delete, and acks with
+  `POST /v1/deletes/<id>/ack`. On every start and resume it reconciles against the
   server's manifest, which backfills notes written before sync existed and anything
   a lost queue missed.
 - **Server** (`quill-sync/server.py`): Python standard library only, a
@@ -194,6 +201,7 @@ the gap per file. The inbound side logs file seen to ack.
 | Tailscale off on the iPad, or the mini down | Writes queue on the iPad; nothing visible; all of it lands on reconnect. |
 | App killed mid-upload | Queue is persisted before the upload; it resumes on next launch. |
 | App killed before a save | At most 1 s of strokes since the last pause (the editor now also saves on backgrounding). |
+| App killed mid-import | The import is recorded (expected note path, whether it existed) before it starts; on redelivery a note that now exists is acked, not imported again as "(2)". |
 | Partial file dropped in `Inbox/` | Offered only once its size is stable; a failed import is not acked and retries. |
 | Unsupported file in `Inbox/` | Left in place and logged; never offered. |
 | Bad token or server error | Retried with backoff; logged in Quill's logs (Settings, logs). |
