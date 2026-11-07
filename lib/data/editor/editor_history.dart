@@ -89,6 +89,15 @@ class EditorHistory {
   /// Marks the last change as saved to disk.
   /// This does not modify the history stacks, but allows us to know
   /// whether the current state is saved or not.
+  /// The newest change, to pass to [markChangeAsSaved] once it is written.
+  Historic? get lastChange => _past.lastOrNull;
+
+  /// Marks [change] (from [lastChange] when a save started) as saved. If more
+  /// changes were made since, the current state stays unsaved.
+  void markChangeAsSaved(Historic? change) {
+    _lastSaved = change;
+  }
+
   void markLastChangeAsSaved() {
     _lastSaved = _past.lastOrNull;
   }

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Quill sync (saber fork docs/quill-sync.md), sam account on the mini. Loopback only:
+     tailscale serve --bg --https=8796 http://127.0.0.1:8796 publishes it to the tailnet. -->
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.samstuhl.quill-sync</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/local/bin/python3</string>
+    <string>/Users/sam/repos/saber/quill-sync/server.py</string>
+    <string>serve</string>
+    <string>--host</string><string>127.0.0.1</string>
+    <string>--port</string><string>8796</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key><string>/usr/local/bin:/usr/bin:/bin</string>
+    <key>PYTHONUNBUFFERED</key><string>1</string>
+  </dict>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><true/>
+  <key>ThrottleInterval</key><integer>10</integer>
+  <key>StandardOutPath</key><string>/Users/sam/Library/Logs/quill-sync.log</string>
+  <key>StandardErrorPath</key><string>/Users/sam/Library/Logs/quill-sync.log</string>
+</dict>
+</plist>

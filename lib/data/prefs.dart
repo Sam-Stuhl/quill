@@ -175,9 +175,10 @@ class Stows {
     isDesktop,
     volatile: !_isOnMainIsolate,
   );
+  /// Quill: 1 s (upstream 10 s) so Quill sync gets each pause in writing.
   final autosaveDelay = PlainStow(
     'autosaveDelay',
-    10000,
+    1000,
     volatile: !_isOnMainIsolate,
   );
   final shapeRecognitionDelay = PlainStow(

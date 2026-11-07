@@ -28,10 +28,11 @@ abstract class EditorExporter {
     return stroke.toolId == .highlighter || stroke.toolId == .pencil;
   }
 
+  /// [context] is not used; Quill sync renders PDFs without one.
   static Future<pw.Document> generatePdf(
-    EditorCoreInfo coreInfo,
-    BuildContext context,
-  ) async {
+    EditorCoreInfo coreInfo, [
+    BuildContext? context,
+  ]) async {
     if (coreInfo.pages.isNotEmpty && coreInfo.pages.last.isEmpty) {
       // don't export the empty last page
       coreInfo = coreInfo.copyWith(

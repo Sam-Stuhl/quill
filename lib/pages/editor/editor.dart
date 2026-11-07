@@ -165,6 +165,15 @@ class EditorState extends State<Editor> {
 
   ValueNotifier<SavingState> savingState = ValueNotifier(SavingState.saved);
   Timer? _delayedSaveTimer;
+
+  /// When the oldest unsaved change was made, so that continuous writing
+  /// still saves at least every [maxAutosaveWait] (Quill sync).
+  DateTime? _unsavedSince;
+  static const maxAutosaveWait = Duration(seconds: 4);
+
+  /// Saves when the app is backgrounded, so iOS cannot kill it with unsaved
+  /// strokes.
+  AppLifecycleListener? _lifecycleListener;
   Timer? _watchServerTimer;
 
   // used to prevent accidentally drawing when pinch zooming
@@ -189,8 +198,16 @@ class EditorState extends State<Editor> {
 
     _initAsync();
     _assignKeybindings();
+    _lifecycleListener = AppLifecycleListener(
+      onInactive: _saveIfWaiting,
+      onHide: _saveIfWaiting,
+    );
 
     super.initState();
+  }
+
+  void _saveIfWaiting() {
+    if (savingState.value == .waitingToSave) saveToFile();
   }
 
   void _initAsync() async {
@@ -1025,34 +1042,47 @@ class EditorState extends State<Editor> {
   }
 
   void autosaveAfterDelay() {
-    if (history.isCurrentStateSaved) return cancelAutosaveAndMarkSaved();
+    if (history.isCurrentStateSaved) {
+      // A save in progress decides the state when it finishes.
+      if (savingState.value == .saving) return;
+      return cancelAutosaveAndMarkSaved();
+    }
 
     late final void Function() callback;
 
     void startTimer() {
       _delayedSaveTimer?.cancel();
       if (stows.autosaveDelay.value < 0) return;
-      _delayedSaveTimer = Timer(
-        Duration(milliseconds: stows.autosaveDelay.value),
-        callback,
-      );
+      final unsavedSince = _unsavedSince ??= DateTime.now();
+      var delay = Duration(milliseconds: stows.autosaveDelay.value);
+      final untilCap =
+          maxAutosaveWait - DateTime.now().difference(unsavedSince);
+      if (untilCap < delay) delay = untilCap.isNegative ? .zero : untilCap;
+      _delayedSaveTimer = Timer(delay, callback);
     }
 
     callback = () {
       if (Pen.currentStroke != null) {
         // don't save yet if the pen is currently drawing
-        startTimer();
+        _delayedSaveTimer = Timer(const Duration(milliseconds: 100), callback);
+        return;
+      }
+      if (savingState.value == .saving) {
+        // saveToFile() saves again when it finishes
         return;
       }
       saveToFile();
     };
 
-    savingState.value = .waitingToSave;
+    // While a save is being written, keep its state: it checks for newer
+    // changes when it finishes and schedules another save.
+    if (savingState.value != .saving) savingState.value = .waitingToSave;
     startTimer();
   }
 
   void cancelAutosaveAndMarkSaved() {
     _delayedSaveTimer?.cancel();
+    _unsavedSince = null;
     savingState.value = .saved;
     history.markLastChangeAsSaved();
   }
@@ -1080,6 +1110,10 @@ class EditorState extends State<Editor> {
     final filePath = coreInfo.filePath + Editor.extension;
     final Uint8List bson;
     final OrderedAssetCache assets;
+    // What this save contains: changes made while it is being written are
+    // not in it, and must not be marked as saved by it.
+    final savedChange = history.lastChange;
+    _unsavedSince = null;
     coreInfo.assetCache.allowRemovingAssets = false;
     try {
       (bson, assets) = coreInfo.saveToBinary(
@@ -1103,8 +1137,13 @@ class EditorState extends State<Editor> {
               ),
         FileManager.removeUnusedAssets(filePath, numAssets: assets.length),
       ]);
-      savingState.value = .saved;
-      history.markLastChangeAsSaved();
+      history.markChangeAsSaved(savedChange);
+      if (history.isCurrentStateSaved) {
+        savingState.value = .saved;
+      } else {
+        savingState.value = .waitingToSave;
+        autosaveAfterDelay();
+      }
     } catch (e, st) {
       log.severe('Failed to save file: $e', e, st);
       savingState.value = .waitingToSave;
@@ -2185,6 +2224,7 @@ class EditorState extends State<Editor> {
     _delayedSaveTimer?.cancel();
     _watchServerTimer?.cancel();
     _lastSeenPointerCountTimer?.cancel();
+    _lifecycleListener?.dispose();
 
     _removeKeybindings();
 
