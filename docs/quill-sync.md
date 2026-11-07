@@ -49,7 +49,13 @@ iPad: Quill                                    mini (sam): quill-sync
   (the queue holds the latest operation per path, persisted as JSON, so it
   survives a crash or a kill) and uploaded in full; a PDF of the note is rendered
   with the app's own exporter (`EditorExporter.generatePdf`, headless) and
-  uploaded, debounced per note. The render goes one page at a time
+  uploaded once the note has had no save for 2 s, so a render never runs
+  between strokes. Pen strokes are vectors in the PDF, so a page's screenshot
+  (background, images, pencil and highlighter) is kept as a JPEG, compressed
+  off the main thread, and reused until it changes: a render while writing
+  costs about the strokes alone (a cached page: 3 ms against 928 ms fresh, on
+  the MacBook). Rendering every page on every save made writing choppy
+  (2026-11-07). The render goes one page at a time
   (`EditorExporter.generatePdfLowMemory`), each page's bitmaps freed once it is
   drawn: holding every page raw (about 20 MB each) got the app killed by iOS on
   long notes. A note imported from a PDF is not rendered at all: the PDF itself
@@ -149,8 +155,8 @@ into its week folder.
 the server that shows each note's PDF (rendered with pdf.js from jsDelivr) and
 redraws it the moment a new one arrives, through a long poll on
 `GET /v1/changes`. "Follow the note I'm writing in" switches to whichever note
-changed last. Pen up to the page is about 2 s, and it keeps up while writing,
-since it does not wait for the vault.
+changed last. It updates about 4 s after the pen stops (PDFs wait for a 2 s
+pause, so writing stays smooth), and it does not wait for the vault.
 
 The page needs no token. `tailscale serve` adds the requester's login
 (`Tailscale-User-Login`) to what it proxies to loopback, and the server lets in
@@ -169,9 +175,9 @@ Pen lifts to PDF current on the mini, at home on Wi-Fi:
 | autosave delay after the last stroke | 1.0 s |
 | serialize and write the note | 0.1 s |
 | queue pickup and native upload | 0.2 s |
-| PDF render (per page about 0.2 s, 3 pages in parallel) | 0.5 s |
+| wait for a 2 s pause, then render (pages one at a time, unchanged ones cached) | 2.5 s |
 | PDF upload and atomic write | 0.2 s |
-| **Total, target** | **under 3 s (p50), under 5 s (p95)** |
+| **Total, target** | **under 5 s (p50), under 7 s (p95)** |
 
 Inbound: file stable in `Inbox/` (0.5 s poll, size unchanged for one poll) plus
 long poll wake plus download plus import: target under 2 s.

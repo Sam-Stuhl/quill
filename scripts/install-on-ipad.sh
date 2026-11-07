@@ -51,6 +51,12 @@ flutter build ios --release --config-only ${defines[@]+"${defines[@]}"}
 xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner -configuration Release \
   -destination "id=$udid" -derivedDataPath "$derived" -allowProvisioningUpdates \
   DEVELOPMENT_TEAM=W2X4GVG63F CODE_SIGN_STYLE=Automatic build
+# Installing replaces the running app, closing it under Sam's pen:
+# QUILL_BUILD_ONLY=1 stops here so the install can wait for a pause.
+if [ -n "${QUILL_BUILD_ONLY:-}" ]; then
+  echo "built, not installed: $derived/Build/Products/Release-iphoneos/Runner.app"
+  exit 0
+fi
 xcrun devicectl device install app --device "$coredevice" \
   "$derived/Build/Products/Release-iphoneos/Runner.app"
 xcrun devicectl device process launch --device "$coredevice" com.samstuhl.saber

@@ -391,7 +391,19 @@ void main() {
       expect(landscape.width, greaterThan(landscape.height));
       coreInfo.dispose();
 
+      final first = Stopwatch()..start();
+      await QuillImport.renderPdf(note);
+      first.stop();
+      // Rendered again (as while writing): the pages come from the cache.
+      final again = Stopwatch()..start();
       final pdf = await QuillImport.renderPdf(note);
+      again.stop();
+      // ignore: avoid_print
+      print(
+        'render: first ${first.elapsedMilliseconds} ms, '
+        'cached ${again.elapsedMilliseconds} ms',
+      );
+      expect(again.elapsedMilliseconds, lessThan(first.elapsedMilliseconds));
       expect(utf8.decode(pdf!.sublist(0, 4)), '%PDF');
       final reread = await PdfDocument.openData(pdf);
       expect(reread.pages, hasLength(2)); // the empty last page is left out
