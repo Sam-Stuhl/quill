@@ -112,8 +112,13 @@ into its week folder.
 - Notes imported from Notability (2026-11-07, `quill-sync/import_notability.py`:
   all 339, same folders) are listed in `~/quill/.quill/imported`. Their PDFs are
   already in the vault, so `stage.py` holds each one back until its PDF changes
-  after the first render, that is, until Sam writes in it in Quill; then it
-  lands as `<name> (Quill).pdf` next to the Notability original. Quill
+  after the first render, that is, until Sam writes in it in Quill. Then it
+  replaces the Notability original in place, no duplicate: the vault file
+  notasync's manifest points at (or the one file of that name, once the sorter
+  has moved it), written through the vault-ingest container, companion note
+  kept. notasync's staged copy of that note moves to
+  `~console/Notability/retired`, so notasync never puts the old version back.
+  Only a note with no original found goes through the Quill router. Quill
   trims spaces around a note's name, so the list carries the trimmed path too.
   A name starting with con, aux, nul or prn was refused by upstream's
   reserved-name check (unanchored, fixed in this fork 2026-11-07) and imported
