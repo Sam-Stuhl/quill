@@ -288,7 +288,10 @@ class Inbox:
                     st = p.stat()
                 except FileNotFoundError:
                     continue
-                current[p.relative_to(base).as_posix()] = (st.st_size, st.st_mtime_ns)
+                # ctime too: moving a file into the inbox sets it, so the same file
+                # dropped again after an earlier delivery is a new item, not a
+                # redelivery the app has already imported and skips.
+                current[p.relative_to(base).as_posix()] = (st.st_size, st.st_mtime_ns, st.st_ctime_ns)
 
         items = {}
         for rel, sig in current.items():
@@ -305,7 +308,7 @@ class Inbox:
                 self._since[rel] = time.monotonic() - (age if rel not in self._seen else 0)
             if sig[0] == 0 or time.monotonic() - self._since.get(rel, 0) < STABLE_FOR:
                 continue  # may still be being written: offer it on a later scan
-            ident = hashlib.sha1(f"{rel}\0{sig[0]}\0{sig[1]}".encode()).hexdigest()[:20]
+            ident = hashlib.sha1(f"{rel}\0{sig[0]}\0{sig[1]}\0{sig[2]}".encode()).hexdigest()[:20]
             folder, name = posixpath.split(rel)
             items[ident] = {
                 "id": ident,
