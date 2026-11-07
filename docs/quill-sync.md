@@ -118,8 +118,11 @@ into its week folder.
 - Deletes in Quill do not delete anything in the vault (notasync's rule).
 - Notes imported from Notability (2026-11-07, `quill-sync/import_notability.py`:
   all 339, same folders) are listed in `~/quill/.quill/imported`. Their PDFs are
-  already in the vault, so `stage.py` holds each one back until its PDF changes
-  after the first render, that is, until Sam writes in it in Quill. Then it
+  already in the vault, so `stage.py` holds each one back until the note itself
+  (its `.sbn2` in `.quill/store`, by sha256) changes, that is, until Sam writes
+  in it in Quill. A redrawn PDF alone does not count: deciding by the PDF once
+  took over 6 untouched notes after the app redrew them post-crash
+  (2026-11-07, undone). Then it
   replaces the Notability original in place, no duplicate: the vault file
   notasync's manifest points at (or the one file of that name, once the sorter
   has moved it), written through the vault-ingest container, companion note

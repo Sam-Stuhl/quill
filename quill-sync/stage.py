@@ -41,6 +41,7 @@ Python 3.9 compatible (console's /usr/bin/python3). Standard library only.
 """
 
 import argparse
+import hashlib
 import json
 import os
 import subprocess
@@ -111,8 +112,11 @@ class Stager:
     def __init__(self, source=SOURCE, staging=STAGING, vault=VAULT, state_dir=STATE_DIR,
                  router_manifest=ROUTER_MANIFEST, imported=IMPORTED,
                  notasync_manifest=NOTASYNC_MANIFEST, notability_staging=NOTABILITY_STAGING,
-                 retired=RETIRED, writer=docker_write, pull_excludes=PULL_EXCLUDES):
+                 retired=RETIRED, writer=docker_write, pull_excludes=PULL_EXCLUDES,
+                 store=None):
         self.source = source
+        # quill-sync's native copy of each note, next to Notes/
+        self.store = store or source.parent / ".quill" / "store"
         self.staging = staging
         self.vault = vault
         self.router_manifest = router_manifest
@@ -225,18 +229,34 @@ class Stager:
             os.replace(staged, dest)
             log("retired-notability-copy", source=orig, to=str(dest))
 
+    def _note_digest(self, rel):
+        """sha256 of the note itself (its .sbn2 in quill-sync's store), or None."""
+        try:
+            data = (self.store / (rel[:-4] + ".sbn2")).read_bytes()
+        except OSError:
+            return None
+        return hashlib.sha256(data).hexdigest()
+
     def _hold_imported(self, rel, st):
-        """True while an imported note still has only the PDF Quill rendered on import."""
+        """True while an imported note has not been written in.
+
+        Decided by the note, not its PDF: the app can redraw a PDF without
+        anyone writing (after a crash, a reinstall, a renderer change), and
+        that must not count as an edit."""
         if rel not in self._imported_paths():
             return False
         seen = self.baseline.get(rel)
         if seen == "live":
             return False
-        now = [st.st_size, st.st_mtime_ns]
-        if seen is None:
-            self.baseline[rel] = now
-        elif seen == now:
+        pdf = [st.st_size, st.st_mtime_ns]
+        if isinstance(seen, dict) and seen["pdf"] == pdf:
             return True
+        digest = self._note_digest(rel)
+        if not isinstance(seen, dict) or seen.get("note") is None:
+            # first sight (or an old PDF-only record): the note as it is now
+            self.baseline[rel] = {"pdf": pdf, "note": digest}
+        elif digest is None or digest == seen["note"]:
+            self.baseline[rel] = {"pdf": pdf, "note": seen["note"]}  # redrawn only
         else:
             self.baseline[rel] = "live"
             log("imported-note-edited", source=rel)
