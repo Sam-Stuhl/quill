@@ -67,7 +67,7 @@ function drawList() {
       s.textContent = `${folder(n.path) || "Quill"} · ${clock(n.mtime)}`;
       li.append(s);
       if (n.path === current) li.className = "on";
-      li.onclick = () => { $("follow").checked = false; open(n.path); };
+      li.onclick = () => { setFollow(false); open(n.path); };
       return li;
     }));
 }
@@ -154,6 +154,10 @@ async function watch() {
   }
 }
 
+// Follow is remembered per browser; picking a note by hand turns it off.
+function setFollow(on) { $("follow").checked = on; localStorage.setItem("quill-live-follow", on ? "1" : "0"); }
+$("follow").onchange = () => setFollow($("follow").checked);
+$("follow").checked = localStorage.getItem("quill-live-follow") !== "0";
 $("filter").oninput = drawList;
 const r = await fetch("/v1/notes");
 if (!r.ok) {
@@ -163,7 +167,6 @@ if (!r.ok) {
   drawList();
   const fromHash = decodeURIComponent(location.hash.slice(1));
   const start = notes.find((n) => n.path === fromHash) || notes[0];
-  if (fromHash) $("follow").checked = false;
   if (start) open(start.path);
   watch();
 }
