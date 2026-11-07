@@ -222,7 +222,12 @@ the bridge noticing the new file about 4 s after it lands, its own watcher,
 shared with Notability and not changed here. Pen up to the vault is about 4 s,
 to Obsidian about 8 s plus the device's own sync.
 
-Not yet measured on the iPad itself (A14, real Pencil, home Wi-Fi), PDF render
+On the iPad itself (installed 2026-11-07 from the MacBook, which reached the
+iPad over the network): a PDF put in `Inbox/` on the mini was a note in Quill
+0.19 s later, the iPad's own render of it was back in `Notes/` 0.7 s after
+that, and in the vault with its companion note about 2 s later.
+
+Not yet measured on the iPad: pen up with a real Pencil, PDF render
 cost for long notes, or behavior after hours offline. The simulator run's only
 failure is the test harness under `--no-dds` (integration_test's golden
 comparator stream), which `--no-dds` is needed to avoid a Flutter DDS start
