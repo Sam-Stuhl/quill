@@ -54,7 +54,7 @@ class FileManager {
     (
       t.home.renameNote.noteNameReserved,
       RegExp(
-        r'^((con|prn|aux|nul|com[1-9]|lpt[1-9])(\..*)?)|\.+$',
+        r'^((con|prn|aux|nul|com[1-9]|lpt[1-9])(\..*)?|\.+)$',
         caseSensitive: false,
       ),
     ),

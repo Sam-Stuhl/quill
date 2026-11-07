@@ -19,14 +19,25 @@ for folder in sys.argv[1:]:
     out = subprocess.run(["ssh", "-o", "BatchMode=yes", "mac-mini-console", f"cd ~/{SRC} && find {subprocess.list2cmdline([folder])} -name '*.pdf' -print0"],
                          check=True, capture_output=True).stdout.decode().split("\0")
     rels = sorted(r[2:] if r.startswith("./") else r for r in out if r)
-    todo = [r for r in rels if not (Q / "Notes" / r).exists() and not (INBOX / r).exists()]
+    def in_quill(r):
+        d, n = os.path.split(r)
+        trimmed = os.path.join(d, n[:-len(".pdf")].strip() + ".pdf")
+        return any((Q / ".quill/store" / (p[:-len(".pdf")] + ".sbn2")).exists()
+                   or (Q / "Notes" / p).exists() for p in (r, trimmed)) or (INBOX / r).exists()
+    todo = [r for r in rels if not in_quill(r)]
     print(f"{folder}: {len(rels)} notes, {len(todo)} to import", flush=True)
     if not todo: continue
     # Register before dropping, so quill-stage never sends their import render to the vault.
+    # Quill trims spaces around a note's name ("Homework 4 .pdf" becomes the
+    # note "Homework 4"), so list the trimmed path too.
     have = set(LIST.read_text().splitlines()) if LIST.exists() else set()
     with open(LIST, "a") as f:
         for r in todo:
-            if r not in have: f.write(r + "\n")
+            d, n = os.path.split(r)
+            for path in (r, os.path.join(d, n[:-len(".pdf")].strip() + ".pdf")):
+                if path not in have:
+                    f.write(path + "\n")
+                    have.add(path)
     shutil.rmtree(TMP, ignore_errors=True); TMP.mkdir(parents=True)
     tar = subprocess.Popen(["ssh", "-o", "BatchMode=yes", "mac-mini-console", f"cd ~/{SRC} && tar -cf - -T -"],
                            stdin=subprocess.PIPE, stdout=subprocess.PIPE)
