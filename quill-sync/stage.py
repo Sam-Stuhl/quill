@@ -21,6 +21,13 @@ wait until he pauses. So a note's staged copy is replaced at most every HOLD
 seconds: the first change after a quiet spell is staged at once, and while he
 keeps writing the vault still updates every few seconds.
 
+Imported notes: notes brought into Quill from elsewhere (the Notability
+library, 2026-11-07) already have their PDF in the vault. Their paths are listed
+in ~sam/quill/.quill/imported (one PDF path under Notes per line), and such a
+note is not staged until its PDF changes after the first one Quill renders,
+that is, until Sam writes in it. Then it goes to the vault like any note (as
+"<name> (Quill).pdf", next to the original).
+
     stage.py [--once] [--interval 0.25]
 
 Python 3.9 compatible (console's /usr/bin/python3). Standard library only.
@@ -41,6 +48,7 @@ SOURCE = Path(os.environ.get("QUILL_NOTES", "/Users/sam/quill/Notes"))
 STAGING = Path(os.environ.get("QUILL_STAGING", HOME / "Quill/staging"))
 VAULT = Path(os.environ.get("QUILL_VAULT", HOME / "console-volumes/vault-ingest/ingest"))
 STATE_DIR = Path(os.environ.get("QUILL_STATE_DIR", HOME / ".local/state/quill-stage"))
+IMPORTED = Path(os.environ.get("QUILL_IMPORTED", "/Users/sam/quill/.quill/imported"))
 ROUTER_MANIFEST = Path(
     os.environ.get("QUILL_ROUTER_MANIFEST", HOME / ".local/state/notasync-quill/manifest.json")
 )
@@ -53,7 +61,7 @@ def log(event, **fields):
 
 class Stager:
     def __init__(self, source=SOURCE, staging=STAGING, vault=VAULT, state_dir=STATE_DIR,
-                 router_manifest=ROUTER_MANIFEST):
+                 router_manifest=ROUTER_MANIFEST, imported=IMPORTED):
         self.source = source
         self.staging = staging
         self.vault = vault
@@ -67,6 +75,45 @@ class Stager:
             self.names = json.loads(self.state_file.read_text(encoding="utf-8"))
         self._vault_names = None
         self._last_staged = {}  # source rel path -> monotonic time last staged
+        self.imported_file = imported
+        self._imported = set()
+        self._imported_mtime = None
+        # imported rel path -> [size, mtime_ns] of its first PDF, or "live" once written in
+        self.baseline_file = state_dir / "imported-baseline.json"
+        self.baseline = {}
+        if self.baseline_file.exists():
+            self.baseline = json.loads(self.baseline_file.read_text(encoding="utf-8"))
+
+    def _imported_paths(self):
+        try:
+            m = self.imported_file.stat().st_mtime_ns
+        except FileNotFoundError:
+            return self._imported
+        if m != self._imported_mtime:
+            lines = self.imported_file.read_text(encoding="utf-8").splitlines()
+            self._imported = {l for l in lines if l.strip()}
+            self._imported_mtime = m
+        return self._imported
+
+    def _hold_imported(self, rel, st):
+        """True while an imported note still has only the PDF Quill rendered on import."""
+        if rel not in self._imported_paths():
+            return False
+        seen = self.baseline.get(rel)
+        if seen == "live":
+            return False
+        now = [st.st_size, st.st_mtime_ns]
+        if seen is None:
+            self.baseline[rel] = now
+        elif seen == now:
+            return True
+        else:
+            self.baseline[rel] = "live"
+            log("imported-note-edited", source=rel)
+        tmp = self.baseline_file.with_name(self.baseline_file.name + ".tmp")
+        tmp.write_text(json.dumps(self.baseline, ensure_ascii=False, indent=1), encoding="utf-8")
+        os.replace(tmp, self.baseline_file)
+        return self.baseline[rel] != "live"
 
     def _save(self):
         tmp = self.state_file.with_name(self.state_file.name + ".tmp")
@@ -129,6 +176,8 @@ class Stager:
                 try:
                     st = src.stat()
                 except FileNotFoundError:
+                    continue
+                if self._hold_imported(rel, st):
                     continue
                 dest = self.staging / self._staged_name(rel)
                 try:

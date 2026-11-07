@@ -109,6 +109,11 @@ into its week folder.
   Quill note whose name a file it does not own already uses (a Notability PDF)
   is staged as `<name> (Quill).pdf`, and keeps that name.
 - Deletes in Quill do not delete anything in the vault (notasync's rule).
+- Notes imported from Notability (2026-11-07, `quill-sync/import_notability.py`:
+  all 339, same folders) are listed in `~/quill/.quill/imported`. Their PDFs are
+  already in the vault, so `stage.py` holds each one back until its PDF changes
+  after the first render, that is, until Sam writes in it in Quill; then it
+  lands as `<name> (Quill).pdf` next to the Notability original.
 - While Sam writes, Quill sends a new PDF every couple of seconds, but the
   router files a file only once it is unchanged across two passes. So
   `stage.py` replaces a note's staged copy at most every 2.5 s: the first change
