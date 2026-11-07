@@ -27,7 +27,7 @@ class QuillSync {
     http.Client? client,
     this.renderPdf = QuillImport.renderPdf,
     this.importBytes = QuillImport.importBytes,
-    this.pdfDebounce = const Duration(milliseconds: 250),
+    this.pdfDebounce = const Duration(seconds: 2),
     this.pollWait = const Duration(seconds: 25),
   }) : _client = client ?? http.Client();
 

@@ -40,15 +40,24 @@ abstract class EditorExporter {
   /// allows. Here each screenshot is compressed to PNG as soon as it is taken,
   /// and [beforePage] and [afterPage] let the caller load and free whatever
   /// that page needs.
+  ///
+  /// [pageImage] may return a page's background from an earlier export, which
+  /// skips its screenshot; [encodePage] turns a fresh screenshot into the
+  /// image the PDF embeds (PNG when not given) and must not dispose it.
   static Future<pw.Document> generatePdfLowMemory(
     EditorCoreInfo coreInfo, {
     Future<void> Function(int pageIndex)? beforePage,
     void Function(int pageIndex)? afterPage,
+    Future<pw.ImageProvider?> Function(int pageIndex)? pageImage,
+    Future<pw.ImageProvider> Function(int pageIndex, ui.Image screenshot)?
+    encodePage,
   }) => _generatePdf(
     coreInfo,
     lowMemory: true,
     beforePage: beforePage,
     afterPage: afterPage,
+    pageImage: pageImage,
+    encodePage: encodePage,
   );
 
   static Future<pw.Document> _generatePdf(
@@ -56,6 +65,9 @@ abstract class EditorExporter {
     bool lowMemory = false,
     Future<void> Function(int pageIndex)? beforePage,
     void Function(int pageIndex)? afterPage,
+    Future<pw.ImageProvider?> Function(int pageIndex)? pageImage,
+    Future<pw.ImageProvider> Function(int pageIndex, ui.Image screenshot)?
+    encodePage,
   }) async {
     if (coreInfo.pages.isNotEmpty && coreInfo.pages.last.isEmpty) {
       // don't export the empty last page
@@ -75,6 +87,8 @@ abstract class EditorExporter {
         coreInfo.pages.length,
         (pageIndex) => pool.withResource<pw.ImageProvider>(() async {
           if (lowMemory) {
+            final cached = await pageImage?.call(pageIndex);
+            if (cached != null) return cached;
             await beforePage?.call(pageIndex);
             try {
               final uiImage = await screenshotPage(
@@ -82,6 +96,9 @@ abstract class EditorExporter {
                 pageIndex: pageIndex,
               );
               try {
+                if (encodePage != null) {
+                  return await encodePage(pageIndex, uiImage);
+                }
                 final png = await uiImage.toByteData(
                   format: ui.ImageByteFormat.png,
                 );
