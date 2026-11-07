@@ -4,8 +4,9 @@
 # Sam's Apple Development identity and install it on a device plugged in by USB.
 # Needs a Mac with Flutter, CocoaPods and Xcode signed in as the team
 # (sam@stuhlfamily.com), the device trusted and unlocked.
-# Run it in a Terminal window on that Mac's desktop, not over ssh: signing needs
-# the login keychain ("User interaction is not allowed" over ssh).
+# Run it in a Terminal window on that Mac's desktop, or on the mini in a window
+# of the mini-host tmux session, not over a plain ssh: signing needs the
+# unlocked login keychain ("User interaction is not allowed" over ssh).
 #
 #   scripts/install-on-ipad.sh [<device udid> [<devicectl id>]]
 #
@@ -18,13 +19,19 @@ cd "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/.."
 derived="${SABER_DEVICE_BUILD_DIR:-/tmp/saber-device-dd}"
 
 # Quill sync (docs/quill-sync.md): the server's address and token are compiled
-# in. The token is read from the mini over ssh straight into a mode 600 file and
-# never printed or passed as an argument. QUILL_SYNC=off builds without sync.
+# in. The token is read (locally on the mini, over ssh elsewhere) straight into
+# a mode 600 file and never printed or passed as an argument. QUILL_SYNC=off builds without sync.
 defines=()
 if [[ "${QUILL_SYNC:-on}" != off ]]; then
   defines_file="$(mktemp -t quill-sync)"
   trap 'rm -f "$defines_file"; sed -i "" "/^DART_DEFINES=/d" ios/Flutter/Generated.xcconfig 2>/dev/null || true' EXIT
-  ssh -o BatchMode=yes mac-mini-sam 'cat ~/.config/quill-sync/token' | python3 -c '
+  # On the mini itself the token is a local file; elsewhere it comes over ssh.
+  if [[ -r ~/.config/quill-sync/token ]]; then
+    read_token() { cat ~/.config/quill-sync/token; }
+  else
+    read_token() { ssh -o BatchMode=yes mac-mini-sam 'cat ~/.config/quill-sync/token'; }
+  fi
+  read_token | python3 -c '
 import json, sys
 token = sys.stdin.read().strip()
 if not token:
