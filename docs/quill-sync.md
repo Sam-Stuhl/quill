@@ -85,8 +85,32 @@ app can watch, and the PDF still has to come from Quill.
 The native files land there too (decision: yes), because the PDF alone cannot be
 turned back into an editable note, and the iPad would otherwise be the only copy.
 
-Vault: not wired in. Whether Quill's PDFs should also appear in the Obsidian vault
-(and where) is Sam's call; see the report.
+### Into the vault
+
+Like Notability's (2026-11-07, Sam: "it should basically mimic notability's
+functionality"): every note's PDF lands in the Obsidian vault with a companion
+note, in the course folder notasync would use, and the nightly sorter files it
+into its week folder.
+
+```
+~sam/quill/Notes ──quill-stage──► ~console/Quill/staging ──notasync-quill──► vault ingest ──► LiveSync
+ (quill-sync)     (console agent,   (mtime kept,          (notasync's image,     (container,
+                   every 1 s)        never deletes)        second instance)       I6)
+```
+
+- `stage.py` is a LaunchAgent in the `console` account, because the router is a
+  container on console's Colima, which only mounts console's home and tank.
+- `notasync-quill.yaml` is notasync's config format with Notability's routes
+  keyed by Quill folders: a Quill folder `Fall 26/CS 114` or just `CS 114`
+  lands in `School/Fall 2026/CS 114 - ...`, anything else in `Inbox/Quill/`.
+  Companion notes carry `source: quill` (and notasync's `notability_path` key,
+  holding the note's path in Quill). notasync's code is not changed.
+- Name clashes: notasync replaces a vault file of the same name, so a new
+  Quill note whose name a file it does not own already uses (a Notability PDF)
+  is staged as `<name> (Quill).pdf`, and keeps that name.
+- Deletes in Quill do not delete anything in the vault (notasync's rule).
+- Install or update: `cat quill-sync/deploy-vault.sh | ssh mac-mini-console bash -s`
+  (`-- --status` to check). Tests: `/usr/bin/python3 -m unittest test_stage`.
 
 ## Latency budget
 
@@ -189,6 +213,11 @@ Tailscale) against the live server on the mini, `quill-sync/run-e2e-sim.sh`:
 
 Over the tailnet alone (`quill-sync/e2e.py`, MacBook as client): native 60 kB
 upload p50 0.13 s, 200 kB PDF p50 0.19 s.
+
+Into the vault (2026-11-07, a PDF uploaded through the server's API on the
+mini): in the vault ingest folder with its companion note 3.9 s later, in the
+vault bridge's export (what Obsidian clients sync from) 8.4 s later. Pen up to
+the vault is about 6 s, to Obsidian about 10 s plus the device's own sync.
 
 Not yet measured on the iPad itself (A14, real Pencil, home Wi-Fi), PDF render
 cost for long notes, or behavior after hours offline. The simulator run's only
