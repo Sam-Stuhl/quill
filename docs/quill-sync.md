@@ -117,7 +117,9 @@ into its week folder.
   notasync's manifest points at (or the one file of that name, once the sorter
   has moved it), written through the vault-ingest container, companion note
   kept. notasync's staged copy of that note moves to
-  `~console/Notability/retired`, so notasync never puts the old version back.
+  `~console/Notability/retired` and onto drive-pull's exclude list
+  (`~console/.local/state/notasync/quill-retired.txt`), so notasync never puts
+  the old version back.
   Only a note with no original found goes through the Quill router. Quill
   trims spaces around a note's name, so the list carries the trimmed path too.
   A name starting with con, aux, nul or prn was refused by upstream's

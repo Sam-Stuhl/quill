@@ -31,7 +31,8 @@ class StageTest(unittest.TestCase):
 
         self.make = lambda: stage.Stager(self.src, self.stg, self.vault, r / "state", self.manifest,
                                          self.imported, self.nmanifest, self.nstaging,
-                                         self.retired, writer)
+                                         self.retired, writer, r / "pull-excludes.txt")
+        self.excludes = r / "pull-excludes.txt"
 
     def tearDown(self):
         self.tmp.cleanup()
@@ -126,6 +127,7 @@ class StageTest(unittest.TestCase):
         # notasync's copy is retired so it never puts the old version back
         self.assertFalse((self.nstaging / "Notability" / orig).exists())
         self.assertTrue((self.retired / "Notability" / orig).exists())
+        self.assertEqual(self.excludes.read_text(), "/Fall 26/CS 114/Old lec .pdf\n")
         # unchanged: no rewrite; changed again: rewritten, even after a restart
         s.pass_once()
         self.assertEqual(len(self.writes), 1)
@@ -139,6 +141,9 @@ class StageTest(unittest.TestCase):
         self.make().pass_once()
         self.assertEqual((self.vault / "School/CS 114/Wk 04/Old lec .pdf").read_bytes(),
                          b"%PDF even more")
+
+    def test_rclone_literal_escapes_globs(self):
+        self.assertEqual(stage.rclone_literal("A/[draft] *1?.pdf"), "/A/\\[draft\\] \\*1\\?.pdf")
 
     def test_imported_note_without_an_original_goes_through_the_router(self):
         self.imported.write_text("Other/Lost.pdf\n")

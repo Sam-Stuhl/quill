@@ -30,7 +30,9 @@ place (no duplicate): the vault file notasync placed, found through notasync's
 own manifest, wherever the nightly sorter has since filed it, keeping its
 companion note. The write goes through the vault-ingest container (invariant
 I6), and notasync's staged copy of that note moves to ~/Notability/retired,
-so notasync never puts the old version back. Only if no original can be found
+and it is added to drive-pull's exclude list
+(~/.local/state/notasync/quill-retired.txt), so notasync never puts the old
+version back. Only if no original can be found
 does the note go through the Quill router like a new one.
 
     stage.py [--once] [--interval 0.25]
@@ -60,6 +62,17 @@ NOTASYNC_MANIFEST = Path(
 )
 NOTABILITY_STAGING = Path(os.environ.get("QUILL_NOTABILITY_STAGING", HOME / "Notability/staging"))
 RETIRED = Path(os.environ.get("QUILL_RETIRED", HOME / "Notability/retired"))
+PULL_EXCLUDES = Path(
+    os.environ.get("QUILL_PULL_EXCLUDES", HOME / ".local/state/notasync/quill-retired.txt")
+)
+
+
+def rclone_literal(rel):
+    """An rclone --exclude-from pattern matching exactly this path under the Drive root."""
+    out = "".join("\\" + c if c in "\\*?[]{}" else c for c in rel)
+    return "/" + out
+
+
 INGEST_IN_CONTAINER = "/data/ingest"
 DOCKER = "/usr/local/bin/docker"
 
@@ -98,7 +111,7 @@ class Stager:
     def __init__(self, source=SOURCE, staging=STAGING, vault=VAULT, state_dir=STATE_DIR,
                  router_manifest=ROUTER_MANIFEST, imported=IMPORTED,
                  notasync_manifest=NOTASYNC_MANIFEST, notability_staging=NOTABILITY_STAGING,
-                 retired=RETIRED, writer=docker_write):
+                 retired=RETIRED, writer=docker_write, pull_excludes=PULL_EXCLUDES):
         self.source = source
         self.staging = staging
         self.vault = vault
@@ -119,6 +132,7 @@ class Stager:
         self.notasync_manifest = notasync_manifest
         self.notability_staging = notability_staging
         self.retired = retired
+        self.pull_excludes = pull_excludes
         self.writer = writer
         # Quill rel path -> {"vault": path, "size": n, "mtime": ns} once it replaced its original
         self.takeover_file = state_dir / "takeover.json"
@@ -196,6 +210,14 @@ class Stager:
         return True
 
     def _retire(self, orig):
+        # drive-pull (rclone copy) would bring the staged copy back within minutes.
+        line = rclone_literal(orig)
+        self.pull_excludes.parent.mkdir(parents=True, exist_ok=True)
+        have = self.pull_excludes.read_text(encoding="utf-8").splitlines() \
+            if self.pull_excludes.exists() else []
+        if line not in have:
+            with open(self.pull_excludes, "a", encoding="utf-8") as f:
+                f.write(line + "\n")
         staged = self.notability_staging / "Notability" / orig
         if staged.exists():
             dest = self.retired / "Notability" / orig
