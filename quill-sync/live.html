@@ -117,6 +117,14 @@ async function refresh() {
   } while (again);
 }
 
+function showNone() {
+  current = null; shown = 0;
+  $("title").textContent = "No note open"; $("status").textContent = "";
+  history.replaceState(null, "", location.pathname);
+  $("pages").innerHTML = `<p class="empty">Pick a note, or start writing in Quill.</p>`;
+  drawList();
+}
+
 function open(path) {
   if (path !== current) {
     current = path;
@@ -147,6 +155,7 @@ async function watch() {
       drawList();
       const live = changed.filter(([, m]) => m !== null).sort((a, b) => b[1] - a[1]);
       if ($("follow").checked && live.length && live[0][0] !== current) open(live[0][0]);
+      else if (body.changed[current] === null) notes.length ? open(notes[0].path) : showNone();
       else if (body.changed[current] !== undefined) refresh();
     } catch {
       await new Promise((res) => setTimeout(res, 2000));
