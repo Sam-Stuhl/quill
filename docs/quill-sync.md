@@ -113,7 +113,11 @@ into its week folder.
   all 339, same folders) are listed in `~/quill/.quill/imported`. Their PDFs are
   already in the vault, so `stage.py` holds each one back until its PDF changes
   after the first render, that is, until Sam writes in it in Quill; then it
-  lands as `<name> (Quill).pdf` next to the Notability original.
+  lands as `<name> (Quill).pdf` next to the Notability original. Quill
+  trims spaces around a note's name, so the list carries the trimmed path too.
+  A name starting with con, aux, nul or prn was refused by upstream's
+  reserved-name check (unanchored, fixed in this fork 2026-11-07) and imported
+  as `Imported <date>`.
 - While Sam writes, Quill sends a new PDF every couple of seconds, but the
   router files a file only once it is unchanged across two passes. So
   `stage.py` replaces a note's staged copy at most every 2.5 s: the first change
