@@ -1,0 +1,48 @@
+# Quill's PDFs into the vault (saber docs/quill-sync.md, "Into the vault").
+# A second instance of notasync's own router (image notasync:local, container
+# notasync-quill), reading ~/Quill/staging, which quill-stage fills from
+# ~sam/quill/Notes. Same vault, same companion notes, same routes as
+# Notability's (~/opt/notasync/config/notasync.yaml), keyed by Quill's folders.
+# Installed at ~/opt/quill-stage/notasync-quill.yaml on the console account.
+
+vault: /Users/console/console-volumes/vault-ingest/ingest
+staging: /Users/console/Quill/staging
+
+# A note outside a course folder, or in a folder no route names.
+default: "Inbox/Quill/{name}"
+
+# Quill folders named like Notability's subjects ("Fall 26/CS 114"), or just
+# the course code ("CS 114"), land in the same course folder as its notes.
+routes:
+  "Fall 26/COM 312":  "School/Fall 2026/COM 312 - Effective Communication/{name}"
+  "Fall 26/CS 100":   "School/Fall 2026/CS 100 - Roadmap to Computing/{name}"
+  "Fall 26/CS 114":   "School/Fall 2026/CS 114 - Introduction to Computer Science II/{name}"
+  "Fall 26/FYS":      "School/Fall 2026/FYS - First-Year Seminar/{name}"
+  "Fall 26/MATH 333": "School/Fall 2026/MATH 333 - Probability & Statistics/{name}"
+  "Fall 26/PHYS 121": "School/Fall 2026/PHYS 121 - Physics II/{name}"
+  "COM 312":  "School/Fall 2026/COM 312 - Effective Communication/{name}"
+  "CS 100":   "School/Fall 2026/CS 100 - Roadmap to Computing/{name}"
+  "CS 114":   "School/Fall 2026/CS 114 - Introduction to Computer Science II/{name}"
+  "FYS":      "School/Fall 2026/FYS - First-Year Seminar/{name}"
+  "MATH 333": "School/Fall 2026/MATH 333 - Probability & Statistics/{name}"
+  "PHYS 121": "School/Fall 2026/PHYS 121 - Physics II/{name}"
+  "*":        "Inbox/Quill/{subject}/{name}"
+
+# notability_path is notasync's managed key name; for these it is the note's
+# path in Quill (staging-relative).
+companion_notes:
+  enabled: true
+  suffix: ".md"
+  template: |
+    ---
+    source: quill
+    notability_path: "{notability_path}"
+    pdf: "[[{name}]]"
+    course: "{hub_link}"
+    synced: {synced}
+    ---
+    ![[{name}]]
+
+# Quill already writes each PDF whole and atomically, so a short settle is safe.
+poll_interval: 2
+settle_seconds: 2
