@@ -10,6 +10,12 @@ publishes it to the tailnet over HTTPS.
 
 Root: $QUILL_ROOT or ~/quill. Token: $QUILL_TOKEN_FILE or
 ~/.config/quill-sync/token (created on first serve, mode 600, never printed).
+
+Live view: /live shows each note's PDF and redraws it the moment a new one
+arrives. Besides the token, it lets in tailnet users named in
+~/.config/quill-sync/viewers (one Tailscale login per line), which `tailscale
+serve` identifies in the Tailscale-User-Login header on requests it proxies to
+loopback. That trust is read only: notes, PDFs and changes, never uploads.
 """
 
 from __future__ import annotations
@@ -66,6 +72,10 @@ class Store:
         self.events = self.meta / "events.jsonl"
         self._log_lock = threading.Lock()
         self._lock = threading.Lock()
+        # PDF changes for the live view: note -> (seq, mtime ms or None if deleted)
+        self._changes = threading.Condition()
+        self._seq = 0
+        self._changed: dict[str, tuple[int, int | None]] = {}
 
     # -- paths ---------------------------------------------------------------
 
@@ -126,6 +136,7 @@ class Store:
         target = self.pdf_path(note)
         with self._lock:
             self.write_atomic(target, data, mtime_ms, 0o444)
+        self._changed_pdf(self.clean(note), target.stat().st_mtime_ns // 1_000_000)
         return target
 
     def _to_trash(self, src: Path, base: Path, bucket: Path):
@@ -158,8 +169,34 @@ class Store:
                 pdf = self.pdf_path(note)
                 if pdf.exists():
                     os.chmod(pdf, 0o644)
+                    self._changed_pdf(note, None)
                 moved |= self._to_trash(pdf, self.notes, bucket / "Notes")
         return moved
+
+    # -- live view -------------------------------------------------------------
+
+    def _changed_pdf(self, note: str, mtime: int | None):
+        with self._changes:
+            self._seq += 1
+            self._changed[note] = (self._seq, mtime)
+            self._changes.notify_all()
+
+    def wait_changes(self, since: int | None, timeout: float):
+        """PDFs changed after `since` ({note: mtime or None}), waiting up to timeout."""
+        with self._changes:
+            if since is None or since > self._seq:
+                return self._seq, {}
+            self._changes.wait_for(lambda: self._seq > since, timeout=timeout)
+            return self._seq, {n: m for n, (q, m) in self._changed.items() if q > since}
+
+    def notes_list(self):
+        out = []
+        for p in self.notes.rglob("*.pdf"):
+            if not p.name.startswith("."):
+                rel = "/" + p.relative_to(self.notes).as_posix()[: -len(".pdf")]
+                out.append({"path": rel, "mtime": p.stat().st_mtime_ns // 1_000_000})
+        out.sort(key=lambda n: n["mtime"], reverse=True)
+        return out
 
     # -- reads ---------------------------------------------------------------
 
@@ -302,7 +339,10 @@ class Inbox:
         return {"file": item["file"], "note": note, "lag_ms": lag}
 
 
-def make_handler(store: Store, inbox: Inbox, token: str):
+LIVE_HTML = Path(__file__).with_name("live.html")
+
+
+def make_handler(store: Store, inbox: Inbox, token: str, viewers: frozenset = frozenset()):
     class Handler(BaseHTTPRequestHandler):
         server_version = "quill-sync/1"
         protocol_version = "HTTP/1.1"
@@ -312,7 +352,7 @@ def make_handler(store: Store, inbox: Inbox, token: str):
 
         # -- helpers ---------------------------------------------------------
 
-        def _send(self, code: int, body=None, ctype="application/json"):
+        def _send(self, code: int, body=None, ctype="application/json", headers=None):
             if body is None:
                 data = b""
             elif isinstance(body, (bytes, bytearray)):
@@ -322,6 +362,8 @@ def make_handler(store: Store, inbox: Inbox, token: str):
             self.send_response(code)
             self.send_header("Content-Type", ctype)
             self.send_header("Content-Length", str(len(data)))
+            for k, v in (headers or {}).items():
+                self.send_header(k, v)
             self.end_headers()
             if self.command != "HEAD":
                 self.wfile.write(data)
@@ -330,6 +372,17 @@ def make_handler(store: Store, inbox: Inbox, token: str):
             got = self.headers.get("Authorization", "")
             want = f"Bearer {token}"
             if hmac.compare_digest(got.encode(), want.encode()):
+                return True
+            self._send(HTTPStatus.UNAUTHORIZED, {"error": "unauthorized"})
+            return False
+
+        def _viewer(self) -> bool:
+            """Token, or a listed Tailscale user proxied by tailscale serve (read only)."""
+            got = self.headers.get("Authorization", "")
+            if hmac.compare_digest(got.encode(), f"Bearer {token}".encode()):
+                return True
+            login = self.headers.get("Tailscale-User-Login", "")
+            if login and login in viewers and self.client_address[0] in ("127.0.0.1", "::1"):
                 return True
             self._send(HTTPStatus.UNAUTHORIZED, {"error": "unauthorized"})
             return False
@@ -362,6 +415,10 @@ def make_handler(store: Store, inbox: Inbox, token: str):
             path, q = self._route()
             if path == "/v1/health":
                 return self._send(200, {"ok": True})
+            if path in ("/live", "/v1/notes", "/v1/changes") or (path == "/v1/pdf"):
+                if not self._viewer():
+                    return
+                return self._live(path, q)
             if not self._authed():
                 return
             if path == "/v1/manifest":
@@ -383,6 +440,28 @@ def make_handler(store: Store, inbox: Inbox, token: str):
                     return self._send(404, {"error": "gone"})
                 return self._send(200, data, "application/octet-stream")
             self._send(404, {"error": "not found"})
+
+        def _live(self, path, q):
+            if path == "/live":
+                return self._send(200, LIVE_HTML.read_bytes(), "text/html; charset=utf-8")
+            if path == "/v1/notes":
+                return self._send(200, {"notes": store.notes_list()})
+            if path == "/v1/changes":
+                wait = min(float(q.get("wait", 0) or 0), 55.0)
+                since = q.get("since")
+                since = int(since) if since and since.isdigit() else None
+                seq, changed = store.wait_changes(since, wait)
+                return self._send(200, {"seq": seq, "changed": changed})
+            try:
+                pdf = store.pdf_path(q.get("path"))
+                mtime = pdf.stat().st_mtime_ns // 1_000_000
+                data = pdf.read_bytes()
+            except ValueError as e:
+                return self._send(400, {"error": str(e)})
+            except FileNotFoundError:
+                return self._send(404, {"error": "no such note"})
+            return self._send(200, data, "application/pdf",
+                              {"X-Mtime": str(mtime), "Cache-Control": "no-store"})
 
         def do_PUT(self):
             path, q = self._route()
@@ -453,12 +532,23 @@ def load_token(create: bool) -> str:
     return f.read_text().strip()
 
 
-def serve(host: str, port: int, root: Path, token: str):
+def load_viewers() -> frozenset:
+    f = Path(os.environ.get("QUILL_VIEWERS_FILE", Path.home() / ".config/quill-sync/viewers"))
+    try:
+        lines = f.read_text().split()
+    except FileNotFoundError:
+        return frozenset()
+    return frozenset(l for l in lines if l and not l.startswith("#"))
+
+
+def serve(host: str, port: int, root: Path, token: str, viewers: frozenset | None = None):
     """Start the server; returns (httpd, inbox) with threads running."""
     store = Store(root)
     inbox = Inbox(store)
     threading.Thread(target=inbox.run, daemon=True, name="inbox").start()
-    httpd = ThreadingHTTPServer((host, port), make_handler(store, inbox, token))
+    if viewers is None:
+        viewers = load_viewers()
+    httpd = ThreadingHTTPServer((host, port), make_handler(store, inbox, token, viewers))
     httpd.daemon_threads = True
     return httpd, inbox
 

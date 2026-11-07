@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quill live</title>
+<style>
+  :root { color-scheme: light dark; --line: #8884; --muted: #888; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.4 -apple-system, system-ui, sans-serif; display: flex; height: 100vh; }
+  nav { width: 260px; flex: none; border-right: 1px solid var(--line); display: flex; flex-direction: column; }
+  nav header { padding: 12px; border-bottom: 1px solid var(--line); }
+  nav h1 { font-size: 15px; margin: 0 0 8px; }
+  nav input[type=search] { width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: transparent; color: inherit; }
+  nav label { display: flex; gap: 6px; align-items: center; margin-top: 8px; color: var(--muted); }
+  nav ul { list-style: none; margin: 0; padding: 4px 0; overflow: auto; flex: 1; }
+  nav li { padding: 6px 12px; cursor: pointer; }
+  nav li:hover { background: #8881; }
+  nav li.on { background: #8883; }
+  nav li small { display: block; color: var(--muted); }
+  main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  main header { padding: 10px 16px; border-bottom: 1px solid var(--line); display: flex; gap: 12px; align-items: baseline; }
+  main header b { font-size: 15px; }
+  #status { color: var(--muted); }
+  #status.fresh { color: #2a9d4b; }
+  #pages { flex: 1; overflow: auto; padding: 16px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  #pages canvas { max-width: 100%; box-shadow: 0 1px 4px #0004; background: white; }
+  .empty { color: var(--muted); margin-top: 20vh; }
+</style>
+</head>
+<body>
+<nav>
+  <header>
+    <h1>Quill live</h1>
+    <input type="search" id="filter" placeholder="Filter notes">
+    <label><input type="checkbox" id="follow" checked> Follow the note I'm writing in</label>
+  </header>
+  <ul id="list"></ul>
+</nav>
+<main>
+  <header><b id="title">No note open</b><span id="status"></span></header>
+  <div id="pages"><p class="empty">Pick a note, or start writing in Quill.</p></div>
+</main>
+<script type="module">
+import * as pdfjs from "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs";
+pdfjs.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs";
+
+const $ = (id) => document.getElementById(id);
+let notes = [];          // [{path, mtime}], newest first
+let current = null;      // note path on screen
+let shown = 0;           // mtime of the PDF on screen
+let rendering = null;    // promise of the render in progress
+let again = false;       // another change arrived during a render
+
+const name = (p) => p.split("/").pop();
+const folder = (p) => p.split("/").slice(1, -1).join(" / ");
+const clock = (ms) => new Date(ms).toLocaleTimeString();
+
+function drawList() {
+  const f = $("filter").value.toLowerCase();
+  $("list").replaceChildren(...notes
+    .filter((n) => n.path.toLowerCase().includes(f))
+    .map((n) => {
+      const li = document.createElement("li");
+      li.textContent = name(n.path);
+      const s = document.createElement("small");
+      s.textContent = `${folder(n.path) || "Quill"} · ${clock(n.mtime)}`;
+      li.append(s);
+      if (n.path === current) li.className = "on";
+      li.onclick = () => { setFollow(false); open(n.path); };
+      return li;
+    }));
+}
+
+function tick() {
+  if (!current || !shown) return;
+  const ago = Math.max(0, (Date.now() - shown) / 1000);
+  $("status").textContent = `updated ${clock(shown)} (${ago < 60 ? ago.toFixed(0) + " s" : Math.round(ago / 60) + " min"} ago)`;
+  $("status").className = ago < 5 ? "fresh" : "";
+}
+setInterval(tick, 1000);
+
+async function render() {
+  const path = current;
+  const r = await fetch(`/v1/pdf?path=${encodeURIComponent(path)}`, { cache: "no-store" });
+  if (!r.ok) { $("pages").innerHTML = `<p class="empty">This note has no PDF yet.</p>`; return; }
+  const doc = await pdfjs.getDocument({ data: await r.arrayBuffer() }).promise;
+  const width = Math.min($("pages").clientWidth - 32, 1100);
+  const canvases = [];
+  for (let i = 1; i <= doc.numPages; i++) {
+    const page = await doc.getPage(i);
+    const base = page.getViewport({ scale: 1 });
+    const vp = page.getViewport({ scale: (width / base.width) * devicePixelRatio });
+    const c = document.createElement("canvas");
+    c.width = vp.width; c.height = vp.height;
+    c.style.width = `${vp.width / devicePixelRatio}px`;
+    await page.render({ canvasContext: c.getContext("2d"), viewport: vp }).promise;
+    canvases.push(c);
+  }
+  doc.destroy();
+  if (path !== current) return;
+  // Swap in the finished pages at once, keeping the scroll position.
+  const top = $("pages").scrollTop;
+  $("pages").replaceChildren(...canvases);
+  $("pages").scrollTop = top;
+  shown = Number(r.headers.get("X-Mtime")) || (notes.find((n) => n.path === path)?.mtime ?? Date.now());
+  tick();
+}
+
+async function refresh() {
+  if (rendering) { again = true; return; }
+  do {
+    again = false;
+    rendering = render().catch((e) => { $("status").textContent = `could not draw it: ${e.message}`; });
+    await rendering;
+    rendering = null;
+  } while (again);
+}
+
+function open(path) {
+  if (path !== current) {
+    current = path;
+    shown = 0;
+    $("title").textContent = name(path);
+    document.title = `${name(path)} · Quill live`;
+    history.replaceState(null, "", `#${encodeURIComponent(path)}`);
+    $("pages").replaceChildren();
+    drawList();
+  }
+  refresh();
+}
+
+async function watch() {
+  let seq = (await (await fetch("/v1/changes")).json()).seq;
+  for (;;) {
+    try {
+      const r = await fetch(`/v1/changes?since=${seq}&wait=50`, { cache: "no-store" });
+      const body = await r.json();
+      seq = body.seq;
+      const changed = Object.entries(body.changed);
+      if (!changed.length) continue;
+      for (const [path, mtime] of changed) {
+        notes = notes.filter((n) => n.path !== path);
+        if (mtime !== null) notes.unshift({ path, mtime });
+      }
+      notes.sort((a, b) => b.mtime - a.mtime);
+      drawList();
+      const live = changed.filter(([, m]) => m !== null).sort((a, b) => b[1] - a[1]);
+      if ($("follow").checked && live.length && live[0][0] !== current) open(live[0][0]);
+      else if (body.changed[current] !== undefined) refresh();
+    } catch {
+      await new Promise((res) => setTimeout(res, 2000));
+    }
+  }
+}
+
+// Follow is remembered per browser; picking a note by hand turns it off.
+function setFollow(on) { $("follow").checked = on; localStorage.setItem("quill-live-follow", on ? "1" : "0"); }
+$("follow").onchange = () => setFollow($("follow").checked);
+$("follow").checked = localStorage.getItem("quill-live-follow") !== "0";
+$("filter").oninput = drawList;
+const r = await fetch("/v1/notes");
+if (!r.ok) {
+  $("pages").innerHTML = `<p class="empty">Not allowed: this page is for the tailnet users in quill-sync's viewers file.</p>`;
+} else {
+  notes = (await r.json()).notes;
+  drawList();
+  const fromHash = decodeURIComponent(location.hash.slice(1));
+  const start = notes.find((n) => n.path === fromHash) || notes[0];
+  if (start) open(start.path);
+  watch();
+}
+</script>
+</body>
+</html>

@@ -24,7 +24,8 @@ class ServerTest(unittest.TestCase):
         self.root = Path(self.tmp.name)
         server.SCAN_INTERVAL = 0.05
         server.STABLE_FOR = 0.2
-        self.httpd, self.inbox = server.serve("127.0.0.1", 0, self.root, TOKEN)
+        self.httpd, self.inbox = server.serve("127.0.0.1", 0, self.root, TOKEN,
+                                              viewers=frozenset({"sam@example.com"}))
         self.port = self.httpd.server_address[1]
         threading.Thread(target=self.httpd.serve_forever, daemon=True).start()
 
@@ -174,6 +175,44 @@ class ServerTest(unittest.TestCase):
         _, m = self.req("GET", "/v1/manifest")
         self.assertEqual(m["files"], {"/x/y.sbn2": {"size": 3, "mtime": 1700000000123}})
         self.assertEqual(m["pdfs"], {"/x/y": 1700000000123})
+
+    # 8: live view
+    def test_live_view_viewer_auth_is_read_only(self):
+        self.put("/School/n", PDF, 1700000000000, kind="pdf")
+        me = {"Tailscale-User-Login": "sam@example.com"}
+        status, page = self.req("GET", "/live", token=None, headers=me)
+        self.assertEqual(status, 200)
+        self.assertIn(b"Quill live", page)
+        _, body = self.req("GET", "/v1/notes", token=None, headers=me)
+        self.assertEqual(body["notes"], [{"path": "/School/n", "mtime": 1700000000000}])
+        status, data = self.req("GET", "/v1/pdf?path=/School/n", token=None, headers=me)
+        self.assertEqual((status, data), (200, PDF))
+        # an unlisted login, or no login, gets nothing
+        self.assertEqual(self.req("GET", "/v1/notes", token=None,
+                                  headers={"Tailscale-User-Login": "eve@example.com"})[0], 401)
+        self.assertEqual(self.req("GET", "/live", token=None)[0], 401)
+        # and a viewer can never write or read the native store
+        self.assertEqual(self.req("PUT", "/v1/pdf?path=/x", PDF, token=None, headers=me)[0], 401)
+        self.assertEqual(self.req("GET", "/v1/manifest", token=None, headers=me)[0], 401)
+        self.assertEqual(self.req("GET", "/v1/pdf?path=/missing")[0], 404)
+        self.assertEqual(self.req("GET", "/v1/pdf?path=/../etc")[0], 400)
+
+    def test_live_changes_wake_on_pdf_and_delete(self):
+        _, body = self.req("GET", "/v1/changes")
+        seq = body["seq"]
+        threading.Timer(0.3, lambda: self.put("/a", PDF, 1700000000000, kind="pdf")).start()
+        t0 = time.monotonic()
+        _, body = self.req("GET", f"/v1/changes?since={seq}&wait=10")
+        self.assertLess(time.monotonic() - t0, 2)
+        self.assertEqual(body["changed"], {"/a": 1700000000000})
+        seq = body["seq"]
+        self.put("/a.sbn2", b"bson")
+        self.req("DELETE", "/v1/file?path=/a.sbn2")
+        _, body = self.req("GET", f"/v1/changes?since={seq}&wait=1")
+        self.assertEqual(body["changed"], {"/a": None})
+        # nothing new: returns empty after the wait
+        _, body = self.req("GET", f"/v1/changes?since={body['seq']}&wait=0.2")
+        self.assertEqual(body["changed"], {})
 
 
 class PutCommandTest(unittest.TestCase):

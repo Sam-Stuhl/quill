@@ -3,6 +3,7 @@
 import json
 import os
 import tempfile
+import time
 import unittest
 from pathlib import Path
 
@@ -11,6 +12,7 @@ import stage
 
 class StageTest(unittest.TestCase):
     def setUp(self):
+        stage.HOLD = 0
         self.tmp = tempfile.TemporaryDirectory()
         r = Path(self.tmp.name)
         self.src, self.stg, self.vault = r / "Notes", r / "staging", r / "vault"
@@ -66,6 +68,22 @@ class StageTest(unittest.TestCase):
         self.write("CS 114/Lec 3.pdf", b"%PDF")
         self.make().pass_once()
         self.assertTrue((self.stg / "CS 114/Lec 3.pdf").exists())
+
+    def test_hold_lets_a_note_being_written_settle(self):
+        stage.HOLD = 0.3
+        s = self.make()
+        out = self.stg / "n.pdf"
+        self.write("n.pdf", b"%PDF 1", 1_700_000_000)
+        self.assertEqual(s.pass_once(), 1)  # first change: at once
+        self.write("n.pdf", b"%PDF 2", 1_700_000_001)
+        self.assertEqual(s.pass_once(), 0)  # held
+        self.assertEqual(out.read_bytes(), b"%PDF 1")
+        time.sleep(0.35)
+        self.assertEqual(s.pass_once(), 1)  # newest after the hold
+        self.assertEqual(out.read_bytes(), b"%PDF 2")
+        # another note is not held by this one's
+        self.write("m.pdf", b"%PDF m")
+        self.assertEqual(s.pass_once(), 1)
 
 
 if __name__ == "__main__":

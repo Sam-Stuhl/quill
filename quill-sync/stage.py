@@ -14,6 +14,13 @@ Quill note whose name is already used by a vault file the Quill router does not
 own is staged as "<name> (Quill).pdf". The choice is remembered, so the note
 keeps that name for good.
 
+Hold: the router files a PDF only once it has seen the staged copy unchanged on
+two passes a second apart. While Sam writes, Quill sends a new PDF every couple
+of seconds, so a copy staged each time never holds still and the vault would
+wait until he pauses. So a note's staged copy is replaced at most every HOLD
+seconds: the first change after a quiet spell is staged at once, and while he
+keeps writing the vault still updates every few seconds.
+
     stage.py [--once] [--interval 0.25]
 
 Python 3.9 compatible (console's /usr/bin/python3). Standard library only.
@@ -26,6 +33,8 @@ import sys
 import tempfile
 import time
 from pathlib import Path
+
+HOLD = 2.5
 
 HOME = Path.home()
 SOURCE = Path(os.environ.get("QUILL_NOTES", "/Users/sam/quill/Notes"))
@@ -57,6 +66,7 @@ class Stager:
         if self.state_file.exists():
             self.names = json.loads(self.state_file.read_text(encoding="utf-8"))
         self._vault_names = None
+        self._last_staged = {}  # source rel path -> monotonic time last staged
 
     def _save(self):
         tmp = self.state_file.with_name(self.state_file.name + ".tmp")
@@ -127,7 +137,11 @@ class Stager:
                         continue
                 except FileNotFoundError:
                     pass
+                now = time.monotonic()
+                if now - self._last_staged.get(rel, -HOLD) < HOLD:
+                    continue  # still being written: picked up on a later pass
                 self._copy(src, dest, st)
+                self._last_staged[rel] = now
                 copied += 1
                 log("staged", source=rel, staged=dest.relative_to(self.staging).as_posix(),
                     bytes=st.st_size)
