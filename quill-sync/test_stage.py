@@ -37,6 +37,12 @@ class StageTest(unittest.TestCase):
     def tearDown(self):
         self.tmp.cleanup()
 
+    def note(self, rel, data):
+        """The note itself, in quill-sync's store next to Notes/."""
+        f = self.src.parent / ".quill/store" / (rel[:-4] + ".sbn2")
+        f.parent.mkdir(parents=True, exist_ok=True)
+        f.write_bytes(data)
+
     def write(self, rel, data, mtime=1_700_000_000):
         p = self.src / rel
         p.parent.mkdir(parents=True, exist_ok=True)
@@ -112,12 +118,17 @@ class StageTest(unittest.TestCase):
         (self.nstaging / "Notability/Fall 26/CS 114").mkdir(parents=True)
         (self.nstaging / "Notability" / orig).write_bytes(b"notability's")
         s = self.make()
+        self.note("Fall 26/CS 114/Old lec.pdf", b"imported note")
         self.write("Fall 26/CS 114/Old lec.pdf", b"%PDF import render", 1_700_000_000)
         self.write("Fall 26/CS 114/New lec.pdf", b"%PDF new", 1_700_000_000)
         self.assertEqual(s.pass_once(), 1)  # only the new note is staged
         self.assertEqual(self.make().pass_once(), 0)  # still held after a restart
+        # the app redraws its PDF, nobody wrote in it: still held
+        self.write("Fall 26/CS 114/Old lec.pdf", b"%PDF redrawn", 1_700_000_030)
+        self.assertEqual(s.pass_once(), 0)
         self.assertEqual(self.writes, [])
         # Sam writes in it: the original is replaced where it is, no duplicate.
+        self.note("Fall 26/CS 114/Old lec.pdf", b"imported note + ink")
         self.write("Fall 26/CS 114/Old lec.pdf", b"%PDF import render + ink", 1_700_000_050)
         s.pass_once()
         self.assertEqual((week / "Old lec .pdf").read_bytes(), b"%PDF import render + ink")
@@ -148,8 +159,10 @@ class StageTest(unittest.TestCase):
     def test_imported_note_without_an_original_goes_through_the_router(self):
         self.imported.write_text("Other/Lost.pdf\n")
         s = self.make()
+        self.note("Other/Lost.pdf", b"note")
         self.write("Other/Lost.pdf", b"%PDF render", 1_700_000_000)
         self.assertEqual(s.pass_once(), 0)
+        self.note("Other/Lost.pdf", b"note + ink")
         self.write("Other/Lost.pdf", b"%PDF render + ink", 1_700_000_050)
         self.assertEqual(s.pass_once(), 1)
         self.assertTrue((self.stg / "Other/Lost.pdf").exists())
