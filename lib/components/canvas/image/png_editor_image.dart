@@ -185,6 +185,12 @@ class PngEditorImage extends EditorImage {
   }
 
   @override
+  void releasePrerender() {
+    _raster?.dispose();
+    _raster = null;
+  }
+
+  @override
   void dispose() {
     _raster?.dispose();
     _raster = null;

@@ -214,6 +214,33 @@ class ServerTest(unittest.TestCase):
         _, body = self.req("GET", f"/v1/changes?since={body['seq']}&wait=0.2")
         self.assertEqual(body["changed"], {})
 
+    # 9: deletes asked for on the mini reach the app through the inbox poll
+    def test_delete_requests_wake_the_poll_and_ack(self):
+        _, body = self.req("GET", "/v1/inbox?wait=0")
+        self.assertEqual(body["deletes"], [])
+        version = body["version"]
+
+        class A:
+            notes = ["/School/hw (2)", "School/other (2)"]
+
+        os.environ["QUILL_ROOT"] = str(self.root)
+        try:
+            threading.Timer(0.3, server.cmd_delete, args=(A,)).start()
+            t0 = time.monotonic()
+            _, body = self.req("GET", f"/v1/inbox?wait=10&since={version}")
+        finally:
+            del os.environ["QUILL_ROOT"]
+        self.assertLess(time.monotonic() - t0, 2)
+        self.assertEqual(sorted(d["note"] for d in body["deletes"]),
+                         ["/School/hw (2)", "/School/other (2)"])
+        first = body["deletes"][0]
+        _, res = self.req("POST", f"/v1/deletes/{first['id']}/ack", b"{}")
+        self.assertEqual(res["note"], first["note"])
+        _, body = self.req("GET", "/v1/inbox?wait=0")
+        self.assertEqual(len(body["deletes"]), 1)
+        # acking again is harmless
+        self.assertEqual(self.req("POST", f"/v1/deletes/{first['id']}/ack", b"{}")[0], 200)
+
 
 class PutCommandTest(unittest.TestCase):
     def test_put_copies_into_inbox(self):

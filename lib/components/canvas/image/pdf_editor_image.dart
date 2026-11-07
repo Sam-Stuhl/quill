@@ -34,6 +34,12 @@ class PdfEditorImage extends EditorImage {
     _raster = image;
   }
 
+  @override
+  void releasePrerender() {
+    _raster?.dispose();
+    _raster = null;
+  }
+
   static final log = Logger('PdfEditorImage');
 
   new({

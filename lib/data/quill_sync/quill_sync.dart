@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
+import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:saber/data/file_manager/file_manager.dart';
 import 'package:saber/data/quill_sync/quill_import.dart';
@@ -79,6 +80,13 @@ class QuillSync {
   /// Inbox item ids already imported, newest last.
   @visibleForTesting
   final delivered = <String>[];
+
+  /// Inbox imports under way: id -> the note path the import will create, and
+  /// whether a note was already there. Saved before importing, so an import
+  /// cut short by iOS (it kills the app for memory) is recognised on the next
+  /// try instead of creating a "(2)" copy.
+  @visibleForTesting
+  final importing = <String, Map<String, dynamic>>{};
 
   final _pdfTimers = <String, Timer>{};
   var _running = false;
@@ -297,6 +305,33 @@ class QuillSync {
     _check(r, 'upload $note.pdf');
   }
 
+  /// Uploads [bytes] as [note]'s PDF instead of rendering it. Falls back to
+  /// rendering later if the upload fails.
+  Future<void> _sendSourcePdf(String note, Uint8List bytes) async {
+    _pdfTimers.remove(note)?.cancel();
+    pdfs.remove(note);
+    final file = FileManager.getFile(note + Editor.extension);
+    try {
+      final mtime = file.lastModifiedSync().millisecondsSinceEpoch;
+      final r = await _client
+          .put(
+            _url('/v1/pdf', {'path': note}),
+            headers: {
+              ..._auth,
+              'X-Mtime': '$mtime',
+              'X-Quill-Written-At': '$mtime',
+            },
+            body: bytes,
+          )
+          .timeout(Duration(seconds: 30 + bytes.length ~/ 100000));
+      _check(r, 'upload $note.pdf');
+    } catch (e) {
+      log.warning('Could not send the imported PDF of $note, will render: $e');
+      pdfs.add(note);
+      _kick();
+    }
+  }
+
   // -- reconcile -----------------------------------------------------------
 
   /// Uploads every note file the server lacks or has an older copy of, and
@@ -370,6 +405,9 @@ class QuillSync {
         for (final item in (body['items'] as List).cast<Map>()) {
           await _deliver(item.cast<String, dynamic>());
         }
+        for (final d in ((body['deletes'] as List?) ?? const []).cast<Map>()) {
+          await _deleteRequested(d['id'] as String, d['note'] as String);
+        }
       } catch (e) {
         if (generation != _pollGeneration) return;
         failures++;
@@ -381,29 +419,65 @@ class QuillSync {
     }
   }
 
+  /// A note was deleted on the mini's side (`server.py delete`): delete it
+  /// here, which sends it to the server's trash like any delete, then ack.
+  Future<void> _deleteRequested(String id, String note) async {
+    if (FileManager.doesFileExist(note + Editor.extension)) {
+      await FileManager.deleteFile(note + Editor.extension);
+      log.info('Deleted $note, as asked from the mini');
+    }
+    final r = await _client
+        .post(_url('/v1/deletes/$id/ack'), headers: _auth, body: '{}')
+        .timeout(const Duration(seconds: 30));
+    if (r.statusCode != 200) throw HttpException('delete ack: ${r.statusCode}');
+  }
+
   Future<void> _deliver(Map<String, dynamic> item) async {
     final id = item['id'] as String;
+    final name = item['name'] as String;
+    final folder = item['folder'] as String;
     String? note;
     if (!delivered.contains(id)) {
-      final r = await _client
-          .get(_url('/v1/inbox/$id'), headers: _auth)
-          .timeout(const Duration(minutes: 2));
-      if (r.statusCode != 200) {
-        throw HttpException('download $id: HTTP ${r.statusCode}');
-      }
-      try {
-        note = await importBytes(
-          r.bodyBytes,
-          folder: item['folder'] as String,
-          name: item['name'] as String,
-        );
-      } catch (e, st) {
-        // Not acked, so it stays in the inbox and is tried again later.
-        log.severe('Could not import ${item['file']}: $e', e, st);
-        return;
+      final pending = importing[id];
+      final expected = pending?['note'] as String?;
+      if (pending != null &&
+          pending['existed'] == false &&
+          expected != null &&
+          FileManager.doesFileExist(expected + Editor.extension)) {
+        // Imported before the app was killed, just not recorded: done.
+        note = expected;
+        log.info('Import of ${item['file']} had finished before a restart');
+      } else {
+        final r = await _client
+            .get(_url('/v1/inbox/$id'), headers: _auth)
+            .timeout(const Duration(minutes: 2));
+        if (r.statusCode != 200) {
+          throw HttpException('download $id: HTTP ${r.statusCode}');
+        }
+        final target =
+            folder + QuillImport.safeName(p.basenameWithoutExtension(name));
+        importing[id] = {
+          'note': target,
+          'existed': FileManager.doesFileExist(target + Editor.extension),
+        };
+        await _save();
+        try {
+          note = await importBytes(r.bodyBytes, folder: folder, name: name);
+        } catch (e, st) {
+          // Not acked, so it stays in the inbox and is tried again later.
+          log.severe('Could not import ${item['file']}: $e', e, st);
+          return;
+        }
+        if (p.extension(name).toLowerCase() == '.pdf') {
+          // The note is the PDF with nothing on it yet, so the PDF itself is
+          // the note's PDF: no render, which for a long PDF can take more
+          // memory than iOS allows.
+          await _sendSourcePdf(note, r.bodyBytes);
+        }
       }
       delivered.add(id);
       if (delivered.length > 500) delivered.removeAt(0);
+      importing.remove(id);
       await _save();
     }
     final ack = await _client
@@ -427,6 +501,10 @@ class QuillSync {
       }
       pdfs.addAll((json['pdfs'] as List).cast<String>());
       delivered.addAll((json['delivered'] as List).cast<String>());
+      for (final MapEntry(:key, :value)
+          in ((json['importing'] as Map?) ?? const {}).entries) {
+        importing[key as String] = (value as Map).cast<String, dynamic>();
+      }
     } catch (e, st) {
       // A bad state file only costs a reconcile, which rebuilds the queue.
       log.severe('Could not read Quill sync state: $e', e, st);
@@ -450,6 +528,7 @@ class QuillSync {
             'ops': {for (final e in ops.entries) e.key: e.value.toJson()},
             'pdfs': pdfs.toList(),
             'delivered': delivered,
+            'importing': importing,
           });
           await Directory(stateDir).create(recursive: true);
           final tmp = File('${_stateFile.path}.tmp');

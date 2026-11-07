@@ -243,6 +243,9 @@ sealed class EditorImage extends ChangeNotifier {
   /// includes the image. [width] is the page width in pixels.
   Future<void> prerender({required int width}) async {}
 
+  /// Frees what [prerender] made.
+  void releasePrerender() {}
+
   /// Adds the image to Flutter's image cache.
   Future<void> precache(BuildContext context);
 

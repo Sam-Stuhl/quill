@@ -28,6 +28,8 @@ class FakeServer {
   final inbox = <Map<String, dynamic>>[];
   final inboxBytes = <String, Uint8List>{};
   final acks = <String, String?>{};
+  final deletes = <Map<String, String>>[];
+  final deleteAcks = <String>[];
   var version = 0;
   var failing = false;
   var requests = 0;
@@ -72,9 +74,14 @@ class FakeServer {
           );
         }
         return http.Response(
-          jsonEncode({'version': version, 'items': inbox}),
+          jsonEncode({'version': version, 'items': inbox, 'deletes': deletes}),
           200,
         );
+      case ('POST', final p) when p.startsWith('/v1/deletes/'):
+        final id = p.split('/')[3];
+        deleteAcks.add(id);
+        deletes.removeWhere((d) => d['id'] == id);
+        version++;
       case ('POST', final p) when p.endsWith('/ack'):
         final id = p.split('/')[3];
         final note = (jsonDecode(req.body) as Map)['note'] as String?;
@@ -278,6 +285,63 @@ void main() {
       expect(server.acks['bbbb'], '/Inbox test/photo (2)');
     },
   );
+
+  test('a delete asked for by the mini deletes the note, then acks', () async {
+    sync = QuillSync.instance = makeSync();
+    await sync.start();
+    await FileManager.writeFile('/Dupes/hw (2).sbn2', [1], awaitWrite: true);
+    server.deletes.add({'id': 'd1', 'note': '/Dupes/hw (2)'});
+    server.deletes.add({'id': 'd2', 'note': '/Dupes/already gone'});
+    server.version++;
+    await until(() => server.deleteAcks.length == 2);
+    expect(FileManager.doesFileExist('/Dupes/hw (2).sbn2'), isFalse);
+    await until(() => server.deleted.contains('/Dupes/hw (2).sbn2'));
+  });
+
+  test('an import that finished before a crash is acked, not redone', () async {
+    // The app was killed after writing the note but before recording it.
+    await FileManager.writeFile('/In/scan.sbn2', [1], awaitWrite: true);
+    File('$stateDir/state.json').writeAsStringSync(
+      jsonEncode({
+        'ops': {},
+        'pdfs': [],
+        'delivered': [],
+        'importing': {
+          'eeee': {'note': '/In/scan', 'existed': false},
+        },
+      }),
+    );
+    final imported = <String>[];
+    sync = QuillSync.instance = makeSync(
+      importer: (bytes, {required folder, required name}) async {
+        imported.add(name);
+        return '$folder$name';
+      },
+    );
+    await sync.start();
+    server.drop('eeee', '/In/', 'scan.png', pngBytes(10, 10));
+    await until(() => server.acks.containsKey('eeee'));
+    expect(server.acks['eeee'], '/In/scan');
+    expect(imported, isEmpty);
+  });
+
+  test('an imported PDF is sent as the note\'s PDF, not rendered', () async {
+    final source = Uint8List.fromList(utf8.encode('%PDF source'));
+    sync = QuillSync.instance = makeSync(
+      importer: (bytes, {required folder, required name}) async {
+        await FileManager.writeFile('/Pdf/hw.sbn2', [1], awaitWrite: true);
+        return '/Pdf/hw';
+      },
+    );
+    await sync.start();
+    server.drop('ffff', '/Pdf/', 'hw.pdf', source);
+    await until(() => server.acks.containsKey('ffff'));
+    await until(() => server.pdfs.containsKey('/Pdf/hw'));
+    expect(server.pdfs['/Pdf/hw'], source);
+    await Future.delayed(const Duration(milliseconds: 300));
+    expect(rendered, isNot(contains('/Pdf/hw')));
+    expect(server.pdfs['/Pdf/hw'], source);
+  });
 
   test('a failed import is not acked', () async {
     sync = QuillSync.instance = makeSync();

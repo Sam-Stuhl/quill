@@ -7,6 +7,7 @@ publishes it to the tailnet over HTTPS.
     server.py serve [--host 127.0.0.1] [--port 8796]
     server.py put FILE [--to FOLDER] [--wait]
     server.py status
+    server.py delete NOTE...   (asks Quill to delete notes, e.g. "/School/hw (2)")
 
 Root: $QUILL_ROOT or ~/quill. Token: $QUILL_TOKEN_FILE or
 ~/.config/quill-sync/token (created on first serve, mode 600, never printed).
@@ -236,6 +237,43 @@ class Inbox:
         self.items: dict[str, dict] = {}
         self.version = 0
         self._stop = threading.Event()
+        # Notes Sam (or an agent) asked Quill to delete: id -> note path.
+        self.deletes: dict[str, str] = {}
+        self._deletes_mtime = None
+        self._deletes_lock = threading.Lock()
+
+    @property
+    def deletes_file(self) -> Path:
+        return self.store.meta / "delete-requests.json"
+
+    def _load_deletes(self) -> bool:
+        try:
+            m = self.deletes_file.stat().st_mtime_ns
+        except FileNotFoundError:
+            m = None
+        if m == self._deletes_mtime:
+            return False
+        self._deletes_mtime = m
+        try:
+            new = json.loads(self.deletes_file.read_text(encoding="utf-8")) if m else {}
+        except ValueError:
+            return False
+        changed = new != self.deletes
+        self.deletes = new
+        return changed
+
+    def ack_delete(self, ident: str):
+        with self._deletes_lock:
+            reqs = read_delete_requests(self.store)
+            note = reqs.pop(ident, None)
+            write_delete_requests(self.store, reqs)
+        if note is not None:
+            self.store.log("delete.done", note=note)
+        with self.cond:
+            self._load_deletes()
+            self.version += 1
+            self.cond.notify_all()
+        return note
 
     def scan(self):
         base = self.store.inbox
@@ -284,7 +322,8 @@ class Inbox:
                 self._since.pop(rel, None)
         self._seen = current
         with self.cond:
-            if items.keys() != self.items.keys():
+            deletes_changed = self._load_deletes()
+            if items.keys() != self.items.keys() or deletes_changed:
                 self.items = items
                 self.version += 1
                 self.cond.notify_all()
@@ -305,12 +344,13 @@ class Inbox:
         [since] is None), or whatever it holds when [timeout] runs out."""
         deadline = time.monotonic() + timeout
         with self.cond:
-            while (not self.items) if since is None else (self.version == since):
+            while (not self.items and not self.deletes) if since is None else (self.version == since):
                 left = deadline - time.monotonic()
                 if left <= 0:
                     break
                 self.cond.wait(left)
-            return self.version, list(self.items.values())
+            deletes = [{"id": i, "note": n} for i, n in self.deletes.items()]
+            return self.version, list(self.items.values()), deletes
 
     def get(self, ident: str):
         with self.cond:
@@ -337,6 +377,19 @@ class Inbox:
             self.version += 1
             self.cond.notify_all()
         return {"file": item["file"], "note": note, "lag_ms": lag}
+
+
+def read_delete_requests(store: Store) -> dict:
+    f = store.meta / "delete-requests.json"
+    try:
+        return json.loads(f.read_text(encoding="utf-8"))
+    except (FileNotFoundError, ValueError):
+        return {}
+
+
+def write_delete_requests(store: Store, reqs: dict):
+    Store.write_atomic(store.meta / "delete-requests.json",
+                       json.dumps(reqs, ensure_ascii=False, indent=1).encode(), None, 0o644)
 
 
 LIVE_HTML = Path(__file__).with_name("live.html")
@@ -427,8 +480,8 @@ def make_handler(store: Store, inbox: Inbox, token: str, viewers: frozenset = fr
                 wait = min(float(q.get("wait", 0) or 0), 55.0)
                 since = q.get("since")
                 since = int(since) if since and since.lstrip("-").isdigit() else None
-                version, items = inbox.wait(wait, since)
-                return self._send(200, {"version": version, "items": items})
+                version, items, deletes = inbox.wait(wait, since)
+                return self._send(200, {"version": version, "items": items, "deletes": deletes})
             m = re.fullmatch(r"/v1/inbox/([0-9a-f]{20})", path)
             if m:
                 item = inbox.get(m.group(1))
@@ -499,6 +552,9 @@ def make_handler(store: Store, inbox: Inbox, token: str, viewers: frozenset = fr
             path, _ = self._route()
             if not self._authed():
                 return
+            d = re.fullmatch(r"/v1/deletes/([0-9a-f]{20})/ack", path)
+            if d:
+                return self._send(200, {"ok": True, "note": inbox.ack_delete(d.group(1))})
             m = re.fullmatch(r"/v1/inbox/([0-9a-f]{20})/ack", path)
             if not m:
                 return self._send(404, {"error": "not found"})
@@ -593,6 +649,21 @@ def cmd_put(args):
     sys.exit("not delivered yet (is Quill open and on the tailnet?); it stays queued")
 
 
+def cmd_delete(args):
+    """Ask Quill to delete notes. The app deletes each one (to the server's trash) and acks."""
+    store = Store(default_root())
+    reqs = read_delete_requests(store)
+    for note in args.notes:
+        note = "/" + note.strip("/")
+        Store.clean(note)  # refuses traversal
+        if note in reqs.values():
+            continue
+        ident = hashlib.sha1(f"{note}\0{time.time()}".encode()).hexdigest()[:20]
+        reqs[ident] = note
+        print(f"asked Quill to delete {note}")
+    write_delete_requests(store, reqs)
+
+
 def cmd_status(_args):
     root = default_root()
     store = Store(root)
@@ -626,6 +697,8 @@ def main():
     p.add_argument("--wait", action="store_true", help="wait until Quill has it")
     p.add_argument("--timeout", type=float, default=60)
     sub.add_parser("status")
+    d = sub.add_parser("delete", help="ask Quill to delete notes")
+    d.add_argument("notes", nargs="+", help="note paths without extension, e.g. '/School/hw (2)'")
     args = ap.parse_args()
 
     if args.cmd == "serve":
@@ -635,6 +708,8 @@ def main():
         httpd.serve_forever()
     elif args.cmd == "put":
         cmd_put(args)
+    elif args.cmd == "delete":
+        cmd_delete(args)
     else:
         cmd_status(args)
 

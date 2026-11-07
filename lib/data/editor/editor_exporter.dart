@@ -32,7 +32,31 @@ abstract class EditorExporter {
   static Future<pw.Document> generatePdf(
     EditorCoreInfo coreInfo, [
     BuildContext? context,
-  ]) async {
+  ]) => _generatePdf(coreInfo);
+
+  /// [generatePdf] one page at a time, for headless exports on a phone or
+  /// tablet: every page screenshot is held raw (about 20 MB at pixel ratio 2)
+  /// until the PDF is built, which for a long note is more memory than iOS
+  /// allows. Here each screenshot is compressed to PNG as soon as it is taken,
+  /// and [beforePage] and [afterPage] let the caller load and free whatever
+  /// that page needs.
+  static Future<pw.Document> generatePdfLowMemory(
+    EditorCoreInfo coreInfo, {
+    Future<void> Function(int pageIndex)? beforePage,
+    void Function(int pageIndex)? afterPage,
+  }) => _generatePdf(
+    coreInfo,
+    lowMemory: true,
+    beforePage: beforePage,
+    afterPage: afterPage,
+  );
+
+  static Future<pw.Document> _generatePdf(
+    EditorCoreInfo coreInfo, {
+    bool lowMemory = false,
+    Future<void> Function(int pageIndex)? beforePage,
+    void Function(int pageIndex)? afterPage,
+  }) async {
     if (coreInfo.pages.isNotEmpty && coreInfo.pages.last.isEmpty) {
       // don't export the empty last page
       coreInfo = coreInfo.copyWith(
@@ -43,11 +67,32 @@ abstract class EditorExporter {
     final pdf = pw.Document();
 
     // screenshot each page
-    final pool = Pool((Platform.numberOfProcessors ~/ 2).clamp(1, 4));
+    final pool = Pool(
+      lowMemory ? 1 : (Platform.numberOfProcessors ~/ 2).clamp(1, 4),
+    );
     final pageScreenshots = await Future.wait(
       List.generate(
         coreInfo.pages.length,
-        (pageIndex) => pool.withResource(() async {
+        (pageIndex) => pool.withResource<pw.ImageProvider>(() async {
+          if (lowMemory) {
+            await beforePage?.call(pageIndex);
+            try {
+              final uiImage = await screenshotPage(
+                coreInfo: coreInfo,
+                pageIndex: pageIndex,
+              );
+              try {
+                final png = await uiImage.toByteData(
+                  format: ui.ImageByteFormat.png,
+                );
+                return pw.MemoryImage(png!.buffer.asUint8List());
+              } finally {
+                uiImage.dispose();
+              }
+            } finally {
+              afterPage?.call(pageIndex);
+            }
+          }
           final uiImage = await screenshotPage(
             coreInfo: coreInfo,
             pageIndex: pageIndex,
@@ -66,7 +111,7 @@ abstract class EditorExporter {
             order: im.ChannelOrder.rgba,
           );
           uiImage.dispose();
-          return imImage;
+          return pw.ImageImage(imImage);
         }),
       ),
     );
@@ -136,7 +181,7 @@ abstract class EditorExporter {
                   }
                 },
                 child: pw.Image(
-                  pw.ImageImage(pageScreenshots[pageIndex]),
+                  pageScreenshots[pageIndex],
                   width: pageSize.width,
                   height: pageSize.height,
                 ),
