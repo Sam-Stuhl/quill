@@ -95,7 +95,7 @@ into its week folder.
 ```
 ~sam/quill/Notes ──quill-stage──► ~console/Quill/staging ──notasync-quill──► vault ingest ──► LiveSync
  (quill-sync)     (console agent,   (mtime kept,          (notasync's image,     (container,
-                   every 1 s)        never deletes)        second instance)       I6)
+                   every 0.25 s)     never deletes)        second instance)       I6)
 ```
 
 - `stage.py` is a LaunchAgent in the `console` account, because the router is a

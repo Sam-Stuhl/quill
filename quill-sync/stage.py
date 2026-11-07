@@ -14,7 +14,7 @@ Quill note whose name is already used by a vault file the Quill router does not
 own is staged as "<name> (Quill).pdf". The choice is remembered, so the note
 keeps that name for good.
 
-    stage.py [--once] [--interval 1]
+    stage.py [--once] [--interval 0.25]
 
 Python 3.9 compatible (console's /usr/bin/python3). Standard library only.
 """
@@ -160,7 +160,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--once", action="store_true")
-    ap.add_argument("--interval", type=float, default=1.0)
+    ap.add_argument("--interval", type=float, default=0.25)
     args = ap.parse_args()
     stager = Stager()
     if args.once:
