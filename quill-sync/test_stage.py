@@ -19,7 +19,9 @@ class StageTest(unittest.TestCase):
         for d in (self.src, self.vault):
             d.mkdir()
         self.manifest = r / "router/manifest.json"
-        self.make = lambda: stage.Stager(self.src, self.stg, self.vault, r / "state", self.manifest)
+        self.imported = r / "imported"
+        self.make = lambda: stage.Stager(self.src, self.stg, self.vault, r / "state", self.manifest,
+                                         self.imported)
 
     def tearDown(self):
         self.tmp.cleanup()
@@ -84,6 +86,22 @@ class StageTest(unittest.TestCase):
         # another note is not held by this one's
         self.write("m.pdf", b"%PDF m")
         self.assertEqual(s.pass_once(), 1)
+
+    def test_imported_note_waits_until_written_in(self):
+        self.imported.write_text("Fall 26/CS 114/Old lec.pdf\n")
+        (self.vault / "School").mkdir()
+        (self.vault / "School/Old lec.pdf").write_bytes(b"notability's")
+        s = self.make()
+        self.write("Fall 26/CS 114/Old lec.pdf", b"%PDF import render", 1_700_000_000)
+        self.write("Fall 26/CS 114/New lec.pdf", b"%PDF new", 1_700_000_000)
+        self.assertEqual(s.pass_once(), 1)  # only the new note
+        self.assertEqual(self.make().pass_once(), 0)  # still held after a restart
+        self.write("Fall 26/CS 114/Old lec.pdf", b"%PDF import render + ink", 1_700_000_050)
+        self.assertEqual(s.pass_once(), 1)
+        self.assertEqual((self.stg / "Fall 26/CS 114/Old lec (Quill).pdf").read_bytes(),
+                         b"%PDF import render + ink")
+        self.write("Fall 26/CS 114/Old lec.pdf", b"%PDF more ink", 1_700_000_090)
+        self.assertEqual(self.make().pass_once(), 1)  # live for good
 
 
 if __name__ == "__main__":
