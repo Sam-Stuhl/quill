@@ -109,8 +109,30 @@ into its week folder.
   Quill note whose name a file it does not own already uses (a Notability PDF)
   is staged as `<name> (Quill).pdf`, and keeps that name.
 - Deletes in Quill do not delete anything in the vault (notasync's rule).
+- While Sam writes, Quill sends a new PDF every couple of seconds, but the
+  router files a file only once it is unchanged across two passes. So
+  `stage.py` replaces a note's staged copy at most every 2.5 s: the first change
+  after a pause goes at once, and the vault keeps updating during writing
+  instead of waiting for a pause.
 - Install or update: `cat quill-sync/deploy-vault.sh | ssh mac-mini-console bash -s`
   (`-- --status` to check). Tests: `/usr/bin/python3 -m unittest test_stage`.
+
+### Live view
+
+`https://sams-mac-mini.tail2add23.ts.net:8796/live` (2026-11-07): a page on
+the server that shows each note's PDF (rendered with pdf.js from jsDelivr) and
+redraws it the moment a new one arrives, through a long poll on
+`GET /v1/changes`. "Follow the note I'm writing in" switches to whichever note
+changed last. Pen up to the page is about 2 s, and it keeps up while writing,
+since it does not wait for the vault.
+
+The page needs no token. `tailscale serve` adds the requester's login
+(`Tailscale-User-Login`) to what it proxies to loopback, and the server lets in
+logins listed in `~/.config/quill-sync/viewers` (one per line; Sam's
+`sam.stuhl.personal@gmail.com`). That access is read only: the note list, PDFs
+and changes (`/live`, `/v1/notes`, `GET /v1/pdf`, `/v1/changes`), never uploads,
+deletes, the inbox or the native store. A process on the mini could forge the
+header on loopback, but anything there can already read `~/quill`.
 
 ## Latency budget
 
