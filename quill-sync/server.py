@@ -73,6 +73,7 @@ class Store:
         self.events = self.meta / "events.jsonl"
         self._log_lock = threading.Lock()
         self._lock = threading.Lock()
+        self.on_pdf = None  # called with the note path after each PDF upload (OCR)
         # PDF changes for the live view: note -> (seq, mtime ms or None if deleted)
         self._changes = threading.Condition()
         self._seq = 0
@@ -138,6 +139,8 @@ class Store:
         with self._lock:
             self.write_atomic(target, data, mtime_ms, 0o444)
         self._changed_pdf(self.clean(note), target.stat().st_mtime_ns // 1_000_000)
+        if self.on_pdf:
+            self.on_pdf(self.clean(note))
         return target
 
     def _to_trash(self, src: Path, base: Path, bucket: Path):
@@ -398,7 +401,7 @@ def write_delete_requests(store: Store, reqs: dict):
 LIVE_HTML = Path(__file__).with_name("live.html")
 
 
-def make_handler(store: Store, inbox: Inbox, token: str, viewers: frozenset = frozenset()):
+def make_handler(store: Store, inbox: Inbox, token: str, viewers: frozenset = frozenset(), link=None):
     class Handler(BaseHTTPRequestHandler):
         server_version = "quill-sync/1"
         protocol_version = "HTTP/1.1"
@@ -479,6 +482,13 @@ def make_handler(store: Store, inbox: Inbox, token: str, viewers: frozenset = fr
                 return
             if path == "/v1/manifest":
                 return self._send(200, store.manifest())
+            if path == "/v1/courses":
+                if link is None:
+                    return self._send(404, {"error": "not configured"})
+                try:
+                    return self._send(200, link.courses.payload(force=q.get("refresh") == "1"))
+                except Exception as e:  # Cedar or Canvas down: the app keeps what it had
+                    return self._send(502, {"error": f"courses unavailable: {e!r}"[:200]})
             if path == "/v1/inbox":
                 wait = min(float(q.get("wait", 0) or 0), 55.0)
                 since = q.get("since")
@@ -538,6 +548,28 @@ def make_handler(store: Store, inbox: Inbox, token: str, viewers: frozenset = fr
                 return self._send(400, {"error": str(e)})
             self._send(200, {"ok": True})
 
+        def _send_out(self, path, q):
+            """A page or PDF from Quill to ATLAS's shelf, or a PDF proposed to Canvas
+            (Sam taps Submit on the card; nothing is submitted here)."""
+            if link is None:
+                return self._send(404, {"error": "not configured"})
+            try:
+                data = self._body()
+                note = q.get("note") or "note"
+                if path == "/v1/send":
+                    kind = q.get("kind") if q.get("kind") in ("page", "pdf") else "pdf"
+                    res = link.sender.to_atlas(note, kind, data)
+                else:
+                    res = link.sender.to_canvas(note, q.get("course", ""), q.get("assignment", ""), data)
+            except ValueError as e:
+                return self._send(400, {"error": str(e)})
+            except RuntimeError as e:
+                store.log("send.failed", path=path, note=q.get("note"), error=str(e))
+                return self._send(502, {"error": str(e)})
+            store.log("send" if path == "/v1/send" else "canvas.propose", note=q.get("note"),
+                      kind=q.get("kind"), course=q.get("course"), assignment=q.get("assignment"))
+            self._send(200, res)
+
         def do_DELETE(self):
             path, q = self._route()
             if not self._authed():
@@ -552,9 +584,11 @@ def make_handler(store: Store, inbox: Inbox, token: str, viewers: frozenset = fr
             self._send(200, {"ok": True, "moved": moved})
 
         def do_POST(self):
-            path, _ = self._route()
+            path, q = self._route()
             if not self._authed():
                 return
+            if path in ("/v1/send", "/v1/canvas"):
+                return self._send_out(path, q)
             d = re.fullmatch(r"/v1/deletes/([0-9a-f]{20})/ack", path)
             if d:
                 return self._send(200, {"ok": True, "note": inbox.ack_delete(d.group(1))})
@@ -600,14 +634,45 @@ def load_viewers() -> frozenset:
     return frozenset(l for l in lines if l and not l.startswith("#"))
 
 
-def serve(host: str, port: int, root: Path, token: str, viewers: frozenset | None = None):
+class Link:
+    """The connections to the rest of Sam's setup (connect.py)."""
+
+    def __init__(self, root: Path):
+        import connect
+
+        self.courses = connect.Courses(root)
+        self.sender = connect.Sender(root, self.courses)
+        self.ocr = connect.Ocr(root)
+
+    def start(self):
+        threading.Thread(target=self.ocr.run, daemon=True, name="ocr").start()
+        self.ocr.backfill()
+        threading.Thread(target=self._provision, daemon=True, name="courses").start()
+
+    def _provision(self):
+        import connect
+
+        while True:
+            try:
+                landed = self.courses.provision()
+                if landed:
+                    print(json.dumps({"ev": "courses.provisioned", "files": landed}), flush=True)
+            except Exception as e:  # Cedar or Canvas down: try again next round
+                print(json.dumps({"ev": "courses.failed", "error": repr(e)[:200]}), flush=True)
+            time.sleep(connect.REFRESH_EVERY * 3)
+
+
+def serve(host: str, port: int, root: Path, token: str, viewers: frozenset | None = None,
+          link: Link | None = None):
     """Start the server; returns (httpd, inbox) with threads running."""
     store = Store(root)
+    if link is not None:
+        store.on_pdf = link.ocr.touch
     inbox = Inbox(store)
     threading.Thread(target=inbox.run, daemon=True, name="inbox").start()
     if viewers is None:
         viewers = load_viewers()
-    httpd = ThreadingHTTPServer((host, port), make_handler(store, inbox, token, viewers))
+    httpd = ThreadingHTTPServer((host, port), make_handler(store, inbox, token, viewers, link))
     httpd.daemon_threads = True
     return httpd, inbox
 
@@ -706,7 +771,9 @@ def main():
 
     if args.cmd == "serve":
         token = load_token(create=True)
-        httpd, _ = serve(args.host, args.port, default_root(), token)
+        link = Link(default_root())
+        httpd, _ = serve(args.host, args.port, default_root(), token, link=link)
+        link.start()
         print(f"quill-sync on {args.host}:{args.port}, root {default_root()}", flush=True)
         httpd.serve_forever()
     elif args.cmd == "put":

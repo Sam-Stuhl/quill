@@ -166,6 +166,37 @@ and changes (`/live`, `/v1/notes`, `GET /v1/pdf`, `/v1/changes`), never uploads,
 deletes, the inbox or the native store. A process on the mini could forge the
 header on loopback, but anything there can already read `~/quill`.
 
+## Connected: courses, ATLAS, Canvas, handwriting text (2026-11-08)
+
+Quill is also Sam's, not only a Saber build: the pieces below tie it to Cedar,
+ATLAS, Canvas and the vault. The server side is `quill-sync/connect.py`; the app
+side is under `lib/data/quill_sync/` and `lib/data/quill_defaults.dart`.
+
+- **Course folders.** `GET /v1/courses` joins Cedar's Courses (the current ones,
+  not archived) with `~/school/courses.json` (Canvas ids) and returns, per course,
+  its Quill folder (`/Fall 26/CS 114`, the router's keys; FYS SEM is `FYS`), the
+  **next due date** (Cedar's next unfinished `due`, through the course's Coursework
+  relation, so Wiley and Mastering homework count) and its Canvas file-upload
+  assignments. The app makes each folder and shows the due date on the folder's
+  card. A background pass (every 30 min) puts each upcoming assignment's PDFs
+  (from the Canvas description's file links) in that folder's `Inbox/`, once: a
+  file Sam moved or deleted is never put back (`.quill/courses-delivered.json`).
+- **Send to ATLAS.** The editor's export bar has ATLAS (the finished PDF, or the
+  current page as a PNG) and Canvas. `POST /v1/send` saves the file under
+  `Sent/<time>/` and puts it on ATLAS's shelf (`atlas-tool shelf add`, project
+  Quill), where Sam opens it in the ATLAS app. `POST /v1/canvas` takes the PDF and
+  a course and assignment from the list above, and runs `atlas-tool
+  canvas-propose`: ATLAS shows the file and the assignment on a card and Sam taps
+  Submit. Nothing here submits; an assignment Quill did not list is refused.
+- **Handwriting text.** After a note's PDF has been unchanged for 45 s, `ocr.swift`
+  (Apple's Vision, accurate mode, compiled once to `~/.cache/quill-sync/ocr`, run at
+  `nice 19`: about 3 s a page on the mini's CPU) reads it into `Text/<note>.md`,
+  once per PDF (sha256, `.quill/ocr.json`). On start every note without text is
+  queued. `stage.py` then writes each into the vault as `<note> (handwriting).md`
+  beside the note's PDF, wherever that PDF is now. Vision reads neat handwriting
+  and print well; math, diagrams and fast scrawl come out rough.
+- Tests: `/usr/bin/python3 -m unittest test_connect test_stage test_server`.
+
 ## Latency budget
 
 Pen lifts to PDF current on the mini, at home on Wi-Fi:

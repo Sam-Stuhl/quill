@@ -35,6 +35,13 @@ and it is added to drive-pull's exclude list
 version back. Only if no original can be found
 does the note go through the Quill router like a new one.
 
+Handwriting text: quill-sync's server reads each note's handwriting (connect.py,
+Apple's Vision) into ~sam/quill/Text/<note>.md. Each one is written into the
+vault as "<note> (handwriting).md" beside the note's PDF, wherever that PDF is
+(the router's folder, an imported note's original, or where the nightly sorter has
+since moved it), so Obsidian's search finds what Sam wrote. The vault's own
+companion note is untouched. It waits until the PDF has a place in the vault.
+
     stage.py [--once] [--interval 0.25]
 
 Python 3.9 compatible (console's /usr/bin/python3). Standard library only.
@@ -113,8 +120,9 @@ class Stager:
                  router_manifest=ROUTER_MANIFEST, imported=IMPORTED,
                  notasync_manifest=NOTASYNC_MANIFEST, notability_staging=NOTABILITY_STAGING,
                  retired=RETIRED, writer=docker_write, pull_excludes=PULL_EXCLUDES,
-                 store=None):
+                 store=None, texts=None):
         self.source = source
+        self.texts = texts or source.parent / "Text"
         # quill-sync's native copy of each note, next to Notes/
         self.store = store or source.parent / ".quill" / "store"
         self.staging = staging
@@ -143,6 +151,11 @@ class Stager:
         self.takeover = {}
         if self.takeover_file.exists():
             self.takeover = json.loads(self.takeover_file.read_text(encoding="utf-8"))
+        # Text rel path -> {"size", "mtime", "dest"} once written into the vault
+        self.texts_file = state_dir / "texts.json"
+        self.written_texts = {}
+        if self.texts_file.exists():
+            self.written_texts = json.loads(self.texts_file.read_text(encoding="utf-8"))
         self.baseline_file = state_dir / "imported-baseline.json"
         self.baseline = {}
         if self.baseline_file.exists():
@@ -311,8 +324,66 @@ class Stager:
         self._save()
         return staged
 
+    def _pdf_in_vault(self, rel):
+        """Where a note's PDF is in the vault right now, or None if it has no place yet."""
+        pdf_rel = rel[: -len(".md")] + ".pdf"
+        t = self.takeover.get(pdf_rel)
+        recorded = Path(t["vault"]) if t else None
+        if recorded is None:
+            try:
+                entries = json.loads(self.router_manifest.read_text(encoding="utf-8")).get("entries", {})
+            except (OSError, ValueError):
+                entries = {}
+            vp = (entries.get(self.names.get(pdf_rel, pdf_rel)) or {}).get("vault_path")
+            recorded = Path(vp) if vp else None
+        if recorded is None:
+            return None
+        if recorded.exists():
+            return recorded
+        return self._find_by_name(recorded.name)
+
+    def text_pass(self):
+        written = 0
+        if not self.texts.is_dir():
+            return 0
+        for dirpath, dirnames, filenames in os.walk(self.texts):
+            dirnames[:] = [d for d in dirnames if not d.startswith(".")]
+            for name in filenames:
+                if name.startswith(".") or not name.endswith(".md"):
+                    continue
+                src = Path(dirpath) / name
+                rel = src.relative_to(self.texts).as_posix()
+                try:
+                    st = src.stat()
+                except FileNotFoundError:
+                    continue
+                done = self.written_texts.get(rel)
+                if done and done["size"] == st.st_size and done["mtime"] == st.st_mtime_ns:
+                    continue
+                dest = None
+                if done:  # update the note where it is now, if the sorter moved it
+                    old = Path(done["dest"])
+                    dest = old if old.exists() else self._find_by_name(old.name)
+                if dest is None:
+                    pdf = self._pdf_in_vault(rel)
+                    if pdf is None:
+                        continue  # the PDF is not in the vault yet: later
+                    dest = pdf.with_name(pdf.stem + " (handwriting).md")
+                self.writer(src, dest, self.vault)
+                self.written_texts[rel] = {"size": st.st_size, "mtime": st.st_mtime_ns, "dest": str(dest)}
+                tmp = self.texts_file.with_name(self.texts_file.name + ".tmp")
+                tmp.write_text(json.dumps(self.written_texts, ensure_ascii=False, indent=1), encoding="utf-8")
+                os.replace(tmp, self.texts_file)
+                log("text", source=rel, vault=str(dest), bytes=st.st_size)
+                written += 1
+        return written
+
     def pass_once(self):
         self._vault_names = None
+        try:
+            self.text_pass()
+        except Exception as e:  # text never holds up the PDFs
+            log("text-failed", error=repr(e))
         copied = 0
         if not self.source.is_dir():
             return 0
