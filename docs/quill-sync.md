@@ -195,6 +195,15 @@ side is under `lib/data/quill_sync/` and `lib/data/quill_defaults.dart`.
   queued. `stage.py` then writes each into the vault as `<note> (handwriting).md`
   beside the note's PDF, wherever that PDF is now. Vision reads neat handwriting
   and print well; math, diagrams and fast scrawl come out rough.
+- The server's LaunchAgent now runs through `uv run --no-project --`: reading
+  `~/school/courses.json` (a symlink into the NAS on the mini) needs the Full Disk
+  Access that `uv` holds, and without it the read blocks forever (found 2026-11-08:
+  `/v1/courses` hung). The read is also time limited, with a local copy in
+  `.quill/courses-cache.json` as the fallback. `kill -USR1` on the server prints
+  every thread's stack to `~/Library/Logs/quill-sync.log`.
+- OCR rests 15 s between notes and starts none while the mini's 1-minute load is
+  over 36 (3 per core; it sits at 10 to 25 with Ollama running, and a first,
+  ungated backfill took it to 25).
 - Tests: `/usr/bin/python3 -m unittest test_connect test_stage test_server`.
 
 ## Latency budget
