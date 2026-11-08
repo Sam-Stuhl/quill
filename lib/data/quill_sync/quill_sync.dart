@@ -10,6 +10,7 @@ import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:saber/data/file_manager/file_manager.dart';
+import 'package:saber/data/quill_sync/quill_connect.dart';
 import 'package:saber/data/quill_sync/quill_import.dart';
 import 'package:saber/pages/editor/editor.dart';
 
@@ -51,6 +52,12 @@ class QuillSync {
       stateDir: '${dir.path}/quill_sync',
     );
     await instance!.start();
+    QuillConnect.instance = QuillConnect(
+      baseUrl: Uri.parse(configuredUrl),
+      token: configuredToken,
+      stateDir: '${dir.path}/quill_sync',
+    );
+    unawaited(QuillConnect.instance!.start());
   }
 
   final Uri baseUrl;
