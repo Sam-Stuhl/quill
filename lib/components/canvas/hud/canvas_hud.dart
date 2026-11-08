@@ -59,7 +59,7 @@ class CanvasHud extends HookWidget {
           children: [
             Positioned(
               top: 5,
-              left: 5,
+              left: 0,
               child: CanvasGestureLockBtn(
                 lock: zoomLock,
                 setLock: setZoomLock,
@@ -70,8 +70,8 @@ class CanvasHud extends HookWidget {
               ),
             ),
             Positioned(
-              top: 45,
-              left: 5,
+              top: 50,
+              left: 0,
               child: CanvasGestureLockBtn(
                 lock: singleFingerPanLock,
                 setLock: setSingleFingerPanLock,
@@ -82,8 +82,8 @@ class CanvasHud extends HookWidget {
               ),
             ),
             Positioned(
-              top: 85,
-              left: 5,
+              top: 95,
+              left: 0,
               child: CanvasGestureLockBtn(
                 lock: axisAlignedPanLock,
                 setLock: setAxisAlignedPanLock,

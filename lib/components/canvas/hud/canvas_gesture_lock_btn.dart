@@ -23,21 +23,28 @@ class CanvasGestureLockBtn extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = ColorScheme.of(context);
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: () => setLock(!lock),
-      child: Container(
-        decoration: BoxDecoration(
-          color: colorScheme.surface.withValues(alpha: 0.5),
-          borderRadius: const .all(.circular(16)),
-        ),
-        padding: const .all(5),
-        child: Tooltip(
-          message: tooltip,
-          child:
-              child ??
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 200),
-                child: Icon(icon, color: colorScheme.onSurface),
-              ),
+      // the tap area is 44 pt, the visible button stays small
+      child: SizedBox.square(
+        dimension: 44,
+        child: Center(
+          child: Container(
+            decoration: BoxDecoration(
+              color: colorScheme.surface.withValues(alpha: 0.5),
+              borderRadius: const .all(.circular(16)),
+            ),
+            padding: const .all(5),
+            child: Tooltip(
+              message: tooltip,
+              child:
+                  child ??
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 200),
+                    child: Icon(icon, color: colorScheme.onSurface),
+                  ),
+            ),
+          ),
         ),
       ),
     );

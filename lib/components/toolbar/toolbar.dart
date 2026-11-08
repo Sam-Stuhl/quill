@@ -14,7 +14,6 @@ import 'package:saber/components/theming/uni_icon.dart';
 import 'package:saber/components/toolbar/color_bar.dart';
 import 'package:saber/components/toolbar/export_bar.dart';
 import 'package:saber/components/toolbar/pen_modal.dart';
-import 'package:saber/components/toolbar/selection_bar.dart';
 import 'package:saber/components/toolbar/size_picker.dart';
 import 'package:saber/components/toolbar/toolbar_button.dart';
 import 'package:saber/data/editor/page.dart';
@@ -46,8 +45,6 @@ class Toolbar extends StatefulWidget {
     required this.toggleFingerDrawing,
     required this.pickPhoto,
     required this.paste,
-    required this.duplicateSelection,
-    required this.deleteSelection,
     required this.exportAsSba,
     required this.exportAsPdf,
     required this.exportAsPng,
@@ -74,9 +71,6 @@ class Toolbar extends StatefulWidget {
 
   final VoidCallback paste;
 
-  final VoidCallback duplicateSelection;
-  final VoidCallback deleteSelection;
-
   final Future Function(BuildContext)? exportAsSba;
   final Future Function(BuildContext)? exportAsPdf;
   final Future Function(BuildContext)? exportAsPng;
@@ -84,8 +78,8 @@ class Toolbar extends StatefulWidget {
   @override
   State<Toolbar> createState() => _ToolbarState();
 
-  static const _buttonPaddingHorizontal = EdgeInsets.symmetric(horizontal: 6);
-  static const _buttonPaddingVertical = EdgeInsets.symmetric(vertical: 6);
+  static const _buttonPaddingHorizontal = EdgeInsets.symmetric(horizontal: 3);
+  static const _buttonPaddingVertical = EdgeInsets.symmetric(vertical: 3);
 }
 
 class _ToolbarState extends State<Toolbar> {
@@ -192,13 +186,6 @@ class _ToolbarState extends State<Toolbar> {
       _ => null,
     };
 
-    if (widget.currentTool == Select.currentSelect) {
-      // Enable selection bar only when selection is done
-      toolOptionsType.value = Select.currentSelect.doneSelecting
-          ? .select
-          : .hide;
-    }
-
     final bars = <Widget>[
       ValueListenableBuilder(
         valueListenable: showExportOptions,
@@ -242,10 +229,6 @@ class _ToolbarState extends State<Toolbar> {
               .pencil => PenModal(
                 getTool: () => Pencil.currentPencil,
                 setTool: widget.setTool,
-              ),
-              .select => SelectionBar(
-                duplicateSelection: widget.duplicateSelection,
-                deleteSelection: widget.deleteSelection,
               ),
             },
           );
@@ -580,4 +563,4 @@ class _ToolbarState extends State<Toolbar> {
   }
 }
 
-enum ToolOptions { hide, pen, highlighter, pencil, select }
+enum ToolOptions { hide, pen, highlighter, pencil }
