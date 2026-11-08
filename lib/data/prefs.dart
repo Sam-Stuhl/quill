@@ -175,6 +175,7 @@ class Stows {
     isDesktop,
     volatile: !_isOnMainIsolate,
   );
+
   /// Quill: 1 s (upstream 10 s) so Quill sync gets each pause in writing.
   final autosaveDelay = PlainStow(
     'autosaveDelay',
@@ -318,6 +319,13 @@ class Stows {
         Colors.black.toARGB32(),
         volatile: !_isOnMainIsolate,
       );
+
+  /// The version of Sam's defaults (quill_defaults.dart) last applied.
+  final quillDefaultsVersion = PlainStow(
+    'quillDefaultsVersion',
+    0,
+    volatile: !_isOnMainIsolate,
+  );
   final lastBackgroundPattern = PlainStow(
     'lastBackgroundPattern',
     CanvasBackgroundPattern.none,
