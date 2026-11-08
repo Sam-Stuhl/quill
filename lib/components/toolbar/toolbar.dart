@@ -48,6 +48,8 @@ class Toolbar extends StatefulWidget {
     required this.exportAsSba,
     required this.exportAsPdf,
     required this.exportAsPng,
+    this.exportToAtlas,
+    this.exportToCanvas,
   });
 
   final bool readOnly;
@@ -74,6 +76,8 @@ class Toolbar extends StatefulWidget {
   final Future Function(BuildContext)? exportAsSba;
   final Future Function(BuildContext)? exportAsPdf;
   final Future Function(BuildContext)? exportAsPng;
+  final Future Function(BuildContext)? exportToAtlas;
+  final Future Function(BuildContext)? exportToCanvas;
 
   @override
   State<Toolbar> createState() => _ToolbarState();
@@ -205,6 +209,8 @@ class _ToolbarState extends State<Toolbar> {
           exportAsSba: widget.exportAsSba,
           exportAsPdf: widget.exportAsPdf,
           exportAsPng: widget.exportAsPng,
+          exportToAtlas: widget.exportToAtlas,
+          exportToCanvas: widget.exportToCanvas,
         ),
       ),
       ValueListenableBuilder(

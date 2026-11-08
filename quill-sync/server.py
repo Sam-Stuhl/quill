@@ -770,6 +770,10 @@ def main():
     args = ap.parse_args()
 
     if args.cmd == "serve":
+        import faulthandler
+        import signal
+
+        faulthandler.register(signal.SIGUSR1, all_threads=True)  # kill -USR1 dumps every stack to the log
         token = load_token(create=True)
         link = Link(default_root())
         httpd, _ = serve(args.host, args.port, default_root(), token, link=link)

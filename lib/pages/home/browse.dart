@@ -20,6 +20,7 @@ import 'package:saber/components/home/syncing_button.dart';
 import 'package:saber/components/theming/saber_theme.dart';
 import 'package:saber/data/file_manager/file_manager.dart';
 import 'package:saber/data/prefs.dart';
+import 'package:saber/data/quill_sync/quill_connect.dart';
 import 'package:saber/data/routes.dart';
 import 'package:saber/i18n/strings.g.dart';
 
@@ -46,6 +47,7 @@ class _BrowsePageState extends State<BrowsePage> {
   void initState() {
     path = widget.initialPath;
 
+    unawaited(QuillConnect.instance?.refreshIfStale());
     findChildrenOfPath();
     fileWriteSubscription = FileManager.fileWriteStream.stream.listen(
       fileWriteListener,
@@ -123,6 +125,7 @@ class _BrowsePageState extends State<BrowsePage> {
     final platform = Theme.of(context).platform;
     final crossAxisCount = MediaQuery.sizeOf(context).width ~/ 300 + 1;
     useListenable(stows.homeLayout);
+    useListenable(QuillConnect.courses);
     useOnListenableChange(stows.browseSortMetric, findChildrenOfPath);
 
     return Scaffold(
@@ -156,6 +159,16 @@ class _BrowsePageState extends State<BrowsePage> {
           const SliverPadding(padding: .only(bottom: 16)),
           GridFolders(
             isAtRoot: path?.isEmpty ?? true,
+            subtitleOf: (folderName) {
+              final course = QuillConnect.courseOfPath(
+                p.join(path ?? '/', folderName),
+              );
+              final next = course?.next;
+              if (course == null || next == null) return null;
+              // Only on the course's own card, not on folders inside it.
+              if (p.join(path ?? '/', folderName) != course.folder) return null;
+              return '${next.name}\n${QuillConnect.dueLabel(next)}';
+            },
             crossAxisCount: crossAxisCount,
             onTap: onDirectoryTap,
             createFolder: createFolder,

@@ -23,6 +23,7 @@ import 'package:saber/components/canvas/canvas_image.dart';
 import 'package:saber/components/canvas/image/editor_image.dart';
 import 'package:saber/components/canvas/save_indicator.dart';
 import 'package:saber/components/editor/read_only_banner.dart';
+import 'package:saber/components/quill/quill_send.dart';
 import 'package:saber/components/theming/adaptive_alert_dialog.dart';
 import 'package:saber/components/theming/adaptive_icon.dart';
 import 'package:saber/components/theming/dynamic_material_app.dart';
@@ -2122,6 +2123,13 @@ class EditorState extends State<Editor> {
           exportAsSba: exportAsSba,
           exportAsPdf: exportAsPdf,
           exportAsPng: exportAsPng,
+          exportToAtlas: QuillSend.available
+              ? (context) =>
+                    QuillSend.toAtlas(context, coreInfo, currentPageIndex)
+              : null,
+          exportToCanvas: QuillSend.available
+              ? (context) => QuillSend.toCanvas(context, coreInfo)
+              : null,
         ),
       ),
     );

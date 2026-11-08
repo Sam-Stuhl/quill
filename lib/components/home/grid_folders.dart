@@ -20,6 +20,7 @@ class GridFolders extends StatelessWidget {
     required this.deleteFolder,
     required this.doesFolderExist,
     required this.folders,
+    this.subtitleOf,
   });
 
   final bool isAtRoot;
@@ -33,6 +34,9 @@ class GridFolders extends StatelessWidget {
   final Future<void> Function(String) deleteFolder;
 
   final List<String> folders;
+
+  /// A second line for a folder's card (a course's next due date), or null.
+  final String? Function(String folderName)? subtitleOf;
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +60,7 @@ class GridFolders extends StatelessWidget {
           return _GridFolder(
             cardType: cardType,
             folderName: folderName,
+            subtitle: folderName == null ? null : subtitleOf?.call(folderName),
             createFolder: createFolder,
             doesFolderExist: doesFolderExist,
             renameFolder: renameFolder,
@@ -73,6 +78,7 @@ class _GridFolder extends StatefulWidget {
   const new({
     required this.cardType,
     required this.folderName,
+    this.subtitle,
     required this.createFolder,
     required this.doesFolderExist,
     required this.renameFolder,
@@ -86,6 +92,7 @@ class _GridFolder extends StatefulWidget {
 
   final _FolderCardType cardType;
   final String? folderName;
+  final String? subtitle;
   final void Function(String) createFolder;
   final bool Function(String) doesFolderExist;
   final Future<void> Function(String oldName, String newName) renameFolder;
@@ -231,6 +238,18 @@ class _GridFolderState extends State<_GridFolder> {
                   .newFolder => Text(t.home.newFolder.newFolder),
                   .realFolder => Text(widget.folderName!),
                 },
+                if (widget.subtitle case final subtitle?)
+                  Text(
+                    subtitle,
+                    style: TextTheme.of(context).bodySmall?.copyWith(
+                      color: subtitle.endsWith('Overdue')
+                          ? colorScheme.error
+                          : colorScheme.onSurfaceVariant,
+                    ),
+                    textAlign: .center,
+                    maxLines: 3,
+                    overflow: .ellipsis,
+                  ),
               ],
             ),
           ),

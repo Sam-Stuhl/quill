@@ -195,7 +195,38 @@ side is under `lib/data/quill_sync/` and `lib/data/quill_defaults.dart`.
   queued. `stage.py` then writes each into the vault as `<note> (handwriting).md`
   beside the note's PDF, wherever that PDF is now. Vision reads neat handwriting
   and print well; math, diagrams and fast scrawl come out rough.
-- Tests: `/usr/bin/python3 -m unittest test_connect test_stage test_server`.
+- The server's LaunchAgent now runs through `uv run --no-project --`: reading
+  `~/school/courses.json` (a symlink into the NAS on the mini) needs the Full Disk
+  Access that `uv` holds, and without it the read blocks forever (found 2026-11-08:
+  `/v1/courses` hung). The read is also time limited, with a local copy in
+  `.quill/courses-cache.json` as the fallback. `kill -USR1` on the server prints
+  every thread's stack to `~/Library/Logs/quill-sync.log`.
+- OCR rests 15 s between notes and starts none while the mini's 1-minute load is
+  over 36 (3 per core; it sits at 10 to 25 with Ollama running, and a first,
+  ungated backfill took it to 25).
+- **In the app.** `lib/data/quill_sync/quill_connect.dart` fetches `/v1/courses` on
+  start, on resume, every 15 minutes and when the folder page opens (at most once a
+  minute), keeps a copy for when the mini is away, and makes each course's folder.
+  A course's own folder card shows its next due item and date ("Due tomorrow",
+  "Overdue" in red); folders inside it and the semester folder show nothing. The
+  export bar (the toolbar's export button) gains ATLAS (a dialog: this page as a
+  PNG, or the whole note as a PDF) and Canvas (a list of the course's upload
+  assignments, unsubmitted first; the course is the note's folder, any course when
+  the note is elsewhere). Both buttons are hidden in a build without a sync server.
+  Canvas only files the proposal: ATLAS's card has the Submit button.
+- **His defaults.** `lib/data/quill_defaults.dart`, applied once at first launch and
+  again only when its `version` is raised, so upstream's defaults stay as they are
+  and a later change in the app sticks: system light or dark in ink blue (accent
+  `#3454A0`), college ruled paper, a fine black fountain pen (size 3), a blue
+  ballpoint (`#1B3B8C`, 2.5), a slim yellow highlighter (30), a gray pencil. Edit
+  the file and raise `version` to change a taste. The app's name is Quill on the
+  home screen and in `Info.plist`; its text inside (settings, welcome) still says
+  Saber, as upstream's translations do. The icon is a quill on ink blue in light,
+  dark and tinted forms, drawn by `scripts/quill_icon.swift` (`swift
+  scripts/quill_icon.swift`) into the iOS asset catalog only, so upstream's icons
+  under `assets/icon` merge untouched.
+- Tests: `/usr/bin/python3 -m unittest test_connect test_stage test_server`, and
+  `flutter test test/quill_connect_test.dart` for the app side.
 
 ## Latency budget
 

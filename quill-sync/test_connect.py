@@ -102,6 +102,12 @@ class CoursesTest(Fixture):
         self.assertEqual(self.courses.provision(), [])  # never put back
         self.assertFalse(dest.exists())
 
+    def test_submitted_assignments_get_no_pdf(self):
+        self.courses.fetch = lambda url, key: (
+            [{**a, "has_submitted_submissions": True} for a in fake_fetch(url, key)]
+            if "/courses/1/assignments" in url else fake_fetch(url, key))
+        self.assertEqual(self.courses.provision(), [])
+
     def test_only_listed_assignments_can_be_proposed(self):
         self.assertTrue(self.courses.known_assignment("1", "11"))
         self.assertFalse(self.courses.known_assignment("1", "999"))
@@ -161,7 +167,7 @@ class OcrTest(Fixture):
         pdf.parent.mkdir(parents=True)
         pdf.write_bytes(PDF)
         reads = []
-        ocr = connect.Ocr(self.root, quiet=0, recognise=lambda p: reads.append(p) or ["hello\nworld", "", "two"])
+        ocr = connect.Ocr(self.root, quiet=0, pause=0, recognise=lambda p: reads.append(p) or ["hello\nworld", "", "two"])
         self.assertTrue(ocr.read("/Fall 26/CS 114/Lec 3"))
         text = (self.root / "Text/Fall 26/CS 114/Lec 3.md").read_text()
         self.assertIn("source: quill-handwriting", text)
@@ -180,7 +186,7 @@ class OcrTest(Fixture):
         pdf.parent.mkdir(parents=True)
         pdf.write_bytes(PDF)
         reads = []
-        ocr = connect.Ocr(self.root, quiet=0.4, recognise=lambda p: reads.append(p) or ["x"])
+        ocr = connect.Ocr(self.root, quiet=0.4, pause=0, max_load=1e9, recognise=lambda p: reads.append(p) or ["x"])
         threading.Thread(target=ocr.run, daemon=True).start()
         ocr.touch("/a")
         time.sleep(0.15)

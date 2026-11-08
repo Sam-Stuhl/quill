@@ -10,6 +10,8 @@ class ExportBar extends StatefulWidget {
     required this.exportAsSba,
     required this.exportAsPdf,
     required this.exportAsPng,
+    this.exportToAtlas,
+    this.exportToCanvas,
   });
 
   final Axis axis;
@@ -19,6 +21,11 @@ class ExportBar extends StatefulWidget {
   final Future Function(BuildContext)? exportAsSba;
   final Future Function(BuildContext)? exportAsPdf;
   final Future Function(BuildContext)? exportAsPng;
+
+  /// Quill: send a page or the PDF to ATLAS, or the PDF to Canvas for Sam to
+  /// submit. Null (hidden) when Quill sync is not configured.
+  final Future Function(BuildContext)? exportToAtlas;
+  final Future Function(BuildContext)? exportToCanvas;
 
   @override
   State<ExportBar> createState() => _ExportBarState();
@@ -85,6 +92,26 @@ class _ExportBarState extends State<ExportBar> {
           );
         },
       ),
+      if (widget.exportToAtlas != null) ...[
+        const SizedBox.square(dimension: 8),
+        Builder(
+          builder: (context) {
+            return TextButton(
+              onPressed: _onPressed(widget.exportToAtlas, context),
+              child: _buttonChild(widget.exportToAtlas, 'ATLAS'),
+            );
+          },
+        ),
+      ],
+      if (widget.exportToCanvas != null)
+        Builder(
+          builder: (context) {
+            return TextButton(
+              onPressed: _onPressed(widget.exportToCanvas, context),
+              child: _buttonChild(widget.exportToCanvas, 'Canvas'),
+            );
+          },
+        ),
     ];
 
     return Center(

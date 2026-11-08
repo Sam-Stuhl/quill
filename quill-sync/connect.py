@@ -95,7 +95,7 @@ class Courses:
         records = self.fetch(f"{CEDAR}/records?collection={cid}&limit=200", "CEDAR_API_KEY")
         records = records.get("result", records) if isinstance(records, dict) else records
         codes = {r["props"].get("code") or r["title"]: r["id"] for r in records if not r.get("archived_at")}
-        known = json.loads(COURSES_JSON.read_text())["courses"]
+        known = self._courses_json()["courses"]
         out = []
         for c in known:
             if c["code"] not in codes:
@@ -104,6 +104,23 @@ class Courses:
             ids = ids if isinstance(ids, list) else [ids] if ids else []
             out.append({"code": c["code"], "name": c["name"], "canvas": ids, "record": codes[c["code"]]})
         return out
+
+    def _courses_json(self) -> dict:
+        """~/school/courses.json. On the mini ~/school is a symlink into the NAS, which a
+        process launchd starts can open only with Full Disk Access, and without it the
+        read blocks for good: so it is read in a thread with a time limit, kept in a
+        local copy, and the copy is used when the NAS cannot be read."""
+        cache = self.root / ".quill" / "courses-cache.json"
+        box: list = []
+        t = threading.Thread(target=lambda: box.append(COURSES_JSON.read_text()), daemon=True)
+        t.start()
+        t.join(5)
+        if box:
+            data = json.loads(box[0])
+            cache.parent.mkdir(parents=True, exist_ok=True)
+            cache.write_text(box[0])
+            return data
+        return json.loads(cache.read_text())
 
     def due_dates(self, courses: list[dict]) -> dict:
         """Course record id -> its next unfinished due date in Cedar (Canvas, Wiley,
@@ -207,6 +224,8 @@ class Courses:
         landed = []
         for c in courses:
             for a in c["_raw"]:
+                if a["submitted"]:
+                    continue  # already turned in: nothing to hand out
                 for fid, display, data_url in self._pdfs(a["html"]):
                     key = f"{a['id']}:{fid}"
                     if key in done:
@@ -317,9 +336,14 @@ class Ocr:
     read once its PDF has not changed for `quiet` seconds, never while Sam writes,
     and only when the PDF differs from the last one read (sha256)."""
 
-    def __init__(self, root: Path, quiet: float = 45.0, recognise=None):
+    def __init__(self, root: Path, quiet: float = 45.0, recognise=None,
+                 max_load: float = 36.0, pause: float = 15.0):
         self.root = root
         self.quiet = quiet
+        # Vision uses every core (the mini's load sits at 10 to 25 with Ollama running): rest
+        # between notes, and start none while the 1 minute load is over max_load (3 per core).
+        self.max_load = max_load
+        self.pause = pause
         self.recognise = recognise or self._swift
         self.pending: dict[str, float] = {}
         self.cv = threading.Condition()
@@ -353,6 +377,9 @@ class Ocr:
             with self.cv:
                 now = time.time()
                 ready = [n for n, t in self.pending.items() if now - t >= self.quiet]
+                if ready and os.getloadavg()[0] > self.max_load:
+                    ready = []
+                    self.cv.wait(timeout=10.0)
                 if ready:
                     note = min(ready, key=lambda n: self.pending[n])
                     del self.pending[note]
@@ -364,6 +391,8 @@ class Ocr:
                     self.read(note)
                 except Exception as e:  # one bad PDF must not stop the rest
                     self.log("ocr-failed", note=note, error=repr(e)[:200])
+                with self.cv:
+                    self.cv.wait(timeout=self.pause)
 
     def stop(self):
         self.stopped = True
