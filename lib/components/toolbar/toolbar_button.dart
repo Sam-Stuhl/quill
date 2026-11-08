@@ -42,9 +42,11 @@ class ToolbarIconButton extends StatelessWidget {
       backgroundColor: backgroundColor,
       iconColor: foregroundColor,
       foregroundColor: foregroundColor,
-      iconSize: const WidgetStatePropertyAll(20),
-      padding: const WidgetStatePropertyAll(EdgeInsets.all(8)),
-      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      iconSize: const WidgetStatePropertyAll(22),
+      padding: const WidgetStatePropertyAll(EdgeInsets.all(11)),
+      // 44 pt, what a fingertip needs
+      minimumSize: const WidgetStatePropertyAll(Size(44, 44)),
+      tapTargetSize: MaterialTapTargetSize.padded,
     );
 
     return Padding(

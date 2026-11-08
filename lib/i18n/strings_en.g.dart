@@ -1256,6 +1256,42 @@ class Translations$editor$selectionBar$en {
 
 	/// en: 'Duplicate'
 	String get duplicate => 'Duplicate';
+
+	/// en: 'Copy'
+	String get copy => 'Copy';
+
+	/// en: 'Copied'
+	String get copied => 'Copied';
+
+	/// en: 'Cut'
+	String get cut => 'Cut';
+
+	/// en: 'Paste'
+	String get paste => 'Paste';
+
+	/// en: 'Color'
+	String get color => 'Color';
+
+	/// en: 'Clipboard'
+	String get clipboard => 'Clipboard';
+
+	/// en: 'Copy something and it stays here, ready to paste again.'
+	String get clipboardEmpty => 'Copy something and it stays here, ready to paste again.';
+
+	/// en: 'Clear'
+	String get clipboardClear => 'Clear';
+
+	/// en: '(one) {1 item} (other) {$n items}'
+	String clipboardItems({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+		one: '1 item',
+		other: '${n} items',
+	);
+
+	/// en: 'Paste here'
+	String get pasteHere => 'Paste here';
+
+	/// en: 'A PDF page can only be pasted into the note it came from'
+	String get pastedPdfImageSkipped => 'A PDF page can only be pasted into the note it came from';
 }
 
 // Path: editor.menu

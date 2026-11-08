@@ -30,7 +30,9 @@ import 'package:saber/components/theming/saber_theme.dart';
 import 'package:saber/components/toolbar/color_bar.dart';
 import 'package:saber/components/toolbar/editor_bottom_sheet.dart';
 import 'package:saber/components/toolbar/editor_page_manager.dart';
+import 'package:saber/components/toolbar/selection_menu.dart';
 import 'package:saber/components/toolbar/toolbar.dart';
+import 'package:saber/data/clipboard_shelf.dart';
 import 'package:saber/data/editor/editor_core_info.dart';
 import 'package:saber/data/editor/editor_exporter.dart';
 import 'package:saber/data/editor/editor_history.dart';
@@ -581,6 +583,14 @@ class EditorState extends State<Editor> {
 
     if (currentTool == Tool.textEditing) {
       return false;
+    } else if (_isTouchOnSelection(details.focalPoint)) {
+      // a finger can drag a selection it is holding
+      _longPressConsumedTouch = false;
+      return true;
+    } else if (_longPressConsumedTouch) {
+      // the finger that just did a press and hold must not leave a dot
+      _longPressConsumedTouch = false;
+      return false;
     } else if (stows.editorFingerDrawing.value ||
         currentPointerKind == PointerDeviceKind.stylus ||
         currentPointerKind == PointerDeviceKind.invertedStylus ||
@@ -590,6 +600,22 @@ class EditorState extends State<Editor> {
       log.fine('Non-stylus found, rejected stroke');
       return false;
     }
+  }
+
+  /// Set by a press and hold: the lift of that finger is not a stroke.
+  var _longPressConsumedTouch = false;
+
+  bool _isTouchOnSelection(Offset globalPosition) {
+    final select = Select.currentSelect;
+    if (currentTool is! Select ||
+        !select.doneSelecting ||
+        select.selectResult.pageIndex != dragPageIndex) {
+      return false;
+    }
+    final page = coreInfo.pages[dragPageIndex!];
+    final box = page.renderBox;
+    if (box == null) return false;
+    return select.selectResult.path.contains(box.globalToLocal(globalPosition));
   }
 
   static const changePageThreshold = 50.0;
@@ -616,6 +642,8 @@ class EditorState extends State<Editor> {
       removeExcessPages();
     } else if (currentTool is Select) {
       final select = currentTool as Select;
+      _draggingSelection = true;
+      _pasteMenuAt = null;
       if (select.doneSelecting &&
           select.selectResult.pageIndex == dragPageIndex! &&
           select.selectResult.path.contains(position)) {
@@ -817,6 +845,7 @@ class EditorState extends State<Editor> {
     }
     final page = coreInfo.pages[dragPageIndex!];
     bool shouldSave = true;
+    _draggingSelection = false;
     setState(() {
       if (currentTool is Pen) {
         final newStroke = (currentTool as Pen).onDragEnd();
@@ -1447,6 +1476,401 @@ class EditorState extends State<Editor> {
     return true;
   }
 
+  // ---- Selection menu and clipboard shelf ----
+
+  /// The tool to go back to once a press and hold selection is done with.
+  Tool? _toolBeforeSelect;
+
+  /// True while a finger or the pencil is dragging a selection, so the menu
+  /// stays out of the way.
+  var _draggingSelection = false;
+
+  /// Where a press and hold on empty paper happened (page and spot on it),
+  /// for the paste menu.
+  ({int pageIndex, Offset position})? _pasteMenuAt;
+
+  /// The Select tool for a press and hold, remembering what to go back to.
+  void _enterSelect() {
+    if (currentTool is! Select) {
+      _toolBeforeSelect = currentTool;
+      currentTool = Select.currentSelect;
+    }
+  }
+
+  /// Drops the selection and, if it was started by a press and hold, goes
+  /// back to the tool that was in use.
+  void _leaveSelect() {
+    Select.currentSelect.unselect();
+    _draggingSelection = false;
+    final before = _toolBeforeSelect;
+    _toolBeforeSelect = null;
+    if (before != null && currentTool is Select) currentTool = before;
+  }
+
+  /// A finger held still on the page: select the writing or image under it,
+  /// or offer to paste when there is nothing there.
+  void onLongPress(Offset globalPosition) {
+    if (!mounted || coreInfo.readOnly) return;
+    if (currentTool == Tool.textEditing || currentTool is LaserPointer) return;
+    // a finger held still never starts a stroke, so this works with finger
+    // drawing on too
+
+    final pageIndex = onWhichPageIsFocalPoint(globalPosition);
+    if (pageIndex == null) return;
+    final page = coreInfo.pages[pageIndex];
+    final position = page.renderBox!.globalToLocal(globalPosition);
+
+    // with finger drawing on, the finger already started a dot: drop it
+    if (currentTool is Pen && Pen.currentStroke != null) {
+      (currentTool as Pen).onDragEnd();
+      page.redrawStrokes();
+    }
+    HapticFeedback.mediumImpact();
+    _longPressConsumedTouch = true;
+    CanvasImage.activeListener.notifyListenersPlease();
+    setState(() {
+      final hit = Select.currentSelect.selectAt(
+        position,
+        pageIndex,
+        page.strokes,
+        page.images,
+        zoom: _transformationController.value.approxScale,
+      );
+      if (hit) {
+        _enterSelect();
+        _pasteMenuAt = null;
+      } else {
+        if (currentTool is Select) _leaveSelect();
+        _pasteMenuAt = (pageIndex: pageIndex, position: position);
+      }
+    });
+  }
+
+  /// A quick tap: dismisses the selection or paste menu when it lands
+  /// outside them.
+  void onTouchTap(Offset globalPosition) {
+    // the lift of a press and hold is not a tap
+    if (!mounted || _longPressConsumedTouch) return;
+    final select = Select.currentSelect;
+    final selecting = currentTool is Select && select.doneSelecting;
+    if (!selecting && _pasteMenuAt == null) return;
+
+    if (selecting) {
+      final pageIndex = onWhichPageIsFocalPoint(globalPosition);
+      if (pageIndex == select.selectResult.pageIndex) {
+        final position = coreInfo.pages[pageIndex!].renderBox!.globalToLocal(
+          globalPosition,
+        );
+        if (select.selectResult.path.contains(position)) return;
+      }
+    }
+    setState(() {
+      _pasteMenuAt = null;
+      if (selecting) _leaveSelect();
+    });
+  }
+
+  /// Copies the selection onto the clipboard shelf.
+  void copySelection() {
+    final select = Select.currentSelect;
+    if (!select.doneSelecting || select.selectResult.isEmpty) return;
+    final result = select.selectResult;
+    ClipboardShelf.instance.add(
+      ClipboardEntry(
+        strokes: [for (final stroke in result.strokes) stroke.copy()],
+        images: [for (final image in result.images) image.copy()],
+        sourcePath: coreInfo.filePath,
+        bounds: select.bounds ?? .zero,
+      ),
+    );
+    HapticFeedback.selectionClick();
+    ScaffoldMessenger.maybeOf(context)
+      ?..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(t.editor.selectionBar.copied),
+          duration: const Duration(seconds: 1),
+        ),
+      );
+  }
+
+  void cutSelection() {
+    copySelection();
+    deleteSelection();
+  }
+
+  void duplicateSelection() {
+    final select = Select.currentSelect;
+    if (!select.doneSelecting) return;
+
+    setState(() {
+      final page = coreInfo.pages[select.selectResult.pageIndex];
+      final strokes = select.selectResult.strokes;
+      final images = select.selectResult.images;
+
+      const duplicationFeedbackOffset = Offset(25, -25);
+
+      final duplicatedStrokes = strokes.map((stroke) {
+        return stroke.copy()..shift(duplicationFeedbackOffset);
+      }).toList();
+
+      final duplicatedImages = images.map((image) {
+        return image.copy()
+          ..id = coreInfo.nextImageId++
+          ..dstRect = image.dstRect.shift(duplicationFeedbackOffset);
+      }).toList();
+
+      page.strokes.addAll(duplicatedStrokes);
+      page.images.addAll(duplicatedImages);
+
+      select.selectResult = select.selectResult.copyWith(
+        strokes: duplicatedStrokes,
+        images: duplicatedImages,
+        path: select.selectResult.path.shift(duplicationFeedbackOffset),
+      );
+
+      history.recordChange(
+        HistoricAdd(strokes: duplicatedStrokes, images: duplicatedImages),
+      );
+      autosaveAfterDelay();
+    });
+  }
+
+  void deleteSelection() {
+    final select = Select.currentSelect;
+    if (!select.doneSelecting) return;
+
+    setState(() {
+      final page = coreInfo.pages[select.selectResult.pageIndex];
+      final strokes = select.selectResult.strokes;
+      final images = select.selectResult.images;
+
+      for (final stroke in strokes) {
+        page.strokes.remove(stroke);
+      }
+      for (final image in images) {
+        page.images.remove(image);
+      }
+
+      _leaveSelect();
+
+      history.recordChange(HistoricDelete(strokes: strokes, images: images));
+      autosaveAfterDelay();
+    });
+  }
+
+  /// Changes the color of the selected strokes.
+  void setSelectionColor(Color color) {
+    final select = Select.currentSelect;
+    if (!select.doneSelecting) return;
+    final strokes = select.selectResult.strokes;
+    if (strokes.isEmpty) return;
+
+    setState(() {
+      final colorChanges = <Stroke, Change<Color>>{};
+      for (final stroke in strokes) {
+        colorChanges[stroke] = Change(previous: stroke.color, current: color);
+        stroke.color = color;
+      }
+
+      history.recordChange(
+        HistoricColorChange(
+          pageIndex: strokes.first.pageIndex,
+          colorChanges: colorChanges,
+        ),
+      );
+      autosaveAfterDelay();
+    });
+  }
+
+  /// Pastes a shelf entry (the entry stays on the shelf) and selects the
+  /// result so it can be moved at once. Goes where the paste menu was opened,
+  /// or the middle of what is on screen.
+  void pasteEntry(ClipboardEntry entry) {
+    if (coreInfo.readOnly) return;
+
+    int pageIndex;
+    Offset target;
+    final at = _pasteMenuAt;
+    if (at != null) {
+      pageIndex = at.pageIndex;
+      target = at.position;
+    } else {
+      final box = context.findRenderObject() as RenderBox?;
+      final screenCenter = box?.localToGlobal(box.size.center(.zero));
+      pageIndex =
+          (screenCenter == null
+              ? null
+              : onWhichPageIsFocalPoint(screenCenter)) ??
+          currentPageIndex;
+      final pageBox = coreInfo.pages[pageIndex].renderBox;
+      target = screenCenter != null && pageBox != null
+          ? pageBox.globalToLocal(screenCenter)
+          : coreInfo.pages[pageIndex].size.center(.zero);
+    }
+    final page = coreInfo.pages[pageIndex];
+    // keep the paste inside the page
+    target = Offset(
+      target.dx.clamp(0.0, page.size.width),
+      target.dy.clamp(0.0, page.size.height),
+    );
+    final delta = target - entry.bounds.center;
+
+    final sameNote = entry.sourcePath == coreInfo.filePath;
+    final strokes = [
+      for (final stroke in entry.strokes)
+        stroke.copy()
+          ..pageIndex = pageIndex
+          ..page = page
+          ..shift(delta),
+    ];
+    var skippedImages = false;
+    final images = <EditorImage>[];
+    for (final image in entry.images) {
+      if (!sameNote && image is! PngEditorImage) {
+        skippedImages = true;
+        continue;
+      }
+      images.add(
+        image.copy()
+          ..id = coreInfo.nextImageId++
+          ..pageIndex = pageIndex
+          ..onMoveImage = onMoveImage
+          ..onDeleteImage = onDeleteImage
+          ..onMiscChange = autosaveAfterDelay
+          ..dstRect = image.dstRect.shift(delta),
+      );
+    }
+    if (strokes.isEmpty && images.isEmpty) {
+      if (skippedImages) {
+        ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+          SnackBar(content: Text(t.editor.selectionBar.pastedPdfImageSkipped)),
+        );
+      }
+      return;
+    }
+
+    setState(() {
+      for (final stroke in strokes) {
+        page.insertStroke(stroke);
+      }
+      page.images.addAll(images);
+      history.recordChange(HistoricAdd(strokes: strokes, images: images));
+
+      final select = Select.currentSelect;
+      _enterSelect();
+      select.selectResult = SelectResult(
+        pageIndex: pageIndex,
+        strokes: strokes,
+        images: images,
+        path: Path()..addRect(entry.bounds.shift(delta).inflate(6)),
+        pageIndexStart: pageIndex,
+      );
+      select.doneSelecting = true;
+      _pasteMenuAt = null;
+    });
+    HapticFeedback.selectionClick();
+    autosaveAfterDelay();
+  }
+
+  /// Pastes the newest copy, or what is on the system clipboard if the shelf
+  /// is empty.
+  void pasteLatest() {
+    final latest = ClipboardShelf.instance.latest;
+    if (latest != null) {
+      pasteEntry(latest);
+    } else {
+      setState(() => _pasteMenuAt = null);
+      paste();
+    }
+  }
+
+  void openClipboardShelf() {
+    setState(() {}); // keep the paste spot, close nothing
+    showModalBottomSheet(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) => ClipboardShelfSheet(
+        onPaste: (entry) {
+          Navigator.of(sheetContext).pop();
+          pasteEntry(entry);
+        },
+      ),
+    );
+  }
+
+  /// The floating menu next to the selection (or the paste menu), placed over
+  /// the canvas and following it as it is panned or zoomed.
+  Widget _floatingMenu() {
+    return ListenableBuilder(
+      listenable: Listenable.merge([
+        _transformationController,
+        ClipboardShelf.instance,
+      ]),
+      builder: (context, _) {
+        final select = Select.currentSelect;
+        final selecting =
+            currentTool is Select &&
+            select.doneSelecting &&
+            !select.selectResult.isEmpty &&
+            !_draggingSelection &&
+            select.selectResult.pageIndex >= 0 &&
+            select.selectResult.pageIndex < coreInfo.pages.length;
+        final pasteAt = _pasteMenuAt;
+
+        final Widget menu;
+        final int pageIndex;
+        final Rect anchorOnPage;
+        if (selecting) {
+          pageIndex = select.selectResult.pageIndex;
+          anchorOnPage = select.bounds!;
+          menu = SelectionMenu(
+            currentColor: select.getDominantStrokeColor(),
+            cut: cutSelection,
+            copy: copySelection,
+            duplicate: duplicateSelection,
+            delete: deleteSelection,
+            setColor: setSelectionColor,
+            paste: pasteLatest,
+            canPaste: !ClipboardShelf.instance.isEmpty,
+          );
+        } else if (pasteAt != null &&
+            pasteAt.pageIndex < coreInfo.pages.length) {
+          pageIndex = pasteAt.pageIndex;
+          anchorOnPage = Rect.fromCenter(
+            center: pasteAt.position,
+            width: 1,
+            height: 1,
+          );
+          menu = PasteMenu(paste: pasteLatest, openShelf: openClipboardShelf);
+        } else {
+          return const SizedBox.shrink();
+        }
+
+        final pageBox = coreInfo.pages[pageIndex].renderBox;
+        final myBox = context.findRenderObject() as RenderBox?;
+        if (pageBox == null ||
+            !pageBox.attached ||
+            myBox == null ||
+            !myBox.hasSize) {
+          // measured next frame
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) setState(() {});
+          });
+          return const SizedBox.shrink();
+        }
+        final anchor = Rect.fromPoints(
+          myBox.globalToLocal(pageBox.localToGlobal(anchorOnPage.topLeft)),
+          myBox.globalToLocal(pageBox.localToGlobal(anchorOnPage.bottomRight)),
+        );
+        return CustomSingleChildLayout(
+          delegate: AnchoredMenuLayout(anchor: anchor),
+          child: menu,
+        );
+      },
+    );
+  }
+
   Future paste() async {
     /// Maps image formats to their file extension.
     const Map<SimpleFileFormat, String> formats = {
@@ -1580,6 +2004,8 @@ class EditorState extends State<Editor> {
       undo: undo,
       redo: redo,
       onTouchAction: performTouchAction,
+      onLongPress: onLongPress,
+      onTap: onTouchTap,
       pages: coreInfo.pages,
       initialPageIndex: coreInfo.initialPageIndex,
       pageBuilder: pageBuilder,
@@ -1601,6 +2027,13 @@ class EditorState extends State<Editor> {
         );
       },
       transformationController: _transformationController,
+    );
+
+    final canvasWithMenu = Stack(
+      children: [
+        canvas,
+        Positioned.fill(child: _floatingMenu()),
+      ],
     );
 
     final readonlyBanner = ReadOnlyBanner(
@@ -1629,6 +2062,8 @@ class EditorState extends State<Editor> {
             }
 
             currentTool = tool;
+            _toolBeforeSelect = null;
+            _pasteMenuAt = null;
 
             if (tool is Highlighter) {
               Highlighter.currentHighlighter = tool;
@@ -1641,71 +2076,6 @@ class EditorState extends State<Editor> {
             if (mounted) setState(() {});
           },
           currentTool: currentTool,
-          duplicateSelection: () {
-            final select = currentTool as Select;
-            if (!select.doneSelecting) return;
-
-            setState(() {
-              final page = coreInfo.pages[select.selectResult.pageIndex];
-              final strokes = select.selectResult.strokes;
-              final images = select.selectResult.images;
-
-              const duplicationFeedbackOffset = Offset(25, -25);
-
-              final duplicatedStrokes = strokes.map((stroke) {
-                return stroke.copy()..shift(duplicationFeedbackOffset);
-              }).toList();
-
-              final duplicatedImages = images.map((image) {
-                return image.copy()
-                  ..id = coreInfo.nextImageId++
-                  ..dstRect.shift(duplicationFeedbackOffset);
-              }).toList();
-
-              page.strokes.addAll(duplicatedStrokes);
-              page.images.addAll(duplicatedImages);
-
-              select.selectResult = select.selectResult.copyWith(
-                strokes: duplicatedStrokes,
-                images: duplicatedImages,
-                path: select.selectResult.path.shift(duplicationFeedbackOffset),
-              );
-
-              history.recordChange(
-                HistoricAdd(
-                  strokes: duplicatedStrokes,
-                  images: duplicatedImages,
-                ),
-              );
-              autosaveAfterDelay();
-            });
-          },
-          deleteSelection: () {
-            final select = currentTool as Select;
-            if (!select.doneSelecting) {
-              return;
-            }
-
-            setState(() {
-              final page = coreInfo.pages[select.selectResult.pageIndex];
-              final strokes = select.selectResult.strokes;
-              final images = select.selectResult.images;
-
-              for (final stroke in strokes) {
-                page.strokes.remove(stroke);
-              }
-              for (final image in images) {
-                page.images.remove(image);
-              }
-
-              select.unselect();
-
-              history.recordChange(
-                HistoricDelete(strokes: strokes, images: images),
-              );
-              autosaveAfterDelay();
-            });
-          },
           setColor: (color) {
             setState(() {
               updateColorBar(color);
@@ -1717,28 +2087,7 @@ class EditorState extends State<Editor> {
               } else if (currentTool is Pen) {
                 (currentTool as Pen).color = color;
               } else if (currentTool is Select) {
-                // Changes color of selected strokes
-                final select = currentTool as Select;
-                if (select.doneSelecting) {
-                  final strokes = select.selectResult.strokes;
-
-                  final colorChanges = <Stroke, Change<Color>>{};
-                  for (final stroke in strokes) {
-                    colorChanges[stroke] = Change(
-                      previous: stroke.color,
-                      current: color,
-                    );
-                    stroke.color = color;
-                  }
-
-                  history.recordChange(
-                    HistoricColorChange(
-                      pageIndex: strokes.first.pageIndex,
-                      colorChanges: colorChanges,
-                    ),
-                  );
-                  autosaveAfterDelay();
-                }
+                setSelectionColor(color);
               }
             });
           },
@@ -1788,7 +2137,7 @@ class EditorState extends State<Editor> {
           Expanded(
             child: Column(
               children: [
-                Expanded(child: canvas),
+                Expanded(child: canvasWithMenu),
                 readonlyBanner,
               ],
             ),
@@ -1802,7 +2151,7 @@ class EditorState extends State<Editor> {
             ? VerticalDirection.up
             : VerticalDirection.down,
         children: [
-          Expanded(child: canvas),
+          Expanded(child: canvasWithMenu),
           toolbar,
           readonlyBanner,
         ],

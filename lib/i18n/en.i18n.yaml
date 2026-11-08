@@ -326,6 +326,19 @@ editor:
   selectionBar:
     delete: Delete
     duplicate: Duplicate
+    copy: Copy
+    copied: Copied
+    cut: Cut
+    paste: Paste
+    color: Color
+    clipboard: Clipboard
+    clipboardEmpty: Copy something and it stays here, ready to paste again.
+    clipboardClear: Clear
+    clipboardItems(plural, param=n):
+      one: 1 item
+      other: $n items
+    pasteHere: Paste here
+    pastedPdfImageSkipped: A PDF page can only be pasted into the note it came from
   menu:
     clearPage: Clear page $page/$totalPages
     clearAllPages: Clear all pages

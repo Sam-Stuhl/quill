@@ -85,6 +85,7 @@ class _SizeSlider extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = ColorScheme.of(context);
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onHorizontalDragStart: axis == Axis.horizontal
           ? (details) =>
                 onDrag(details.localPosition.dx / SizePicker.largeLength)
@@ -101,17 +102,24 @@ class _SizeSlider extends StatelessWidget {
           ? (details) =>
                 onDrag(details.localPosition.dy / SizePicker.largeLength)
           : null,
-      child: RotatedBox(
-        quarterTurns: axis == Axis.horizontal ? 0 : 1,
-        child: CustomPaint(
-          size: const Size(SizePicker.largeLength, SizePicker.smallLength),
-          painter: _SizeSliderPainter(
-            axis: axis,
-            minSize: pen.sizeMin,
-            maxSize: pen.sizeMax,
-            currentSize: pen.options.size,
-            trackColor: colorScheme.onSurface.withValues(alpha: 0.2),
-            thumbColor: colorScheme.primary,
+      // pad the cross axis to a 44 pt tap area; positions along the slider
+      // are unchanged
+      child: Padding(
+        padding: axis == Axis.horizontal
+            ? const .symmetric(vertical: 9.5)
+            : const .symmetric(horizontal: 9.5),
+        child: RotatedBox(
+          quarterTurns: axis == Axis.horizontal ? 0 : 1,
+          child: CustomPaint(
+            size: const Size(SizePicker.largeLength, SizePicker.smallLength),
+            painter: _SizeSliderPainter(
+              axis: axis,
+              minSize: pen.sizeMin,
+              maxSize: pen.sizeMax,
+              currentSize: pen.options.size,
+              trackColor: colorScheme.onSurface.withValues(alpha: 0.2),
+              thumbColor: colorScheme.primary,
+            ),
           ),
         ),
       ),

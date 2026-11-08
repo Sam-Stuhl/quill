@@ -20,34 +20,44 @@ class ColorOption extends StatelessWidget {
 
   static const double diameter = 25;
 
+  /// How big the tap area is, for a finger.
+  static const double touchTarget = 44;
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = ColorScheme.of(context);
     return Tooltip(
       message: tooltip ?? '',
       child: Padding(
-        padding: const .symmetric(horizontal: 4),
-        child: InkWell(
-          borderRadius: const .all(.circular(diameter / 2)),
+        padding: EdgeInsets.zero,
+        child: InkResponse(
+          radius: touchTarget / 2,
           onTap: enabled ? onTap : null,
           onLongPress: enabled ? onLongPress : null,
           onSecondaryTap: enabled ? onLongPress : null,
-          child: Container(
-            width: diameter,
-            height: diameter,
-            decoration: BoxDecoration(
-              shape: .circle,
-              border: Border.all(
-                color: isSelected ? colorScheme.onSurface : Colors.transparent,
-                width: 2,
-              ),
-            ),
-            child: Padding(
-              padding: const .all(3),
-              child: AnimatedOpacity(
-                opacity: enabled ? 1 : 0.5,
-                duration: const Duration(milliseconds: 200),
-                child: child,
+          child: SizedBox.square(
+            dimension: touchTarget,
+            child: Center(
+              child: Container(
+                width: diameter,
+                height: diameter,
+                decoration: BoxDecoration(
+                  shape: .circle,
+                  border: Border.all(
+                    color: isSelected
+                        ? colorScheme.onSurface
+                        : Colors.transparent,
+                    width: 2,
+                  ),
+                ),
+                child: Padding(
+                  padding: const .all(3),
+                  child: AnimatedOpacity(
+                    opacity: enabled ? 1 : 0.5,
+                    duration: const Duration(milliseconds: 200),
+                    child: child,
+                  ),
+                ),
               ),
             ),
           ),

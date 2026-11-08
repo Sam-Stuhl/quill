@@ -33,6 +33,8 @@ class CanvasGestureDetector extends StatefulWidget {
     required this.undo,
     required this.redo,
     required this.onTouchAction,
+    this.onLongPress,
+    this.onTap,
     required this.pages,
     required this.initialPageIndex,
     required this.pageBuilder,
@@ -63,6 +65,12 @@ class CanvasGestureDetector extends StatefulWidget {
 
   /// Called when a mapped tap gesture (Settings, Gestures) is performed.
   final ValueChanged<TouchAction> onTouchAction;
+
+  /// A single finger held still on the canvas (global position).
+  final ValueChanged<Offset>? onLongPress;
+
+  /// A single finger tapped the canvas quickly (global position).
+  final ValueChanged<Offset>? onTap;
 
   final List<EditorPage> pages;
   final int? initialPageIndex;
@@ -429,6 +437,18 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
     onAction: widget.onTouchAction,
   );
 
+  /// Press and hold: one finger kept still for this long.
+  static const longPressDuration = Duration(milliseconds: 450);
+  static const longPressSlop = 12.0;
+  Timer? _longPressTimer;
+  Offset? _longPressStart;
+
+  void _cancelLongPress() {
+    _longPressTimer?.cancel();
+    _longPressTimer = null;
+    _longPressStart = null;
+  }
+
   void _classifyTouch(PointerEvent event) {
     if (event.kind != PointerDeviceKind.touch) return;
     if (event is PointerDownEvent) {
@@ -437,15 +457,30 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
         event.position,
         event.timeStamp,
       );
+      _cancelLongPress();
+      if (_tapClassifier.pointerCount == 1 && widget.onLongPress != null) {
+        _longPressStart = event.position;
+        _longPressTimer = Timer(longPressDuration, () {
+          final position = _longPressStart;
+          _cancelLongPress();
+          if (position != null) widget.onLongPress?.call(position);
+        });
+      }
     } else if (event is PointerMoveEvent) {
       _tapClassifier.pointerMove(
         event.pointer,
         event.position,
         event.timeStamp,
       );
+      final start = _longPressStart;
+      if (start != null && (event.position - start).distance > longPressSlop) {
+        _cancelLongPress();
+      }
     } else if (event is PointerUpEvent) {
+      _cancelLongPress();
       final fingers = _tapClassifier.pointerUp(event.pointer, event.timeStamp);
       if (fingers == null) return;
+      if (fingers == 1) widget.onTap?.call(event.position);
       // With finger drawing on, a lone finger draws: leave it alone.
       if (fingers == 1 && stows.editorFingerDrawing.value) {
         _tapResolver.flush();
@@ -453,6 +488,7 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
       }
       _tapResolver.onTap(fingers);
     } else if (event is PointerCancelEvent) {
+      _cancelLongPress();
       _tapClassifier.pointerCancel(event.pointer);
     }
   }
@@ -621,6 +657,7 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
     widget._transformationController.removeListener(onTransformChanged);
     widget._transformationController.dispose();
     _removeKeybindings();
+    _cancelLongPress();
     _tapResolver.dispose();
     super.dispose();
   }
