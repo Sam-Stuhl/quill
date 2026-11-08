@@ -153,6 +153,37 @@ class StageTest(unittest.TestCase):
         self.assertEqual((self.vault / "School/CS 114/Wk 04/Old lec .pdf").read_bytes(),
                          b"%PDF even more")
 
+    def test_handwriting_text_lands_beside_the_pdf(self):
+        self.write("Fall 26/CS 114/Lec 1.pdf", b"%PDF 1")
+        text = self.src.parent / "Text/Fall 26/CS 114/Lec 1.md"
+        text.parent.mkdir(parents=True)
+        text.write_text("# Lec 1\n\nhello")
+        s = self.make()
+        s.pass_once()
+        self.assertEqual([w for w in self.writes if w.endswith(".md")], [])  # PDF has no place yet
+        pdf_dir = self.vault / "School/Fall 2026/CS 114"
+        pdf_dir.mkdir(parents=True)
+        (pdf_dir / "Lec 1.pdf").write_bytes(b"x")
+        self.manifest.parent.mkdir(parents=True, exist_ok=True)
+        self.manifest.write_text(json.dumps({"entries": {
+            "Fall 26/CS 114/Lec 1.pdf": {"vault_path": str(pdf_dir / "Lec 1.pdf")}}}))
+        s.pass_once()
+        out = pdf_dir / "Lec 1 (handwriting).md"
+        self.assertEqual(out.read_text(), "# Lec 1\n\nhello")
+        n = len(self.writes)
+        s.pass_once()
+        self.assertEqual(len(self.writes), n)  # unchanged: not written again
+        # the sorter moves the PDF and its text note into a week folder; the text is updated there
+        week = self.vault / "School/Fall 2026/CS 114/Week 10"
+        week.mkdir()
+        (pdf_dir / "Lec 1.pdf").rename(week / "Lec 1.pdf")
+        out.rename(week / out.name)
+        text.write_text("# Lec 1\n\nhello again")
+        os.utime(text, (1_700_000_500, 1_700_000_500))
+        self.make().pass_once()
+        self.assertEqual((week / out.name).read_text(), "# Lec 1\n\nhello again")
+        self.assertFalse(out.exists())
+
     def test_rclone_literal_escapes_globs(self):
         self.assertEqual(stage.rclone_literal("A/[draft] *1?.pdf"), "/A/\\[draft\\] \\*1\\?.pdf")
 
