@@ -34,3 +34,6 @@ Runner/GeneratedPluginRegistrant.*
 !default.perspectivev3
 
 Podfile.lock
+
+# Written by Xcode on each Mac
+Runner.xcworkspace/xcshareddata/swiftpm/

@@ -228,6 +228,31 @@ side is under `lib/data/quill_sync/` and `lib/data/quill_defaults.dart`.
 - Tests: `/usr/bin/python3 -m unittest test_connect test_stage test_server`, and
   `flutter test test/quill_connect_test.dart` for the app side.
 
+## Building and installing
+
+`scripts/install-on-ipad.sh`, on a Mac whose Xcode is signed in as the team, in a
+session that can read the login keychain: on the mini, a window of the `mini-host`
+tmux; on the MacBook, a Terminal window on its desktop. The iPad has to be on USB
+or the same Wi-Fi as that Mac, unlocked. `QUILL_BUILD_ONLY=1` stops before the
+install, which replaces the running app.
+
+Since 2026-11-08 the mini is where this works. It reached the iPad over home Wi-Fi
+(build about 10 minutes, install in seconds). The MacBook's Xcode has no account,
+and `-allowProvisioningUpdates` stops there with `No Accounts`.
+
+What has gone wrong, and how it looks:
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| The app will not open; `devicectl device process launch` says `Launchd job spawn failed` (POSIX error 85); nothing reaches `~/quill` and no crash report is written | The certificate that signed the installed build was revoked (`codesign --verify` on the build says `CSSMERR_TP_CERT_REVOKED`). Every app signed with it stops together. | Build and install again; notes stay in the app's container |
+| The script sits silently at `flutter pub get` or `--config-only`, `dartvm` at 0% CPU in `_dyld_start` | A Gatekeeper prompt for Flutter's `dartvm` is open on the mini's screen (log: `ASP: Security policy would not allow process`). Homebrew's cask leaves the SDK quarantined. | Check the file is the SDK's (`codesign -dv`: FLUTTER.IO LLC, S8QB4VV633), then `xattr -dr com.apple.quarantine` on the Caskroom's `flutter/bin/cache`, and `pkill -9 -u sam -x CoreServicesUIAgent` to close the prompt. The next Flutter cask upgrade can bring it back. |
+| `CocoaPods not installed` on the mini | `brew install cocoapods` compiles Rust and LLVM on this Intel Mac | `GEM_HOME=~/.local/share/cocoapods-gems` and Homebrew's portable Ruby: `gem install cocoapods --no-document`. The script finds it there. |
+| `No Accounts` | That Mac's Xcode is signed out | Build on the other Mac, or sign in under Xcode, Settings, Accounts |
+
+The installed build's certificate came from the mini on 2026-11-08 (SHA-1 `7CFF270A`).
+A signing run from a Mac with no valid identity makes a new certificate, so
+one Mac's build does not depend on the other's.
+
 ## Latency budget
 
 Pen lifts to PDF current on the mini, at home on Wi-Fi:
