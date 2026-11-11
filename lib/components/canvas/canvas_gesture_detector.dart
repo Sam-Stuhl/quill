@@ -12,6 +12,7 @@ import 'package:saber/components/canvas/interactive_canvas.dart';
 import 'package:saber/data/editor/page.dart';
 import 'package:saber/data/extensions/change_notifier_extensions.dart';
 import 'package:saber/data/extensions/matrix4_extensions.dart';
+import 'package:saber/data/palm_rejection.dart';
 import 'package:saber/data/prefs.dart';
 import 'package:saber/data/touch_gestures.dart';
 import 'package:saber/pages/editor/editor.dart';
@@ -449,6 +450,59 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
     _longPressStart = null;
   }
 
+  late final _palm = PalmRejection(holdMs: () => stows.palmRejectionMs.value);
+
+  /// Touch pointers currently down, so a palm that landed before the pen can be
+  /// cancelled when the pen arrives.
+  final Set<int> _touchesDown = {};
+
+  void _cancelPointer(int pointer) {
+    // Out of the current event dispatch: cancelling inside it can re-enter.
+    scheduleMicrotask(() {
+      if (mounted) GestureBinding.instance.cancelPointer(pointer);
+    });
+  }
+
+  /// Runs on every pointer event, before anything else looks at it.
+  /// Returns true if the event is a touch that palm rejection swallowed.
+  bool _palmRejects(PointerEvent event) {
+    final isStylus =
+        event.kind == PointerDeviceKind.stylus ||
+        event.kind == PointerDeviceKind.invertedStylus;
+    if (isStylus) {
+      final wasActive = _palm.penActive;
+      _palm.stylusEvent(
+        event.pointer,
+        down: event is PointerDownEvent,
+        up: event is PointerUpEvent || event is PointerCancelEvent,
+      );
+      if (!wasActive && _palm.penActive) {
+        // The pen just arrived: whatever is already touching is a palm.
+        for (final pointer in _touchesDown.toList()) {
+          _palm.rejected.add(pointer);
+          _cancelPointer(pointer);
+        }
+      }
+      return false;
+    }
+    if (event.kind != PointerDeviceKind.touch) return false;
+
+    if (event is PointerDownEvent) {
+      _touchesDown.add(event.pointer);
+      if (_palm.touchDown(event.pointer)) {
+        _cancelPointer(event.pointer);
+        return true;
+      }
+      return false;
+    }
+    final rejected = _palm.isRejected(event.pointer);
+    if (event is PointerUpEvent || event is PointerCancelEvent) {
+      _touchesDown.remove(event.pointer);
+      _palm.touchEnded(event.pointer);
+    }
+    return rejected;
+  }
+
   void _classifyTouch(PointerEvent event) {
     if (event.kind != PointerDeviceKind.touch) return;
     if (event is PointerDownEvent) {
@@ -494,6 +548,10 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
   }
 
   void _listenerPointerEvent(PointerEvent event) {
+    if (event.kind == PointerDeviceKind.touch &&
+        _palm.isRejected(event.pointer)) {
+      return;
+    }
     final isStylus =
         event.kind == PointerDeviceKind.stylus ||
         event.kind == PointerDeviceKind.invertedStylus;
@@ -568,16 +626,27 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
       children: [
         Listener(
           onPointerDown: (event) {
+            if (_palmRejects(event)) return;
             _classifyTouch(event);
             _listenerPointerEvent(event);
           },
           onPointerMove: (event) {
+            if (_palmRejects(event)) return;
             _classifyTouch(event);
             _listenerPointerEvent(event);
           },
-          onPointerUp: _listenerPointerUpEvent,
-          onPointerCancel: _classifyTouch,
-          onPointerHover: _listenerPointerHoverEvent,
+          onPointerUp: (event) {
+            if (_palmRejects(event)) return;
+            _listenerPointerUpEvent(event);
+          },
+          onPointerCancel: (event) {
+            if (_palmRejects(event)) return;
+            _classifyTouch(event);
+          },
+          onPointerHover: (event) {
+            _palmRejects(event);
+            _listenerPointerHoverEvent(event);
+          },
           child: GestureDetector(
             child: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints containerBounds) {

@@ -154,6 +154,14 @@ class Stows {
       ),
   };
 
+  /// Palm rejection: how long, in milliseconds, finger and palm touches stay
+  /// ignored after the pen was last on or over the screen. 0 turns it off.
+  final palmRejectionMs = PlainStow(
+    'palmRejectionMs',
+    800,
+    volatile: !_isOnMainIsolate,
+  );
+
   /// Whether a quick back-and-forth scratch with the pen erases the ink under it.
   final scribbleToErase = PlainStow(
     'scribbleToErase',
