@@ -219,8 +219,9 @@ side is under `lib/data/quill_sync/` and `lib/data/quill_defaults.dart`.
   and a later change in the app sticks: system light or dark in ink blue (accent
   `#3454A0`), college ruled paper, a fine black fountain pen (size 3), a blue
   ballpoint (`#1B3B8C`, 2.5), a slim yellow highlighter (30), a gray pencil, and the
-  toolbar along the top (Notability's placement: tools centred, undo, redo and share
-  pinned right) instead of Saber's bottom bar. Edit
+  toolbar along the top, laid out like Notability's (a back pill, a floating tools
+  pill with the colour row under it, an undo, redo, more, share and pages pill at the
+  right; `Toolbar._topLayout`) instead of Saber's bottom bar. Edit
   the file and raise `version` to change a taste. The app's name is Quill on the
   home screen and in `Info.plist`; its text inside (settings, welcome) still says
   Saber, as upstream's translations do. The icon is a quill on ink blue in light,
