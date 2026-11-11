@@ -13,7 +13,7 @@ import 'package:sbn/tool_id.dart';
 /// To change a taste: edit the value here and raise [version].
 abstract class QuillDefaults {
   /// Raise to apply the values below again on the next launch.
-  static const version = 1;
+  static const version = 2;
 
   /// Ink blue, the icon's colour (scripts/quill_icon.swift).
   static const accent = Color(0xFF3454A0);
@@ -31,6 +31,10 @@ abstract class QuillDefaults {
     // Theme: follow the system (light by day, dark at night), in ink blue.
     stows.appTheme.value = .system;
     stows.accentColor.value = accent;
+
+    // Toolbar: along the top of the page, as in Notability, out of reach of a
+    // resting palm, instead of Saber's bottom bar that gets tapped by accident.
+    stows.editorToolbarAlignment.value = AxisDirection.up;
 
     // Paper: college ruled, white, for new notes.
     stows.lastBackgroundPattern.value = CanvasBackgroundPattern.collegeLtr;
