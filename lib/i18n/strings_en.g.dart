@@ -1056,6 +1056,12 @@ class Translations$editor$toolbar$en {
 
 	// Translations
 
+	/// en: 'Hide tools'
+	String get hideTools => 'Hide tools';
+
+	/// en: 'Show tools'
+	String get showTools => 'Show tools';
+
 	/// en: 'Toggle colors (Ctrl C)'
 	String get toggleColors => 'Toggle colors (Ctrl C)';
 

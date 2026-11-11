@@ -1984,7 +1984,6 @@ class EditorState extends State<Editor> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = ColorScheme.of(context);
     final platform = Theme.of(context).platform;
     final isToolbarVertical =
         stows.editorToolbarAlignment.value == AxisDirection.left ||
@@ -2055,6 +2054,15 @@ class EditorState extends State<Editor> {
       child: SafeArea(
         bottom: stows.editorToolbarAlignment.value != AxisDirection.up,
         child: Toolbar(
+          header: ToolbarHeader(
+            leading: SaveIndicator(
+              savingState: savingState,
+              triggerSave: saveToFile,
+            ),
+            title: _titleWidget(),
+            onMore: () => _showMoreMenu(context),
+            onPages: () => _showPageManager(context),
+          ),
           readOnly: coreInfo.readOnly,
           setTool: (tool) {
             if (tool is Eraser && currentTool is Eraser) {
@@ -2152,6 +2160,29 @@ class EditorState extends State<Editor> {
           ),
         ],
       );
+    } else if (Toolbar.usesTopLayout) {
+      // Notability's layout: the toolbar draws the header and floats over the
+      // top of the page, so the canvas is pushed down by the header's height.
+      final headerHidden =
+          DynamicMaterialApp.isFullscreen &&
+          !stows.editorToolbarShowInFullscreen.value;
+      body = Stack(
+        children: [
+          Column(
+            children: [
+              SizedBox(
+                height: headerHidden
+                    ? 0
+                    : MediaQuery.paddingOf(context).top +
+                          Toolbar.topHeaderHeight,
+              ),
+              Expanded(child: canvasWithMenu),
+              readonlyBanner,
+            ],
+          ),
+          Positioned(top: 0, left: 0, right: 0, child: toolbar),
+        ],
+      );
     } else {
       body = Column(
         verticalDirection:
@@ -2189,25 +2220,11 @@ class EditorState extends State<Editor> {
         );
       },
       child: Scaffold(
-        appBar: DynamicMaterialApp.isFullscreen
+        appBar: DynamicMaterialApp.isFullscreen || Toolbar.usesTopLayout
             ? null
             : AppBar(
                 toolbarHeight: kToolbarHeight,
-                title: widget.customTitle != null
-                    ? Text(widget.customTitle!)
-                    : Form(
-                        key: _filenameFormKey,
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        child: TextFormField(
-                          decoration: const InputDecoration(
-                            border: InputBorder.none,
-                          ),
-                          controller: filenameTextEditingController,
-                          onChanged: renameFile,
-                          autofocus: needsNaming,
-                          validator: _validateFilenameTextField,
-                        ),
-                      ),
+                title: _titleWidget(),
                 leading: SaveIndicator(
                   savingState: savingState,
                   triggerSave: saveToFile,
@@ -2236,32 +2253,14 @@ class EditorState extends State<Editor> {
                       cupertinoIcon: CupertinoIcons.rectangle_grid_2x2,
                     ),
                     tooltip: t.editor.pages,
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AdaptiveAlertDialog(
-                          title: Text(t.editor.pages),
-                          content: pageManager(context),
-                          actions: const [],
-                        ),
-                      );
-                    },
+                    onPressed: () => _showPageManager(context),
                   ),
                   IconButton(
                     icon: const AdaptiveIcon(
                       icon: Icons.more_vert,
                       cupertinoIcon: CupertinoIcons.ellipsis_vertical,
                     ),
-                    onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (context) => bottomSheet(context),
-                        isScrollControlled: true,
-                        showDragHandle: true,
-                        backgroundColor: colorScheme.surface,
-                        constraints: const BoxConstraints(maxWidth: 500),
-                      );
-                    },
+                    onPressed: () => _showMoreMenu(context),
                   ),
                 ],
               ),
@@ -2278,6 +2277,42 @@ class EditorState extends State<Editor> {
               )
             : null,
       ),
+    );
+  }
+
+  Widget _titleWidget() => widget.customTitle != null
+      ? Text(widget.customTitle!)
+      : Form(
+          key: _filenameFormKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          child: TextFormField(
+            decoration: const InputDecoration(border: InputBorder.none),
+            controller: filenameTextEditingController,
+            onChanged: renameFile,
+            autofocus: needsNaming,
+            validator: _validateFilenameTextField,
+          ),
+        );
+
+  void _showPageManager(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AdaptiveAlertDialog(
+        title: Text(t.editor.pages),
+        content: pageManager(context),
+        actions: const [],
+      ),
+    );
+  }
+
+  void _showMoreMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => bottomSheet(context),
+      isScrollControlled: true,
+      showDragHandle: true,
+      backgroundColor: ColorScheme.of(context).surface,
+      constraints: const BoxConstraints(maxWidth: 500),
     );
   }
 
