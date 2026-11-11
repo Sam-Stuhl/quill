@@ -328,6 +328,7 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
     setInitialTransform();
     widget._transformationController.addListener(onTransformChanged);
     _assignKeybindings();
+    stows.palmRejectionMs.addListener(_onPalmSettingChanged);
     super.initState();
   }
 
@@ -450,7 +451,9 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
     _longPressStart = null;
   }
 
-  late final _palm = PalmRejection(holdMs: () => stows.palmRejectionMs.value);
+  late final _palm = PalmRejection(holdMs: stows.palmRejectionMs.value);
+
+  void _onPalmSettingChanged() => _palm.holdMs = stows.palmRejectionMs.value;
 
   /// Touch pointers currently down, so a palm that landed before the pen can be
   /// cancelled when the pen arrives.
@@ -725,6 +728,7 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
     );
     widget._transformationController.removeListener(onTransformChanged);
     widget._transformationController.dispose();
+    stows.palmRejectionMs.removeListener(_onPalmSettingChanged);
     _removeKeybindings();
     _cancelLongPress();
     _tapResolver.dispose();

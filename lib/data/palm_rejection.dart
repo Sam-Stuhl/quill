@@ -12,8 +12,8 @@ class PalmRejection {
   new({required this.holdMs, Stopwatch? clock})
     : _clock = clock ?? (Stopwatch()..start());
 
-  /// Read on every event, so changing the setting applies at once.
-  final int Function() holdMs;
+  /// Set when the setting changes, so no event has to read the preference.
+  int holdMs;
   final Stopwatch _clock;
 
   final Set<int> _stylusDown = {};
@@ -22,21 +22,28 @@ class PalmRejection {
   /// Touch pointers the pen has claimed, to ignore until they lift.
   final Set<int> rejected = {};
 
-  bool get enabled => holdMs() > 0;
+  bool get enabled => holdMs > 0;
 
   /// The pen is touching, hovering, or only just lifted.
   bool get penActive {
     if (!enabled) return false;
     if (_stylusDown.isNotEmpty) return true;
     final last = _lastStylusMs;
-    return last != null && _clock.elapsedMilliseconds - last < holdMs();
+    return last != null && _clock.elapsedMilliseconds - last < holdMs;
   }
+
+  /// Hover and move events arrive 120 times a second or more: they only
+  /// refresh the pen's last-seen time this often.
+  static const refreshMs = 100;
 
   /// Any pen event, contact or hover.
   void stylusEvent(int pointer, {required bool down, required bool up}) {
     if (down) _stylusDown.add(pointer);
     if (up) _stylusDown.remove(pointer);
-    _lastStylusMs = _clock.elapsedMilliseconds;
+    final now = _clock.elapsedMilliseconds;
+    final last = _lastStylusMs;
+    if (!down && !up && last != null && now - last < refreshMs) return;
+    _lastStylusMs = now;
   }
 
   /// A new touch: true if it should be ignored.
