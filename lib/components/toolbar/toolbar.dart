@@ -646,6 +646,9 @@ class _ToolbarState extends State<Toolbar> {
     Widget pill({required Widget child}) =>
         DecoratedBox(decoration: pillDecoration, child: child);
 
+    // Tapping the tool you are on shows or hides its options: the colours
+    // and the pen's size and type together, as the palette and pen buttons
+    // did in the bottom toolbar.
     void toggleOptions(ToolOptions options, Tool tool) {
       if (widget.currentTool == tool) {
         toolOptionsType.value = toolOptionsType.value == options
@@ -653,6 +656,7 @@ class _ToolbarState extends State<Toolbar> {
             : options;
       } else {
         toolOptionsType.value = .hide;
+        showColorOptions.value = false;
         widget.setTool(tool);
       }
     }
@@ -714,7 +718,12 @@ class _ToolbarState extends State<Toolbar> {
         enabled: !widget.readOnly,
         onPressed: () {
           toolOptionsType.value = .hide;
-          widget.setTool(Select.currentSelect);
+          if (widget.currentTool is Select) {
+            toggleColorOptions();
+          } else {
+            showColorOptions.value = false;
+            widget.setTool(Select.currentSelect);
+          }
         },
         child: const Icon(CupertinoIcons.lasso),
       ),
@@ -788,15 +797,22 @@ class _ToolbarState extends State<Toolbar> {
       ),
     );
 
-    final optionsPill = ValueListenableBuilder(
-      valueListenable: showMoreTools,
-      builder: (context, more, _) => Column(
+    final optionsPill = ListenableBuilder(
+      listenable: Listenable.merge([
+        showMoreTools,
+        toolOptionsType,
+        showColorOptions,
+      ]),
+      builder: (context, _) => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Collapsible(
             axis: CollapsibleAxis.vertical,
             maintainState: true,
-            collapsed: !drawing || more,
+            collapsed:
+                !drawing ||
+                showMoreTools.value ||
+                (toolOptionsType.value == .hide && !showColorOptions.value),
             child: Padding(
               padding: const .only(top: 4),
               child: pill(
