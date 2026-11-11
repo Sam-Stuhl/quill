@@ -116,6 +116,7 @@ class ToolbarHeader {
 
 class _ToolbarState extends State<Toolbar> {
   ValueNotifier<bool> showMoreTools = ValueNotifier(false);
+  ValueNotifier<bool> toolsHidden = ValueNotifier(false);
   ValueNotifier<bool> showExportOptions = ValueNotifier(false);
   ValueNotifier<bool> showColorOptions = ValueNotifier(false);
   ValueNotifier<ToolOptions> toolOptionsType = ValueNotifier(ToolOptions.hide);
@@ -594,7 +595,6 @@ class _ToolbarState extends State<Toolbar> {
       return _topLayout(
         context,
         exportBar: exportBar,
-        penOptions: penOptions,
         quillBar: quillBar,
         currentColor: currentColor,
         invert: invert,
@@ -626,7 +626,6 @@ class _ToolbarState extends State<Toolbar> {
   Widget _topLayout(
     BuildContext context, {
     required Widget exportBar,
-    required Widget penOptions,
     required Widget quillBar,
     required Color? currentColor,
     required bool invert,
@@ -752,61 +751,109 @@ class _ToolbarState extends State<Toolbar> {
       ),
     ];
 
-    final toolsPill = ValueListenableBuilder(
+    // The tools row. The colour row and the pen options hang below it as
+    // their own pill (inside this widget's own height: a Collapsible above
+    // clips whatever overflows, and nothing outside it takes taps).
+    final toolsRow = ValueListenableBuilder(
       valueListenable: showMoreTools,
       builder: (context, more, _) => pill(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              height: _PillButton.size + 8,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      padding: const .symmetric(horizontal: 6),
-                      child: Row(children: more ? moreTools : mainTools),
-                    ),
+        child: SizedBox(
+          height: _PillButton.size + 8,
+          child: Row(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const .symmetric(horizontal: 6),
+                  child: Row(children: more ? moreTools : mainTools),
+                ),
+              ),
+              _PillButton(
+                tooltip: null,
+                onPressed: () => showMoreTools.value = !more,
+                child: Icon(more ? Icons.chevron_left : Icons.chevron_right),
+              ),
+              _PillButton(
+                tooltip: t.editor.toolbar.hideTools,
+                onPressed: () {
+                  toolOptionsType.value = .hide;
+                  toolsHidden.value = true;
+                },
+                child: const Icon(Icons.keyboard_arrow_up),
+              ),
+              const SizedBox(width: 4),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    final optionsPill = ValueListenableBuilder(
+      valueListenable: showMoreTools,
+      builder: (context, more, _) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Collapsible(
+            axis: CollapsibleAxis.vertical,
+            maintainState: true,
+            collapsed: !drawing || more,
+            child: Padding(
+              padding: const .only(top: 4),
+              child: pill(
+                child: SizedBox(
+                  height: _PillButton.size + 8,
+                  child: ColorBar(
+                    axis: Axis.horizontal,
+                    setColor: widget.setColor,
+                    currentColor: currentColor,
+                    invert: invert,
                   ),
-                  _PillButton(
-                    tooltip: null,
-                    onPressed: () => showMoreTools.value = !more,
-                    child: Icon(
-                      more ? Icons.chevron_left : Icons.chevron_right,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                ],
+                ),
               ),
             ),
-            Collapsible(
+          ),
+          ValueListenableBuilder(
+            valueListenable: toolOptionsType,
+            builder: (context, type, _) => Collapsible(
               axis: CollapsibleAxis.vertical,
               maintainState: true,
-              collapsed: !drawing || more,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Divider(
-                    height: 1,
-                    thickness: 1,
-                    color: colorScheme.outlineVariant,
+              collapsed: type == .hide,
+              child: Padding(
+                padding: const .only(top: 4),
+                child: pill(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: switch (type) {
+                      .hide => const SizedBox.shrink(),
+                      .pen => PenModal(
+                        getTool: () => Pen.currentPen,
+                        setTool: widget.setTool,
+                      ),
+                      .highlighter => PenModal(
+                        getTool: () => Highlighter.currentHighlighter,
+                        setTool: widget.setTool,
+                      ),
+                      .pencil => PenModal(
+                        getTool: () => Pencil.currentPencil,
+                        setTool: widget.setTool,
+                      ),
+                    },
                   ),
-                  SizedBox(
-                    height: _PillButton.size + 8,
-                    child: ColorBar(
-                      axis: Axis.horizontal,
-                      setColor: widget.setColor,
-                      currentColor: currentColor,
-                      invert: invert,
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
-            penOptions,
-          ],
-        ),
+          ),
+        ],
+      ),
+    );
+
+    // Shown instead of the tools while they are hidden: the current tool, to
+    // bring them back, and the title gets the room.
+    final hiddenPill = pill(
+      child: _PillButton(
+        tooltip: t.editor.toolbar.showTools,
+        onPressed: () => toolsHidden.value = false,
+        child: UniIcon(Pen.currentPen.icon, size: 18),
       ),
     );
 
@@ -859,61 +906,82 @@ class _ToolbarState extends State<Toolbar> {
       ),
     );
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        ColoredBox(
-          color: headerColor,
-          child: SizedBox(
-            height: Toolbar.topHeaderHeight,
-            child: Padding(
-              padding: const .symmetric(horizontal: 12),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(padding: const .only(top: 8), child: backPill),
-                  Expanded(
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        // the title sits behind the tools, as in Notability
-                        Positioned.fill(
-                          child: Padding(
-                            padding: const .only(left: 12, top: 8),
-                            child: Align(
-                              alignment: Alignment.topLeft,
-                              child: SizedBox(
-                                height: _PillButton.size + 6,
-                                child: header.title,
-                              ),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          left: 58,
-                          top: 8,
-                          width: 440,
-                          child: toolsPill,
-                        ),
-                      ],
+    const backWidth = _PillButton.size + 6.0;
+    const rightWidth = _PillButton.size * 5 + 14.0;
+    const titleWidth = 130.0;
+    const gap = 8.0;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final pillWidth =
+            (constraints.maxWidth -
+                    24 -
+                    backWidth -
+                    rightWidth -
+                    titleWidth -
+                    gap * 3)
+                .clamp(0.0, 440.0);
+        const pillLeft = 12 + backWidth + gap + titleWidth + gap;
+
+        return ValueListenableBuilder(
+          valueListenable: toolsHidden,
+          builder: (context, hidden, _) {
+            final title = Align(
+              alignment: Alignment.centerLeft,
+              child: header.title,
+            );
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ColoredBox(
+                  color: headerColor,
+                  child: SizedBox(
+                    height: Toolbar.topHeaderHeight,
+                    child: Padding(
+                      padding: const .symmetric(horizontal: 12, vertical: 8),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          backPill,
+                          const SizedBox(width: gap),
+                          if (hidden) ...[
+                            Expanded(child: title),
+                            hiddenPill,
+                            const SizedBox(width: gap),
+                          ] else ...[
+                            SizedBox(width: titleWidth, child: title),
+                            const SizedBox(width: gap),
+                            SizedBox(width: pillWidth, child: toolsRow),
+                            const Spacer(),
+                          ],
+                          rightPill,
+                        ],
+                      ),
                     ),
                   ),
-                  Padding(padding: const .only(top: 8), child: rightPill),
-                ],
-              ),
-            ),
-          ),
-        ),
-        Align(
-          alignment: Alignment.centerRight,
-          child: Padding(
-            padding: const .symmetric(horizontal: 12),
-            child: pill(child: exportBar),
-          ),
-        ),
-        quillBar,
-      ],
+                ),
+                if (!hidden)
+                  Padding(
+                    padding: const EdgeInsets.only(left: pillLeft),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: SizedBox(width: pillWidth, child: optionsPill),
+                    ),
+                  ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Padding(
+                    padding: const .symmetric(horizontal: 12),
+                    child: pill(child: exportBar),
+                  ),
+                ),
+                quillBar,
+              ],
+            );
+          },
+        );
+      },
     );
   }
 

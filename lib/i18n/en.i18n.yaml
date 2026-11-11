@@ -269,6 +269,8 @@ update:
   downloadNotAvailableYet: The download isn't available yet for your platform. Please check back shortly.
 editor:
   toolbar:
+    hideTools: Hide tools
+    showTools: Show tools
     toggleColors: Toggle colors (Ctrl C)
     select: Select
     toggleEraser: Toggle eraser (Ctrl E)
