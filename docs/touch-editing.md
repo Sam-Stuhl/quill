@@ -24,3 +24,12 @@ reference. These are the touch changes on top of Saber (2026-11-07).
 Test: `flutter test integration_test/touch_selection_test.dart -d <simulator>`
 drives the real editor with touch input (hold, menu, copy, delete, paste twice
 from the shelf, dismiss).
+
+## Palm rejection
+
+While the Pencil is touching the screen, hovering over it, or was lifted less
+than a hold time ago, finger and palm touches are ignored: no panning, zooming,
+taps, press and hold or drawing. A palm that was already down when the Pencil
+arrived is cancelled. Settings, Gestures, Palm rejection sets the hold time (Off,
+Low 0.4 s, Medium 0.8 s by default, High 1.5 s). The logic is
+`lib/data/palm_rejection.dart`, applied in `canvas_gesture_detector.dart`.
