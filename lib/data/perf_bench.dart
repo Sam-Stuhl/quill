@@ -361,7 +361,7 @@ class PerfBench {
   /// how many of the strokes made it onto the page.
   static Future<void> _handwrite(String name, {int strokes = 260}) async {
     final editor = EditorState.benchInstance!;
-    final page = editor.coreInfo.pages[1];
+    final page = editor.coreInfo.pages[0];
     final box = page.renderBox!;
     Offset global(double x, double y) => box.localToGlobal(Offset(x, y));
     final rng = Random(11);
@@ -369,13 +369,13 @@ class PerfBench {
     final mark = _mark();
     final lagFrom = _lags.length;
     final starts = <double>[], ends = <double>[], moves = <double>[];
-    var x = 60.0, y = 150.0;
+    var x = 60.0, y = 1000.0;
     for (var n = 0; n < strokes; n++) {
       final pts = 8 + rng.nextInt(17);
       final x0 = x, y0 = y + rng.nextDouble() * 6;
       Offset at(int i) =>
           global(x0 + i * 1.6 + sin(i / 3) * 4, y0 + cos(i / 2.5) * 9);
-      editor.dragPageIndex = 1;
+      editor.dragPageIndex = 0;
       var t = Stopwatch()..start();
       editor.onDrawStart(
         ScaleStartDetails(focalPoint: at(0), localFocalPoint: at(0)),
