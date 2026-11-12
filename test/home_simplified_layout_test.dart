@@ -1,13 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:golden_screenshot/golden_screenshot.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/home/syncing_button.dart';
-import 'package:saber/data/file_manager/file_manager.dart';
-import 'package:saber/data/flavor_config.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/data/sentry/_sentry_init_foss.dart';
-import 'package:saber/i18n/strings.g.dart';
-import 'package:saber/pages/home/home.dart';
+import 'package:quill/components/home/syncing_button.dart';
+import 'package:quill/data/file_manager/file_manager.dart';
+import 'package:quill/data/flavor_config.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/data/sentry/_sentry_init_foss.dart';
+import 'package:quill/i18n/strings.g.dart';
+import 'package:quill/pages/home/home.dart';
 
 import 'screenshot_goldens_test.dart';
 import 'utils/test_mock_channel_handlers.dart';
@@ -37,7 +37,7 @@ void main() {
 
       final widget = ScreenshotApp.withConditionalTitlebar(
         device: device,
-        title: 'Saber',
+        title: 'Quill',
         home: TranslationProvider(
           child: const HomePage(subpage: HomePage.recentSubpage, path: ''),
         ),

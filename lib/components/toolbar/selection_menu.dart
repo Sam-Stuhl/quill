@@ -2,10 +2,10 @@ import 'dart:math';
 
 import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/canvas/_stroke.dart';
-import 'package:saber/components/toolbar/color_bar.dart';
-import 'package:saber/data/clipboard_shelf.dart';
-import 'package:saber/i18n/strings.g.dart';
+import 'package:quill/components/canvas/_stroke.dart';
+import 'package:quill/components/toolbar/color_bar.dart';
+import 'package:quill/data/clipboard_shelf.dart';
+import 'package:quill/i18n/strings.g.dart';
 
 /// Smallest target Apple asks for under a finger.
 const double kTouchTarget = 44;

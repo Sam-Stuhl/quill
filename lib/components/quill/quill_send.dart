@@ -2,9 +2,9 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/data/editor/editor_core_info.dart';
-import 'package:saber/data/editor/editor_exporter.dart';
-import 'package:saber/data/quill_sync/quill_connect.dart';
+import 'package:quill/data/editor/editor_core_info.dart';
+import 'package:quill/data/editor/editor_exporter.dart';
+import 'package:quill/data/quill_sync/quill_connect.dart';
 
 /// The editor's two ways to hand a note on (export bar, "ATLAS" and "Canvas"):
 /// a page or the finished PDF to ATLAS's shelf, and the PDF to Canvas as a

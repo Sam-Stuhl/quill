@@ -1,7 +1,7 @@
 # Touch editing in Quill
 
 Quill is used on an iPad with a finger and Apple Pencil, with Notability as the
-reference. These are the touch changes on top of Saber (2026-11-07).
+reference. These are the touch changes on top of Quill (2026-11-07).
 
 - **Press and hold** a finger on writing or an image to select it. A word is
   taken as a group (strokes written next to each other, narrow gaps between

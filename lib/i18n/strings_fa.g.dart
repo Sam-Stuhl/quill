@@ -120,7 +120,7 @@ class _Translations$settings$fa extends Translations$settings$en {
 	@override late final _Translations$settings$customDataDir$fa customDataDir = _Translations$settings$customDataDir$fa._(_root);
 	@override String get autosaveDisabled => 'هرگز';
 	@override String get shapeRecognitionDisabled => 'هرگز';
-	@override String get openDataDir => 'پوشه Saber را باز کنید';
+	@override String get openDataDir => 'پوشه Quill را باز کنید';
 	@override String get resyncEverything => 'همه چیز را دوباره همگام سازی کنید';
 }
 
@@ -469,7 +469,7 @@ class _Translations$settings$prefDescriptions$fa extends Translations$settings$p
 
 	// Translations
 	@override String get hyperlegibleFont => 'خوانایی را برای خوانندگان کم بینا افزایش می دهد';
-	@override String get allowInsecureConnections => '(توصیه نمی شود) به Saber اجازه دهید به سرورهایی با گواهینامه های خودامضا/غیر قابل اعتماد متصل شود';
+	@override String get allowInsecureConnections => '(توصیه نمی شود) به Quill اجازه دهید به سرورهایی با گواهینامه های خودامضا/غیر قابل اعتماد متصل شود';
 	@override String get preferGreyscale => 'برای نمایشگر های e-ink';
 	@override String get autoClearWhiteboardOnExit => 'همچنان با دستگاه‌های دیگر شما همگام‌سازی می‌شود';
 	@override String get disableEraserAfterUse => 'پس از استفاده از پاک کن به صورت خودکار به خودکار برمی گردد';
@@ -581,10 +581,10 @@ class _Translations$login$ncLoginStep$fa extends Translations$login$ncLoginStep$
 	// Translations
 	@override late final _Translations$login$ncLoginStep$loginFlow$fa loginFlow = _Translations$login$ncLoginStep$loginFlow$fa._(_root);
 	@override String get whereToStoreData => 'محل ذخیره داده های خود را انتخاب کنید:';
-	@override String get saberNcServer => 'سرور Nextcloud Saber';
+	@override String get quillNcServer => 'سرور Nextcloud Quill';
 	@override String get otherNcServer => 'سرور Nextcloud دیگر';
 	@override String get serverUrl => 'آدرس سرور';
-	@override String get loginWithSaber => 'با صابر وارد شوید';
+	@override String get loginWithQuill => 'با صابر وارد شوید';
 	@override String get loginWithNextcloud => 'با Nextcloud وارد شوید';
 }
 
@@ -596,7 +596,7 @@ class _Translations$login$encLoginStep$fa extends Translations$login$encLoginSte
 
 	// Translations
 	@override String get enterEncPassword => 'برای محافظت از داده های خود، لطفا رمز رمزگذاری خود را وارد کنید:';
-	@override String get newToSaber => 'تازه وارد صابر';
+	@override String get newToQuill => 'تازه وارد صابر';
 	@override String get encPassword => 'رمز رمزگذاری';
 	@override String get encFaqTitle => 'سوالات متداول';
 	@override String get wrongEncPassword => 'رمزگشایی با رمز عبور ارائه شده انجام نشد. لطفاً دوباره آن را وارد کنید.';
@@ -638,7 +638,7 @@ class _Translations$profile$faq$1$fa extends Translations$profile$faq$1$en {
 
 	// Translations
 	@override String get q => 'چگونه رمز عبور Nextcloud خود را تغییر دهم؟';
-	@override String get a => 'به وب سایت سرور خود بروید و وارد شوید. سپس به تنظیمات > امنیت > تغییر رمز عبور بروید. پس از تغییر رمز عبور، باید از سیستم خارج شوید و دوباره وارد Saber شوید.';
+	@override String get a => 'به وب سایت سرور خود بروید و وارد شوید. سپس به تنظیمات > امنیت > تغییر رمز عبور بروید. پس از تغییر رمز عبور، باید از سیستم خارج شوید و دوباره وارد Quill شوید.';
 }
 
 // Path: profile.faq.2
@@ -649,7 +649,7 @@ class _Translations$profile$faq$2$fa extends Translations$profile$faq$2$en {
 
 	// Translations
 	@override String get q => 'چگونه رمز رمزگذاری خود را تغییر دهم؟';
-	@override String get a => '1. از Saber خارج شوید. قبل از خروج از سیستم مطمئن شوید که همگام‌سازی کامل شده است تا هیچ داده‌ای را از دست ندهید (پیشرفت همگام‌سازی را در صفحه اصلی ببینید).\n2. به وب سایت سرور خود بروید و پوشه \'Saber\' خود را حذف کنید. با این کار تمام یادداشت های شما از سرور حذف می شود.\n3. دوباره وارد سابر شوید. هنگام ورود به سیستم می‌توانید رمز رمزگذاری جدیدی انتخاب کنید.\n4. فراموش نکنید که از سیستم خارج شوید و در دستگاه های دیگر خود نیز دوباره وارد Saber شوید.';
+	@override String get a => '1. از Quill خارج شوید. قبل از خروج از سیستم مطمئن شوید که همگام‌سازی کامل شده است تا هیچ داده‌ای را از دست ندهید (پیشرفت همگام‌سازی را در صفحه اصلی ببینید).\n2. به وب سایت سرور خود بروید و پوشه \'Quill\' خود را حذف کنید. با این کار تمام یادداشت های شما از سرور حذف می شود.\n3. دوباره وارد سابر شوید. هنگام ورود به سیستم می‌توانید رمز رمزگذاری جدیدی انتخاب کنید.\n4. فراموش نکنید که از سیستم خارج شوید و در دستگاه های دیگر خود نیز دوباره وارد Quill شوید.';
 }
 
 // Path: profile.faq.3
@@ -916,7 +916,7 @@ class _Translations$login$ncLoginStep$loginFlow$fa extends Translations$login$nc
 	final TranslationsFa _root; // ignore: unused_field
 
 	// Translations
-	@override String get pleaseAuthorize => 'لطفاً به Saber اجازه دسترسی به حساب Nextcloud شما را بدهید';
+	@override String get pleaseAuthorize => 'لطفاً به Quill اجازه دسترسی به حساب Nextcloud شما را بدهید';
 	@override String get followPrompts => 'لطفاً دستورات موجود در مرورگر خود را دنبال کنید.';
 	@override String get browserDidntOpen => 'مرورگر باز نشد';
 }

@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:golden_screenshot/golden_screenshot.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/theming/saber_theme.dart';
-import 'package:saber/data/flavor_config.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/pages/user/login.dart';
+import 'package:quill/components/theming/quill_theme.dart';
+import 'package:quill/data/flavor_config.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/pages/user/login.dart';
 
 import 'utils/test_user.dart';
 
@@ -15,7 +15,7 @@ void main() {
   group('LoginPage', () {
     setUp(() {
       FlavorConfig.setup();
-      _theme = SaberTheme.createThemeFromSeed(
+      _theme = QuillTheme.createThemeFromSeed(
         Colors.yellow,
         .light,
         _device.platform,
@@ -76,7 +76,7 @@ class _LoginApp extends StatelessWidget {
     return ScreenshotApp.withConditionalTitlebar(
       theme: _theme,
       device: _device,
-      title: 'Saber',
+      title: 'Quill',
       home: NcLoginPage(forceAppBarLeading: true, forceCurrentStep: step),
     );
   }

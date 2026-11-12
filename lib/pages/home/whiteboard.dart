@@ -1,8 +1,8 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/canvas/save_indicator.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/i18n/strings.g.dart';
-import 'package:saber/pages/editor/editor.dart';
+import 'package:quill/components/canvas/save_indicator.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/i18n/strings.g.dart';
+import 'package:quill/pages/editor/editor.dart';
 
 class const Whiteboard({super.key}) extends StatelessWidget {
   static const filePath = '/_whiteboard';

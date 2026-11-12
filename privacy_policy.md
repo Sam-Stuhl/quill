@@ -1,4 +1,4 @@
-# Saber's Privacy Policy
+# Quill's Privacy Policy
 
 Saber is an application developed by Adil Hanney that
 facilitates the user in creating and organising handwritten notes.
@@ -28,7 +28,7 @@ between the user's devices but is not necessary for the application to function.
 To use this feature, users need to make an account on a Nextcloud server
 of their choice to use as a cloud service.
 For users who don't want to choose a custom Nextcloud server,
-the official Saber server is hosted at
+the official Quill server is hosted at
 [nc.saber.adil.hanney.org](https://nc.saber.adil.hanney.org).
 This server is run by me (Adil Hanney) and hosted in the Netherlands.
 Data may ephemerally pass through the United Kingdom (where I'm based) during essential server maintenance but will not be stored here.
@@ -41,7 +41,7 @@ and an encrypted form of the key is uploaded to the cloud.
 ### My notes are private, right?
 
 With any cloud storage, the server owners can see and read any files you upload.
-This is why Saber encrypts your notes before uploading them to the cloud,
+This is why Quill encrypts your notes before uploading them to the cloud,
 so they're unreadable to the server owner.
 
 ### So what data can the server owners see?
@@ -55,12 +55,12 @@ so they're unreadable to the server owner.
   - The last time you edited a note, when it was created, and when you last synced.
 - An encrypted (scrambled) form of your encryption key. This is required to enable cross-device syncing.
 - Nextcloud is general-purpose software, so the server owner can see any other files you upload
-  to the server and information you provide outside of Saber.
+  to the server and information you provide outside of Quill.
 
 ## Third-party service: Error tracking
 
 To help diagnose and fix errors in the application,
-Saber uses [Sentry](https://sentry.io), an open-source SDK, to
+Quill uses [Sentry](https://sentry.io), an open-source SDK, to
 automatically collect error reports.
 
 This data collection is optional and opt-in. No data collection occurs until
@@ -88,7 +88,7 @@ Sentry handles data in accordance with
 
 ## Third-party service: Ads
 
-Saber has been ad-free since September 2024.
+Quill has been ad-free since September 2024.
 If you are using a version of the application older than v0.4.7,
 please update to the latest version.
 
@@ -101,7 +101,7 @@ and is available on [GitHub](https://github.com/saber-notes/saber).
 ## How can I delete my data?
 
 1. To delete the local data on your device, simply uninstall the application.
-  Desktop users will also need to delete the `Saber` folder inside your Documents folder.
+  Desktop users will also need to delete the `Quill` folder inside your Documents folder.
 
 2. To delete your account and data on the cloud:
     - If you use the default cloud provider, you can head to the
@@ -118,7 +118,7 @@ and is available on [GitHub](https://github.com/saber-notes/saber).
 
 ### Unused accounts
 
-To conserve storage space, inactive accounts on the official Saber server may be deleted automatically.
+To conserve storage space, inactive accounts on the official Quill server may be deleted automatically.
 
 You will receive notifications via email 300, 330, and 360 days after your last login,
 giving you the opportunity to log in and prevent deletion if you wish to keep your account.

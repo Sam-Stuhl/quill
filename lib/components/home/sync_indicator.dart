@@ -1,9 +1,9 @@
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/data/file_manager/file_manager.dart';
-import 'package:saber/data/nextcloud/saber_syncer.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/pages/editor/editor.dart';
+import 'package:quill/data/file_manager/file_manager.dart';
+import 'package:quill/data/nextcloud/quill_syncer.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/pages/editor/editor.dart';
 
 class SyncIndicator extends HookWidget {
   const new({super.key, required this.filePath});
@@ -17,7 +17,7 @@ class SyncIndicator extends HookWidget {
     return false;
   }
 
-  bool _isInQueue(Iterable<SaberSyncFile> pending) => pending.any((syncFile) {
+  bool _isInQueue(Iterable<QuillSyncFile> pending) => pending.any((syncFile) {
     final path = syncFile.relativeLocalPath;
 
     if (_matchesPath(path)) return true;
@@ -33,7 +33,7 @@ class SyncIndicator extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final status = ValueNotifier(_SyncIndicatorStatus.done);
-    void onFileTransfer([SaberSyncFile? _]) {
+    void onFileTransfer([QuillSyncFile? _]) {
       final isInUploadQueue = _isInQueue(syncer.uploader.pending);
       final isInDownloadQueue = _isInQueue(syncer.downloader.pending);
 

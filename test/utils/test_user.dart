@@ -1,4 +1,4 @@
-import 'package:saber/data/quota.dart';
+import 'package:quill/data/quota.dart';
 
 abstract class TestUser {
   static Quota getQuota() {

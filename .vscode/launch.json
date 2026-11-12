@@ -5,18 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Saber",
+            "name": "Quill",
             "request": "launch",
             "type": "dart"
         },
         {
-            "name": "Saber (profile mode)",
+            "name": "Quill (profile mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
         },
         {
-            "name": "Saber (release mode)",
+            "name": "Quill (release mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"

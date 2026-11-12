@@ -1,4 +1,4 @@
-class SaberVersion {
+class QuillVersion {
   final int major;
   final int minor;
   final int patch;
@@ -13,7 +13,7 @@ class SaberVersion {
   factory fromName(String name) {
     final parts = name.split('.');
     assert(parts.length == 3);
-    return SaberVersion(
+    return QuillVersion(
       int.parse(parts[0]),
       int.parse(parts[1]),
       int.parse(parts[2]),
@@ -30,7 +30,7 @@ class SaberVersion {
     // next 2 digits are major version
     final major = (number ~/ 100000) % 100;
 
-    return SaberVersion(major, minor, patch, revision);
+    return QuillVersion(major, minor, patch, revision);
   }
 
   String get buildName => '$major.$minor.$patch';
@@ -38,12 +38,12 @@ class SaberVersion {
   int get buildNumber => revision + patch * 10 + minor * 1000 + major * 100000;
   int get buildNumberWithoutRevision => buildNumber - revision;
 
-  SaberVersion bumpMajor() => SaberVersion(major + 1, 0, 0);
-  SaberVersion bumpMinor() => SaberVersion(major, minor + 1, 0);
-  SaberVersion bumpPatch() => SaberVersion(major, minor, patch + 1);
+  QuillVersion bumpMajor() => QuillVersion(major + 1, 0, 0);
+  QuillVersion bumpMinor() => QuillVersion(major, minor + 1, 0);
+  QuillVersion bumpPatch() => QuillVersion(major, minor, patch + 1);
 
-  SaberVersion copyWith({int? major, int? minor, int? patch, int? revision}) =>
-      SaberVersion(
+  QuillVersion copyWith({int? major, int? minor, int? patch, int? revision}) =>
+      QuillVersion(
         major ?? this.major,
         minor ?? this.minor,
         patch ?? this.patch,
@@ -55,7 +55,7 @@ class SaberVersion {
 
   @override
   bool operator ==(Object other) =>
-      other is SaberVersion &&
+      other is QuillVersion &&
       major == other.major &&
       minor == other.minor &&
       patch == other.patch;

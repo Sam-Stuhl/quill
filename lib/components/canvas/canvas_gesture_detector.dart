@@ -7,15 +7,15 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:keybinder/keybinder.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/canvas/hud/canvas_hud.dart';
-import 'package:saber/components/canvas/interactive_canvas.dart';
-import 'package:saber/data/editor/page.dart';
-import 'package:saber/data/extensions/change_notifier_extensions.dart';
-import 'package:saber/data/extensions/matrix4_extensions.dart';
-import 'package:saber/data/palm_rejection.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/data/touch_gestures.dart';
-import 'package:saber/pages/editor/editor.dart';
+import 'package:quill/components/canvas/hud/canvas_hud.dart';
+import 'package:quill/components/canvas/interactive_canvas.dart';
+import 'package:quill/data/editor/page.dart';
+import 'package:quill/data/extensions/change_notifier_extensions.dart';
+import 'package:quill/data/extensions/matrix4_extensions.dart';
+import 'package:quill/data/palm_rejection.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/data/touch_gestures.dart';
+import 'package:quill/pages/editor/editor.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 class CanvasGestureDetector extends StatefulWidget {

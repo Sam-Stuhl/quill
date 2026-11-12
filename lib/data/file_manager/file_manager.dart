@@ -12,12 +12,12 @@ import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:saber/components/home/sort_button.dart';
-import 'package:saber/data/nextcloud/saber_syncer.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/data/quill_sync/quill_sync.dart';
-import 'package:saber/i18n/strings.g.dart';
-import 'package:saber/pages/editor/editor.dart';
+import 'package:quill/components/home/sort_button.dart';
+import 'package:quill/data/nextcloud/quill_syncer.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/data/quill_sync/quill_sync.dart';
+import 'package:quill/i18n/strings.g.dart';
+import 'package:quill/pages/editor/editor.dart';
 import 'package:saver_gallery/saver_gallery.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -28,7 +28,7 @@ class FileManager {
 
   static final log = Logger('FileManager');
 
-  static const appRootDirectoryPrefix = 'Saber';
+  static const appRootDirectoryPrefix = 'Saber'; // folder on disk and on Nextcloud: kept so existing notes stay put
 
   /// This isn't final because isolates sometimes init multiple times.
   /// Realistically, this value never changes.
@@ -309,7 +309,7 @@ class FileManager {
           await SaverGallery.saveImage(
             Uint8List.fromList(bytes),
             fileName: fileName,
-            albumPath: 'Saber',
+            albumPath: 'Quill',
             skipIfExists: true,
           );
         }
@@ -688,7 +688,7 @@ class FileManager {
 
   static Future<List<String>> getRecentlyAccessed() async {
     if (!stows.recentFiles.loaded) await stows.recentFiles.waitUntilRead();
-    // Delete entries for files that have been deleted outside of Saber
+    // Delete entries for files that have been deleted outside of Quill
     for (final file in stows.recentFiles.value.toList()) {
       if (!doesFileExist(file)) _removeReferences(file);
     }

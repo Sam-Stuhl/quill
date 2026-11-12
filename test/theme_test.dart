@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/theming/dynamic_material_app.dart';
-import 'package:saber/data/flavor_config.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/i18n/strings.g.dart';
+import 'package:quill/components/theming/dynamic_material_app.dart';
+import 'package:quill/data/flavor_config.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/i18n/strings.g.dart';
 
 void main() {
   group('Theme', () {

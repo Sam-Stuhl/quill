@@ -7,19 +7,19 @@ notasync (Notability to Drive to the vault), which it does not touch.
 
 Status: plan written and implemented 2026-11-06. Measurements are at the end.
 
-## How Saber stores and syncs today
+## How Quill stores and syncs today
 
 - **Notes on disk.** Each note is `<path>.sbn2` (BSON: pages, strokes, text,
   image references) plus numbered assets `<path>.sbn2.0`, `.1`, ... (images and
   imported PDFs, one file each) and a thumbnail `<path>.sbn2.p` (PNG). They live
-  under the app's documents directory, `Saber/`, in the same folder tree Sam
+  under the app's documents directory, `Quill/`, in the same folder tree Sam
   sees in the app. `.sba` is a zip of one note and its assets.
 - **Saving.** The editor saves `autosaveDelay` after the last change (10 s by
   default), never while the pen is down, and on leaving the note. It does not
   save when the app goes to the background.
 - **Nextcloud sync.** Every file write enqueues an upload. Paths and contents are
   AES-encrypted with a key derived from the encryption password (`.sbe` files
-  under `Saber/` on the server), so the server never sees a readable file.
+  under `Quill/` on the server), so the server never sees a readable file.
   Downloads happen only at app start, on pull to refresh and when a note is opened
   in "watching server" mode. There is no push and no PDF anywhere in the
   pipeline.
@@ -168,7 +168,7 @@ header on loopback, but anything there can already read `~/quill`.
 
 ## Connected: courses, ATLAS, Canvas, handwriting text (2026-11-08)
 
-Quill is also Sam's, not only a Saber build: the pieces below tie it to Cedar,
+Quill is also Sam's, not only a Quill build: the pieces below tie it to Cedar,
 ATLAS, Canvas and the vault. The server side is `quill-sync/connect.py`; the app
 side is under `lib/data/quill_sync/` and `lib/data/quill_defaults.dart`.
 
@@ -221,7 +221,7 @@ side is under `lib/data/quill_sync/` and `lib/data/quill_defaults.dart`.
   ballpoint (`#1B3B8C`, 2.5), a slim yellow highlighter (30), a gray pencil, and the
   toolbar along the top, laid out like Notability's (a back pill, a floating tools
   pill (hideable) with the colour row and pen options in a pill under it (shown and hidden by tapping the active tool), an undo, redo, more, share and pages pill at the
-  right; `Toolbar._topLayout`) instead of Saber's bottom bar. Edit
+  right; `Toolbar._topLayout`) instead of Quill's bottom bar. Edit
   the file and raise `version` to change a taste. The app's name is Quill on the
   home screen and in `Info.plist`; its text inside (settings, welcome) still says
   Saber, as upstream's translations do. The icon is a flat quill glyph (a solid feather

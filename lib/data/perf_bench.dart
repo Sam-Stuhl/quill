@@ -7,16 +7,16 @@ import 'dart:ui';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
-import 'package:saber/components/canvas/_stroke.dart';
-import 'package:saber/data/editor/editor_core_info.dart';
-import 'package:saber/data/editor/page.dart';
-import 'package:saber/data/file_manager/file_manager.dart';
-import 'package:saber/data/routes.dart';
-import 'package:saber/data/tools/highlighter.dart';
-import 'package:saber/data/tools/pen.dart';
-import 'package:saber/data/tools/pencil.dart';
-import 'package:saber/main.dart';
-import 'package:saber/pages/editor/editor.dart';
+import 'package:quill/components/canvas/_stroke.dart';
+import 'package:quill/data/editor/editor_core_info.dart';
+import 'package:quill/data/editor/page.dart';
+import 'package:quill/data/file_manager/file_manager.dart';
+import 'package:quill/data/routes.dart';
+import 'package:quill/data/tools/highlighter.dart';
+import 'package:quill/data/tools/pen.dart';
+import 'package:quill/data/tools/pencil.dart';
+import 'package:quill/main.dart';
+import 'package:quill/pages/editor/editor.dart';
 import 'package:sbn/tool_id.dart';
 
 /// An on-device benchmark, run only when the app is launched with the

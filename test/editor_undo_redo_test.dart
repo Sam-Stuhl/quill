@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:golden_screenshot/golden_screenshot.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/data/file_manager/file_manager.dart';
-import 'package:saber/data/flavor_config.dart';
-import 'package:saber/i18n/strings.g.dart';
-import 'package:saber/pages/editor/editor.dart';
+import 'package:quill/data/file_manager/file_manager.dart';
+import 'package:quill/data/flavor_config.dart';
+import 'package:quill/i18n/strings.g.dart';
+import 'package:quill/pages/editor/editor.dart';
 
 import 'utils/test_mock_channel_handlers.dart';
 

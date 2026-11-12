@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
-import 'package:saber/data/file_manager/file_manager.dart';
+import 'package:quill/data/file_manager/file_manager.dart';
 
 /// What Quill sync's server (quill-sync/connect.py) knows about Sam's courses,
 /// and the two things a note can be sent to: ATLAS's shelf, and Canvas (as a

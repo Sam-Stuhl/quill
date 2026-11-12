@@ -2,12 +2,12 @@ import 'package:background_downloader/background_downloader.dart';
 import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/settings/app_info.dart';
-import 'package:saber/components/settings/update_manager.dart';
-import 'package:saber/components/theming/adaptive_alert_dialog.dart';
-import 'package:saber/components/theming/adaptive_linear_progress_indicator.dart';
-import 'package:saber/data/locales.dart';
-import 'package:saber/i18n/strings.g.dart';
+import 'package:quill/components/settings/app_info.dart';
+import 'package:quill/components/settings/update_manager.dart';
+import 'package:quill/components/theming/adaptive_alert_dialog.dart';
+import 'package:quill/components/theming/adaptive_linear_progress_indicator.dart';
+import 'package:quill/data/locales.dart';
+import 'package:quill/i18n/strings.g.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class const UpdateDialog({super.key}) extends StatefulWidget {

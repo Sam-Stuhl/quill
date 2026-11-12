@@ -1,4 +1,4 @@
-const kSaberCardRadius = 8.0;
+const kQuillCardRadius = 8.0;
 
-const kSaberBorderWidthInaccessible = 1.0;
-const kSaberBorderWidthAccessible = 2.0;
+const kQuillBorderWidthInaccessible = 1.0;
+const kQuillBorderWidthAccessible = 2.0;

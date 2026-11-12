@@ -1,8 +1,8 @@
 import 'dart:ui' show Rect;
 
 import 'package:flutter/foundation.dart';
-import 'package:saber/components/canvas/_stroke.dart';
-import 'package:saber/components/canvas/image/editor_image.dart';
+import 'package:quill/components/canvas/_stroke.dart';
+import 'package:quill/components/canvas/image/editor_image.dart';
 
 /// One copy: the strokes and images that were selected.
 ///

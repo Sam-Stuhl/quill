@@ -11,12 +11,12 @@ import 'package:logging/logging.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:meta/meta.dart';
 import 'package:pdfrx/pdfrx.dart';
-import 'package:saber/components/canvas/_asset_cache.dart';
-import 'package:saber/components/canvas/canvas_image.dart';
-import 'package:saber/components/canvas/invert_widget.dart';
-import 'package:saber/data/file_manager/file_manager.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/pages/editor/editor.dart';
+import 'package:quill/components/canvas/_asset_cache.dart';
+import 'package:quill/components/canvas/canvas_image.dart';
+import 'package:quill/components/canvas/invert_widget.dart';
+import 'package:quill/data/file_manager/file_manager.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/pages/editor/editor.dart';
 
 part 'pdf_editor_image.dart';
 part 'png_editor_image.dart';

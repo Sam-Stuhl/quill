@@ -1,13 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:saber/data/flavor_config.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/data/sentry/sentry_filter.dart';
-import 'package:saber/data/sentry/sentry_init.dart';
+import 'package:quill/data/flavor_config.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/data/sentry/sentry_filter.dart';
+import 'package:quill/data/sentry/sentry_init.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 void main() {
   group('Sentry filter:', () {
-    const remoteFile = 'Saber/a7c452ee393a9c995efce3cccd27bf7b.sbe';
+    const remoteFile = 'Quill/a7c452ee393a9c995efce3cccd27bf7b.sbe';
     const localFile = '/path/to/somenote.sbn2';
 
     FlavorConfig.setup();
@@ -34,9 +34,9 @@ void main() {
       expect(filteredEvent, isNull);
     });
 
-    test('Redacts SaberSyncFile', () async {
+    test('Redacts QuillSyncFile', () async {
       final originalEvent = SentryEvent(
-        message: SentryMessage('Uploaded: SaberSyncFile(SECRET)'),
+        message: SentryMessage('Uploaded: QuillSyncFile(SECRET)'),
       );
       final filteredEvent = await SentryFilter.beforeSend(
         originalEvent,
@@ -44,7 +44,7 @@ void main() {
       );
       expect(
         filteredEvent?.message?.formatted,
-        'Uploaded: SaberSyncFile([redacted])',
+        'Uploaded: QuillSyncFile([redacted])',
       );
     });
 
@@ -58,7 +58,7 @@ void main() {
       );
       expect(
         filteredEvent?.message?.formatted,
-        'Remote file path: Saber/abef1289.sbe',
+        'Remote file path: Quill/abef1289.sbe',
       );
     });
 
@@ -168,7 +168,7 @@ void main() {
 
     test('Redacts Windows user folder', () async {
       final originalEvent = SentryEvent(
-        message: SentryMessage('C:\\Users\\bill\\Documents\\Saber'),
+        message: SentryMessage('C:\\Users\\bill\\Documents\\Quill'),
       );
       final filteredEvent = await SentryFilter.beforeSend(
         originalEvent,
@@ -176,24 +176,24 @@ void main() {
       );
       expect(
         filteredEvent?.message?.formatted,
-        'C:\\Users\\[USER]\\Documents\\Saber',
+        'C:\\Users\\[USER]\\Documents\\Quill',
       );
     });
 
     test('Redacts Linux user folder', () async {
       final originalEvent = SentryEvent(
-        message: SentryMessage('/home/linus/Documents/Saber'),
+        message: SentryMessage('/home/linus/Documents/Quill'),
       );
       final filteredEvent = await SentryFilter.beforeSend(
         originalEvent,
         Hint(),
       );
-      expect(filteredEvent?.message?.formatted, '/home/[USER]/Documents/Saber');
+      expect(filteredEvent?.message?.formatted, '/home/[USER]/Documents/Quill');
     });
 
     test('Redacts macOS user folder', () async {
       final originalEvent = SentryEvent(
-        message: SentryMessage('/Users/steve/Documents/Saber'),
+        message: SentryMessage('/Users/steve/Documents/Quill'),
       );
       final filteredEvent = await SentryFilter.beforeSend(
         originalEvent,
@@ -201,7 +201,7 @@ void main() {
       );
       expect(
         filteredEvent?.message?.formatted,
-        '/Users/[USER]/Documents/Saber',
+        '/Users/[USER]/Documents/Quill',
       );
     });
 

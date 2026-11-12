@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:saber/data/file_manager/file_manager.dart';
-import 'package:saber/data/flavor_config.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/data/quill_defaults.dart';
-import 'package:saber/data/quill_sync/quill_connect.dart';
+import 'package:quill/data/file_manager/file_manager.dart';
+import 'package:quill/data/flavor_config.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/data/quill_defaults.dart';
+import 'package:quill/data/quill_sync/quill_connect.dart';
 import 'package:sbn/canvas_background_pattern.dart';
 import 'package:sbn/tool_id.dart';
 

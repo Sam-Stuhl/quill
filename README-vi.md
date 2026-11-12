@@ -1,4 +1,4 @@
-# <img src="https://github.com/saber-notes/saber/raw/main/assets/icon/icon.png" width="30" height="30" alt="Logo"> Saber
+# <img src="https://github.com/saber-notes/saber/raw/main/assets/icon/icon.png" width="30" height="30" alt="Logo"> Quill
 
 [<img src='https://github.com/saber-notes/saber/blob/main/assets_raw/badges/google-play-badge.svg'
     alt='Tải trên Google Play'
@@ -33,23 +33,23 @@
 [Tiếng Việt](https://github.com/saber-notes/saber/blob/main/README-vi.md) |
 [Bahasa Indonesia](https://github.com/saber-notes/saber/blob/main/README-id.md)
 
-Saber là ứng dụng được tối ưu hóa cho ghi chú viết tay.
+Quill là ứng dụng được tối ưu hóa cho ghi chú viết tay.
 
-Ứng dụng được thiết kế đơn giản và trực quan nhất có thể, đồng thời cung cấp các tính năng độc đáo mà bạn thực sự cần dùng. Saber có sẵn trên mọi thiết bị của bạn, dù lớn hay nhỏ, và đồng bộ hóa liền mạch.
+Ứng dụng được thiết kế đơn giản và trực quan nhất có thể, đồng thời cung cấp các tính năng độc đáo mà bạn thực sự cần dùng. Quill có sẵn trên mọi thiết bị của bạn, dù lớn hay nhỏ, và đồng bộ hóa liền mạch.
 
-Đặc biệt, Saber có thể đảo màu ghi chú của bạn khi bạn ở chế độ tối. Điều này cho phép bạn viết bằng mực trắng trên nền đen, giúp bảo vệ mắt trong môi trường thiếu sáng.
+Đặc biệt, Quill có thể đảo màu ghi chú của bạn khi bạn ở chế độ tối. Điều này cho phép bạn viết bằng mực trắng trên nền đen, giúp bảo vệ mắt trong môi trường thiếu sáng.
 Hình ảnh và tệp PDF cũng sẽ được đảo màu, giúp bạn thoải mái sử dụng giáo trình hay các sách in điện tử.
 
-Saber sử dụng hệ thống mật khẩu kép để bảo vệ bản ghi chú của bạn khỏi bất kỳ ai ngoài bạn, ngay cả khi họ có toàn quyền kiểm soát máy chủ. Bạn có thể an tâm lưu trữ ghi chú trên máy chủ Saber chính thức, trên một máy chủ khác hoặc thậm chí tự host máy chủ của riêng mình!
+Quill sử dụng hệ thống mật khẩu kép để bảo vệ bản ghi chú của bạn khỏi bất kỳ ai ngoài bạn, ngay cả khi họ có toàn quyền kiểm soát máy chủ. Bạn có thể an tâm lưu trữ ghi chú trên máy chủ Quill chính thức, trên một máy chủ khác hoặc thậm chí tự host máy chủ của riêng mình!
 
 Ứng dụng này có mã nguồn mở, bất kỳ ai cũng có thể xem mã nguồn, biết chính xác ứng dụng đang làm gì và xử lý dữ liệu của bạn ra sao. Rất nhiều ứng dụng ghi chú khác là mã nguồn đóng và độc quyền, nghĩa là cách thức hoạt động nội bộ của chúng là một bí ẩn đối với công chúng.
 
 Đối với các ứng dụng khác, việc dùng bút dạ quang để highlight các phương trình Toán dài dòng luôn rất phiền phức, khi mà màu highlight bị thay đổi tại những chỗ đoạn màu đè lên nhau. Một vấn đề khác tôi từng gặp phải ở một vài app là màu highlight lại được vẽ đè lên trên dòng chữ, làm cho chữ bị mờ đi và khó đọc.
-Tính năng highlight của Saber không gặp những vấn đề này. Saber sử dụng kỹ thuật canvas compositing để hiển thị màu highlight một cách nhất quán/tốt hơn so với trên giấy thật, nơi app tự xử lý các phần nét đè lên nhau và giữ được độ đồng nhất hoàn hảo của màu sắc.
+Tính năng highlight của Quill không gặp những vấn đề này. Quill sử dụng kỹ thuật canvas compositing để hiển thị màu highlight một cách nhất quán/tốt hơn so với trên giấy thật, nơi app tự xử lý các phần nét đè lên nhau và giữ được độ đồng nhất hoàn hảo của màu sắc.
 
-Saber có mọi thứ bạn cần để giữ cho ghi chú của bạn ngăn nắp. Bạn có thể tạo các thư mục lồng nhau bao nhiêu tùy thích. Và dù một bản ghi chú có nằm sâu trong thư mục lồng nhau, bạn vẫn có thể mở nó dễ dàng ở mục "Các ghi chú mở gần đây", nó luôn có sẵn trên màn hình chính. 
+Quill có mọi thứ bạn cần để giữ cho ghi chú của bạn ngăn nắp. Bạn có thể tạo các thư mục lồng nhau bao nhiêu tùy thích. Và dù một bản ghi chú có nằm sâu trong thư mục lồng nhau, bạn vẫn có thể mở nó dễ dàng ở mục "Các ghi chú mở gần đây", nó luôn có sẵn trên màn hình chính. 
 
-Khám phá một phương thức hoàn toàn mới để ghi chép và sắp xếp mọi luồng suy nghĩ với Saber. Dù bạn là sinh viên, người đi làm, hay một người có tư duy sáng tạo, Saber sẽ luôn là bạn đồng hành đáng tin cậy của bạn cho việc ghi chép kỹ thuật số. Hãy tải xuống ngay hôm nay và để cho những ý tưởng của bạn tha hồ tuôn trào!
+Khám phá một phương thức hoàn toàn mới để ghi chép và sắp xếp mọi luồng suy nghĩ với Quill. Dù bạn là sinh viên, người đi làm, hay một người có tư duy sáng tạo, Quill sẽ luôn là bạn đồng hành đáng tin cậy của bạn cho việc ghi chép kỹ thuật số. Hãy tải xuống ngay hôm nay và để cho những ý tưởng của bạn tha hồ tuôn trào!
 
 [![Latest release](https://img.shields.io/github/v/release/saber-notes/saber)](https://github.com/saber-notes/saber/releases/latest)
 [![Flathub](https://img.shields.io/flathub/v/com.adilhanney.saber)](https://flathub.org/apps/details/com.adilhanney.saber)
@@ -74,18 +74,18 @@ Khám phá một phương thức hoàn toàn mới để ghi chép và sắp x�
 
 ## Các tính năng
 
-Xem mục [#1 Saber progress][progress].
+Xem mục [#1 Quill progress][progress].
 
 ## Cài đặt
 
 Xem mục
-[Install Saber](https://github.com/saber-notes/saber/wiki/install)
+[Install Quill](https://github.com/saber-notes/saber/wiki/install)
 trên wiki.
 
 ## Build từ mã nguồn
 
 Xem mục
-[Build Saber](https://github.com/saber-notes/saber/wiki/build)
+[Build Quill](https://github.com/saber-notes/saber/wiki/build)
 trên wiki.
 
 ## Liên kết
@@ -99,13 +99,13 @@ trên wiki.
 
 Tất cả các bản dịch đều là từ những đóng góp của cộng đồng người dùng chúng tôi.
 
-Nếu bạn muốn giúp dịch Saber, hãy truy cập [Weblate](https://hosted.weblate.org/engage/saber-notes/) nhé!
+Nếu bạn muốn giúp dịch Quill, hãy truy cập [Weblate](https://hosted.weblate.org/engage/saber-notes/) nhé!
 
 [![Translation status](https://hosted.weblate.org/widget/saber-notes/multi-auto.svg)](https://hosted.weblate.org/engage/saber-notes/)
 
-## Ủng hộ Saber
+## Ủng hộ Quill
 
-Nếu bạn yêu thích Saber, bạn có thể ủng hộ dự án bằng cách:
+Nếu bạn yêu thích Quill, bạn có thể ủng hộ dự án bằng cách:
 - Giới thiệu tới mọi người!
 - Thả sao (Star) cho dự án trên GitHub
 - Mua cho tôi một ly cà phê trên [GitHub Sponsors](https://github.com/sponsors/adil192)

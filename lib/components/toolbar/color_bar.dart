@@ -2,11 +2,11 @@ import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/theming/adaptive_alert_dialog.dart';
-import 'package:saber/components/toolbar/color_option.dart';
-import 'package:saber/data/extensions/color_extensions.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/i18n/strings.g.dart';
+import 'package:quill/components/theming/adaptive_alert_dialog.dart';
+import 'package:quill/components/toolbar/color_option.dart';
+import 'package:quill/data/extensions/color_extensions.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/i18n/strings.g.dart';
 
 typedef NamedColor = ({String name, Color color});
 

@@ -14,24 +14,24 @@ import 'package:path/path.dart' as p;
 import 'package:path_to_regexp/path_to_regexp.dart';
 import 'package:pdfrx/pdfrx.dart';
 import 'package:printing/printing.dart';
-import 'package:saber/components/canvas/pencil_shader.dart';
-import 'package:saber/components/theming/dynamic_material_app.dart';
-import 'package:saber/data/file_manager/file_manager.dart';
-import 'package:saber/data/flavor_config.dart';
-import 'package:saber/data/nextcloud/nc_http_overrides.dart';
-import 'package:saber/data/nextcloud/saber_syncer.dart';
-import 'package:saber/data/perf_bench.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/data/quill_defaults.dart';
-import 'package:saber/data/quill_sync/quill_sync.dart';
-import 'package:saber/data/routes.dart';
-import 'package:saber/data/sentry/sentry_init.dart';
-import 'package:saber/data/tools/stroke_properties.dart';
-import 'package:saber/i18n/strings.g.dart';
-import 'package:saber/pages/editor/editor.dart';
-import 'package:saber/pages/home/home.dart';
-import 'package:saber/pages/logs.dart';
-import 'package:saber/pages/user/login.dart';
+import 'package:quill/components/canvas/pencil_shader.dart';
+import 'package:quill/components/theming/dynamic_material_app.dart';
+import 'package:quill/data/file_manager/file_manager.dart';
+import 'package:quill/data/flavor_config.dart';
+import 'package:quill/data/nextcloud/nc_http_overrides.dart';
+import 'package:quill/data/nextcloud/quill_syncer.dart';
+import 'package:quill/data/perf_bench.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/data/quill_defaults.dart';
+import 'package:quill/data/quill_sync/quill_sync.dart';
+import 'package:quill/data/routes.dart';
+import 'package:quill/data/sentry/sentry_init.dart';
+import 'package:quill/data/tools/stroke_properties.dart';
+import 'package:quill/i18n/strings.g.dart';
+import 'package:quill/pages/editor/editor.dart';
+import 'package:quill/pages/home/home.dart';
+import 'package:quill/pages/logs.dart';
+import 'package:quill/pages/user/login.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:worker_manager/worker_manager.dart';
 import 'package:workmanager/workmanager.dart';
@@ -222,7 +222,7 @@ void doBackgroundSync() {
     const maxFilesSynced = 10;
     var filesSynced = 0;
     final completer = Completer<bool>();
-    late final StreamSubscription<SaberSyncFile> transferSubscription;
+    late final StreamSubscription<QuillSyncFile> transferSubscription;
     void transferListener([_]) {
       filesSynced++;
       if (filesSynced >= maxFilesSynced ||
@@ -346,7 +346,7 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    return DynamicMaterialApp(title: 'Saber', router: App._router);
+    return DynamicMaterialApp(title: 'Quill', router: App._router);
   }
 
   @override

@@ -2,9 +2,9 @@ import 'dart:ui';
 
 import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/navbar/responsive_navbar.dart';
-import 'package:saber/components/theming/saber_theme.dart';
-import 'package:saber/data/routes.dart';
+import 'package:quill/components/navbar/responsive_navbar.dart';
+import 'package:quill/components/theming/quill_theme.dart';
+import 'package:quill/data/routes.dart';
 
 class const BottomNavbar({
   super.key,

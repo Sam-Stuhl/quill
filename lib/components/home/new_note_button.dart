@@ -2,12 +2,12 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/navbar/bottom_navbar.dart';
-import 'package:saber/components/theming/saber_theme.dart';
-import 'package:saber/data/file_manager/file_manager.dart';
-import 'package:saber/data/routes.dart';
-import 'package:saber/i18n/strings.g.dart';
-import 'package:saber/pages/editor/editor.dart';
+import 'package:quill/components/navbar/bottom_navbar.dart';
+import 'package:quill/components/theming/quill_theme.dart';
+import 'package:quill/data/file_manager/file_manager.dart';
+import 'package:quill/data/routes.dart';
+import 'package:quill/i18n/strings.g.dart';
+import 'package:quill/pages/editor/editor.dart';
 
 class NewNoteButton extends StatefulWidget {
   const new({super.key, required this.cupertino, this.path});

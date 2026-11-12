@@ -4,7 +4,7 @@ import 'package:sbn/font_fallbacks.dart';
 
 typedef _ArgRecord = ({bool invert, Color secondary, int lineHeight});
 
-abstract class SaberQuillStyles {
+abstract class InkQuillStyles {
   static DefaultStyles get({
     required bool invert,
     required Color secondary,
@@ -39,7 +39,7 @@ abstract class SaberQuillStyles {
     final baseStyle = TextStyle(
       inherit: false,
       fontFamily: 'Neucha',
-      fontFamilyFallback: saberHandwritingFontFallbacks,
+      fontFamilyFallback: quillHandwritingFontFallbacks,
       color: invert ? Colors.white : Colors.black,
       fontSize: lineHeight * 1,
       height: 1 / 1,
@@ -141,19 +141,19 @@ abstract class SaberQuillStyles {
         radius: const .circular(3),
         style: textTheme.bodyLarge.copyWith(
           fontFamily: 'FiraMono',
-          fontFamilyFallback: saberMonoFontFallbacks,
+          fontFamilyFallback: quillMonoFontFallbacks,
         ),
         header1: textTheme.displayLarge.copyWith(
           fontFamily: 'FiraMono',
-          fontFamilyFallback: saberMonoFontFallbacks,
+          fontFamilyFallback: quillMonoFontFallbacks,
         ),
         header2: textTheme.displayMedium.copyWith(
           fontFamily: 'FiraMono',
-          fontFamilyFallback: saberMonoFontFallbacks,
+          fontFamilyFallback: quillMonoFontFallbacks,
         ),
         header3: textTheme.displaySmall.copyWith(
           fontFamily: 'FiraMono',
-          fontFamilyFallback: saberMonoFontFallbacks,
+          fontFamilyFallback: quillMonoFontFallbacks,
         ),
       ),
       link: TextStyle(color: secondary, decoration: TextDecoration.underline),
@@ -189,7 +189,7 @@ abstract class SaberQuillStyles {
       code: DefaultTextBlockStyle(
         textTheme.bodyLarge.copyWith(
           fontFamily: 'FiraMono',
-          fontFamilyFallback: saberMonoFontFallbacks,
+          fontFamilyFallback: quillMonoFontFallbacks,
         ),
         HorizontalSpacing.zero,
         VerticalSpacing(-lineHeight * 0.16, lineHeight * 0.8),

@@ -1,13 +1,13 @@
 import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/home/sentry_consent_dialog.dart';
-import 'package:saber/components/navbar/responsive_navbar.dart';
-import 'package:saber/components/settings/update_manager.dart';
-import 'package:saber/components/theming/dynamic_material_app.dart';
-import 'package:saber/pages/home/browse.dart';
-import 'package:saber/pages/home/recent_notes.dart';
-import 'package:saber/pages/home/settings.dart';
-import 'package:saber/pages/home/whiteboard.dart';
+import 'package:quill/components/home/sentry_consent_dialog.dart';
+import 'package:quill/components/navbar/responsive_navbar.dart';
+import 'package:quill/components/settings/update_manager.dart';
+import 'package:quill/components/theming/dynamic_material_app.dart';
+import 'package:quill/pages/home/browse.dart';
+import 'package:quill/pages/home/recent_notes.dart';
+import 'package:quill/pages/home/settings.dart';
+import 'package:quill/pages/home/whiteboard.dart';
 
 class HomePage extends StatefulWidget {
   const new({super.key, required this.subpage, required this.path});

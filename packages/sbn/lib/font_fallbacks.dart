@@ -1,6 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 
-const saberSansSerifFontFallbacks = [
+const quillSansSerifFontFallbacks = [
   'Adwaita Sans',
   'Inter',
   'Noto Sans',
@@ -23,7 +23,7 @@ const saberSansSerifFontFallbacks = [
   '.SF UI Text',
   'Segoe UI',
 ];
-const saberMonoFontFallbacks = [
+const quillMonoFontFallbacks = [
   'Fira Mono',
   'ui-monospace',
   'Cascadia Code',
@@ -33,7 +33,7 @@ const saberMonoFontFallbacks = [
   'DejaVu Sans Mono',
   'monospace',
 ];
-const saberHandwritingFontFallbacks = [
+const quillHandwritingFontFallbacks = [
   'Neucha',
   'Dekko',
   // Fallback fonts from https://github.com/system-fonts/modern-font-stacks#handwritten
@@ -45,7 +45,7 @@ const saberHandwritingFontFallbacks = [
   'casual',
   'cursive',
   'handwriting',
-  ...saberSansSerifFontFallbacks,
+  ...quillSansSerifFontFallbacks,
 ];
 
 extension TextThemeExtension on TextTheme {

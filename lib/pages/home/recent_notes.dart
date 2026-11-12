@@ -5,20 +5,20 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/home/delete_note_button.dart';
-import 'package:saber/components/home/export_note_button.dart';
-import 'package:saber/components/home/home_layout_button.dart';
-import 'package:saber/components/home/masonry_files.dart';
-import 'package:saber/components/home/move_note_button.dart';
-import 'package:saber/components/home/new_note_button.dart';
-import 'package:saber/components/home/rename_note_button.dart';
-import 'package:saber/components/home/syncing_button.dart';
-import 'package:saber/components/home/welcome.dart';
-import 'package:saber/components/theming/saber_theme.dart';
-import 'package:saber/data/file_manager/file_manager.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/data/routes.dart';
-import 'package:saber/i18n/strings.g.dart';
+import 'package:quill/components/home/delete_note_button.dart';
+import 'package:quill/components/home/export_note_button.dart';
+import 'package:quill/components/home/home_layout_button.dart';
+import 'package:quill/components/home/masonry_files.dart';
+import 'package:quill/components/home/move_note_button.dart';
+import 'package:quill/components/home/new_note_button.dart';
+import 'package:quill/components/home/rename_note_button.dart';
+import 'package:quill/components/home/syncing_button.dart';
+import 'package:quill/components/home/welcome.dart';
+import 'package:quill/components/theming/quill_theme.dart';
+import 'package:quill/data/file_manager/file_manager.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/data/routes.dart';
+import 'package:quill/i18n/strings.g.dart';
 
 class const RecentPage({super.key}) extends StatefulHookWidget {
   @override
@@ -35,7 +35,7 @@ class _RecentPageState extends State<RecentPage> {
 
   /// Mitigates a bug where files got imported starting with `null/` instead of `/`.
   ///
-  /// This caused them to be written to `Documents/Sabernull/...` instead of `Documents/Saber/...`.
+  /// This caused them to be written to `Documents/Quillnull/...` instead of `Documents/Quill/...`.
   ///
   /// See https://github.com/saber-notes/saber/issues/996
   /// and https://github.com/saber-notes/saber/pull/977.

@@ -1,13 +1,13 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/data/tools/highlighter.dart';
-import 'package:saber/data/tools/pen.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/data/tools/highlighter.dart';
+import 'package:quill/data/tools/pen.dart';
 import 'package:sbn/canvas_background_pattern.dart';
 import 'package:sbn/tool_id.dart';
 
 /// Sam's defaults for Quill: pens, paper, theme. Applied once on first launch
 /// (and again whenever [version] goes up) by writing the same preferences the
-/// settings screens write, so upstream Saber's own defaults, and merging them,
+/// settings screens write, so upstream Quill's own defaults, and merging them,
 /// stay untouched, and anything Sam changes later in the app stays changed.
 ///
 /// To change a taste: edit the value here and raise [version].
@@ -33,7 +33,7 @@ abstract class QuillDefaults {
     stows.accentColor.value = accent;
 
     // Toolbar: along the top of the page, as in Notability, out of reach of a
-    // resting palm, instead of Saber's bottom bar that gets tapped by accident.
+    // resting palm, instead of Quill's bottom bar that gets tapped by accident.
     stows.editorToolbarAlignment.value = AxisDirection.up;
 
     // Paper: college ruled, white, for new notes.

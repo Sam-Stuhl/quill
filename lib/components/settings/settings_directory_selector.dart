@@ -6,11 +6,11 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/theming/adaptive_alert_dialog.dart';
-import 'package:saber/data/file_manager/file_manager.dart';
-import 'package:saber/data/nextcloud/saber_syncer.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/i18n/strings.g.dart';
+import 'package:quill/components/theming/adaptive_alert_dialog.dart';
+import 'package:quill/data/file_manager/file_manager.dart';
+import 'package:quill/data/nextcloud/quill_syncer.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/i18n/strings.g.dart';
 import 'package:sbn/font_fallbacks.dart';
 
 class SettingsDirectorySelector extends StatelessWidget {
@@ -166,7 +166,7 @@ class _DirectorySelectorState extends State<DirectorySelector> {
                   style: const TextStyle(
                     fontSize: 13,
                     fontFamily: 'FiraMono',
-                    fontFamilyFallback: saberMonoFontFallbacks,
+                    fontFamilyFallback: quillMonoFontFallbacks,
                   ),
                 ),
               ),

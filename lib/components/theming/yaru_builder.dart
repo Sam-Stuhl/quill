@@ -1,8 +1,8 @@
 import 'package:dynamic_yaru/dynamic_yaru.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/theming/saber_theme.dart';
-import 'package:saber/data/prefs.dart';
+import 'package:quill/components/theming/quill_theme.dart';
+import 'package:quill/data/prefs.dart';
 import 'package:sbn/font_fallbacks.dart';
 import 'package:yaru/yaru.dart';
 
@@ -46,11 +46,11 @@ class _YaruBuilderState extends State<YaruBuilder> {
           fontFamily: hyperlegibleFont
               ? 'AtkinsonHyperlegibleNext'
               : 'Adwaita Sans',
-          fontFamilyFallback: saberSansSerifFontFallbacks,
+          fontFamilyFallback: quillSansSerifFontFallbacks,
         );
         if (theme == null) return null;
 
-        return SaberTheme.getThemeFromYaruFixed(theme, widget.platform);
+        return QuillTheme.getThemeFromYaruFixed(theme, widget.platform);
       },
       [
         accentColor,
@@ -67,7 +67,7 @@ class _YaruBuilderState extends State<YaruBuilder> {
 
     return YaruTheme(
       builder: (context, yaru, _) {
-        final theme = SaberTheme.getThemeFromYaru(
+        final theme = QuillTheme.getThemeFromYaru(
           widget.primary ?? yaru.variant?.color ?? Colors.yellow,
           brightness,
           widget.platform,

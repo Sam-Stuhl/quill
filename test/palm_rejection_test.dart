@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:saber/data/palm_rejection.dart';
+import 'package:quill/data/palm_rejection.dart';
 
 void main() {
   test('touches pass when the pen has not been used', () {

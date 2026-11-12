@@ -6,11 +6,11 @@ import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
 import 'package:nextcloud/core.dart';
 import 'package:nextcloud/nextcloud.dart';
-import 'package:saber/data/nextcloud/nc_http_overrides.dart';
-import 'package:saber/data/nextcloud/nextcloud_client_extension.dart';
+import 'package:quill/data/nextcloud/nc_http_overrides.dart';
+import 'package:quill/data/nextcloud/nextcloud_client_extension.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class SaberLoginFlow {
+class QuillLoginFlow {
   new start({required this.serverUrl}) {
     NcHttpOverrides.tempAcceptBadCertificateFrom(serverUrl);
     unawaited(_run());
@@ -18,7 +18,7 @@ class SaberLoginFlow {
 
   final Uri serverUrl;
 
-  final log = Logger('SaberLoginFlow');
+  final log = Logger('QuillLoginFlow');
   Timer? _pollTimer;
 
   final completer = Completer<LoginFlowV2Credentials>();
@@ -31,7 +31,7 @@ class SaberLoginFlow {
     if (init == null) return;
 
     if (Platform.isMacOS || Platform.isIOS || Platform.isAndroid) {
-      // Use FlutterWebAuth2 which returns to Saber when authenticated
+      // Use FlutterWebAuth2 which returns to Quill when authenticated
       log.info('Opening login link in-app: ${init.login}');
       await FlutterWebAuth2.authenticate(
         url: init.login,
