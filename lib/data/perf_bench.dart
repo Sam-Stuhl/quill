@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:saber/components/canvas/_stroke.dart';
@@ -433,6 +434,120 @@ class PerfBench {
     };
   }
 
+  /// The same handwriting as [_handwrite], but as real stylus pointer events
+  /// sent through Flutter's gesture arena, the path the Pencil takes. Counts
+  /// the strokes that reach the page and how much of each stroke's start is
+  /// lost: Flutter's scale recognizer starts a gesture only after the pointer
+  /// has moved a slop distance.
+  static Future<void> _handwriteReal(String name, {int strokes = 120}) async {
+    final editor = EditorState.benchInstance!;
+    // Page 0: pointer events only hit what is on screen.
+    final page = editor.coreInfo.pages[0];
+    final box = page.renderBox!;
+    final binding = WidgetsBinding.instance;
+    final rng = Random(5);
+    final before = page.strokes.length;
+    final mark = _mark();
+    final lagFrom = _lags.length;
+    const device = 7;
+    binding.handlePointerEvent(
+      const PointerAddedEvent(kind: PointerDeviceKind.stylus, device: device),
+    );
+    var x = 60.0, y = 1000.0;
+    final lost = <double>[];
+    var tiny = 0, tinyRegistered = 0;
+    for (var n = 0; n < strokes; n++) {
+      // A third of the strokes are small marks: dots, ticks, a digit's hook.
+      final small = n % 3 == 0;
+      final pts = small ? 3 + rng.nextInt(4) : 10 + rng.nextInt(15);
+      final step = small ? 1.4 : 2.4;
+      final x0 = x, y0 = y;
+      Offset local(int i) => Offset(
+        x0 + i * step + sin(i / 3) * (small ? 1 : 4),
+        y0 + cos(i / 2.5) * (small ? 2 : 9),
+      );
+      Offset at(int i) => box.localToGlobal(local(i));
+      final known = page.strokes.toSet();
+      binding.handlePointerEvent(
+        PointerDownEvent(
+          pointer: n + 1,
+          kind: PointerDeviceKind.stylus,
+          device: device,
+          position: at(0),
+          pressure: 0.4,
+          pressureMin: 0,
+          pressureMax: 1,
+        ),
+      );
+      for (var i = 1; i < pts; i += 2) {
+        await _frame();
+        for (var k = 0; k < 2 && i + k < pts; k++) {
+          binding.handlePointerEvent(
+            PointerMoveEvent(
+              pointer: n + 1,
+              kind: PointerDeviceKind.stylus,
+              device: device,
+              position: at(i + k),
+              delta: at(i + k) - at(i + k - 1),
+              pressure: 0.5,
+              pressureMin: 0,
+              pressureMax: 1,
+            ),
+          );
+        }
+      }
+      binding.handlePointerEvent(
+        PointerUpEvent(
+          pointer: n + 1,
+          kind: PointerDeviceKind.stylus,
+          device: device,
+          position: at(pts - 1),
+        ),
+      );
+      await _frame();
+      final added = page.strokes.where((st) => !known.contains(st)).toList();
+      final registered = added.isNotEmpty;
+      if (small) {
+        tiny++;
+        if (registered) tinyRegistered++;
+      }
+      if (registered) {
+        // How far from where the pen went down the stroke begins.
+        final first = box.localToGlobal(added.last.pointOffsets.first);
+        lost.add((first - at(0)).distance);
+      }
+      x += 16 + rng.nextDouble() * 10;
+      if (x > 900) {
+        x = 60;
+        y += 70;
+      }
+      for (var f = 0; f < 2 + rng.nextInt(3); f++) {
+        await _frame();
+      }
+    }
+    binding.handlePointerEvent(
+      const PointerRemovedEvent(kind: PointerDeviceKind.stylus, device: device),
+    );
+    await _summarise(name, mark);
+    _lagSummary(name, lagFrom);
+    results['${name}_registered'] = {
+      'attempted': strokes,
+      'on_page': page.strokes.length - before,
+      'small_marks_attempted': tiny,
+      'small_marks_registered': tinyRegistered,
+    };
+    if (lost.isNotEmpty) {
+      lost.sort();
+      results['${name}_start_lost_px'] = {
+        'p50': double.parse(lost[lost.length ~/ 2].toStringAsFixed(1)),
+        'p90': double.parse(
+          lost[(lost.length * 0.9).floor()].toStringAsFixed(1),
+        ),
+        'max': double.parse(lost.last.toStringAsFixed(1)),
+      };
+    }
+  }
+
   /// Writing, then a pause long enough for the PDF render to start (it waits
   /// 2 s after the last save), then writing again while it runs.
   static Future<void> _drawStrokes() async {
@@ -447,6 +562,7 @@ class PerfBench {
     // Sentences and numbers, on the next page, with saves and the PDF render
     // going on around them as they would be.
     await _handwrite('handwriting_260_strokes');
+    await _handwriteReal('handwriting_real_pointer_120');
   }
 
   static Future<void> _scrollAndZoom() async {
