@@ -19,6 +19,8 @@ iPad itself (release build). It does nothing unless asked.
    ```
 
    Setting the environment variable `QUILL_BENCH` at launch works too.
+   For a note closer to a real one (3 pages, 180 strokes instead of 12 pages,
+   1800), also copy the same marker to `Documents/Saber/.quill-bench-light`.
 3. Read the result:
 
    ```bash
