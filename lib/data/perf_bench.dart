@@ -48,7 +48,9 @@ class PerfBench {
   static void _onTimings(List<FrameTiming> timings) => _frames.addAll(timings);
 
   /// Summarises the frames since [start], keyed by [name].
-  static void _summarise(String name, int start) {
+  static Future<void> _summarise(String name, int start) async {
+    // The engine reports frame timings in batches, a second or so late.
+    await Future<void>.delayed(const Duration(milliseconds: 2500));
     final frames = _frames.sublist(start);
     if (frames.isEmpty) {
       results[name] = {'frames': 0};
@@ -127,7 +129,7 @@ class PerfBench {
       // Home screen idle: how much the app does by itself.
       final mark = _frames.length;
       await Future<void>.delayed(const Duration(seconds: 3));
-      _summarise('home_idle_3s', mark);
+      await _summarise('home_idle_3s', mark);
 
       await _makeHeavyNote();
       await _stageDone('note');
@@ -224,7 +226,7 @@ class PerfBench {
     await _frame();
     results['editor_open_to_painted_ms'] = open.elapsedMilliseconds;
     await _settle(30);
-    _summarise('editor_open', mark);
+    await _summarise('editor_open', mark);
   }
 
   /// Synthetic pen: [strokes] strokes on page 0, four points per frame (an
@@ -264,7 +266,7 @@ class PerfBench {
       editor.onDrawEnd(ScaleEndDetails());
       await _frame();
     }
-    _summarise('draw_14_strokes', mark);
+    await _summarise('draw_14_strokes', mark);
     frameCosts.sort();
     results['draw_input_handler_ms_p90'] =
         frameCosts[(frameCosts.length * 0.9).floor()];
@@ -272,7 +274,7 @@ class PerfBench {
     // The saves and syncing that follow the last stroke.
     mark = _frames.length;
     await Future<void>.delayed(const Duration(seconds: 6));
-    _summarise('after_draw_6s_autosave', mark);
+    await _summarise('after_draw_6s_autosave', mark);
   }
 
   static Future<void> _scrollAndZoom() async {
@@ -289,7 +291,7 @@ class PerfBench {
         await _frame();
       }
     }
-    _summarise('scroll_9000px_x2', mark);
+    await _summarise('scroll_9000px_x2', mark);
     controller.value = base;
     await _settle(10);
 
@@ -303,7 +305,7 @@ class PerfBench {
         await _frame();
       }
     }
-    _summarise('zoom_1x_3x_x2', mark);
+    await _summarise('zoom_1x_3x_x2', mark);
     controller.value = base;
     await _settle(10);
   }
