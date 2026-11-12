@@ -48,12 +48,27 @@ class PerfBench {
   static void _onTimings(List<FrameTiming> timings) => _frames.addAll(timings);
 
   /// Summarises the frames since [start], keyed by [name].
-  static Future<void> _summarise(String name, int start) async {
+  static (int, int) _mark() => (_frames.length, _gaps.length);
+
+  static Future<void> _summarise(String name, (int, int) from) async {
+    final (start, gapStart) = from;
     // The engine reports frame timings in batches, a second or so late.
     await Future<void>.delayed(const Duration(milliseconds: 2500));
+    final gaps = _gaps.sublist(gapStart);
+    final pacing = gaps.isEmpty
+        ? null
+        : {
+            'frames': gaps.length,
+            'gap_avg_ms': double.parse(
+              (gaps.reduce((a, b) => a + b) / gaps.length).toStringAsFixed(2),
+            ),
+            'gap_max_ms': double.parse(gaps.reduce(max).toStringAsFixed(1)),
+            'gaps_over_25ms': gaps.where((g) => g > 25).length,
+            'gaps_over_50ms': gaps.where((g) => g > 50).length,
+          };
     final frames = _frames.sublist(start);
     if (frames.isEmpty) {
-      results[name] = {'frames': 0};
+      results[name] = {'frames': 0, 'pacing': pacing};
       return;
     }
     double ms(Duration d) => d.inMicroseconds / 1000;
@@ -61,7 +76,9 @@ class PerfBench {
       v.sort();
       double q(double p) => v[min(v.length - 1, (v.length * p).floor())];
       return {
-        'avg': double.parse((v.reduce((a, b) => a + b) / v.length).toStringAsFixed(2)),
+        'avg': double.parse(
+          (v.reduce((a, b) => a + b) / v.length).toStringAsFixed(2),
+        ),
         'p50': q(0.5),
         'p90': q(0.9),
         'p99': q(0.99),
@@ -80,8 +97,21 @@ class PerfBench {
     };
   }
 
+  /// Gaps between consecutive frames seen from Dart (ms). A gap well over
+  /// 16.7 ms is a dropped frame, whatever thread caused it.
+  static final _gaps = <double>[];
+  static final _gapClock = Stopwatch()..start();
+  static int _lastFrameUs = 0;
+
   static Future<void> _frame() async {
     // Frames stop while the screen is locked: say so rather than hang.
+    await _frameRaw();
+    final now = _gapClock.elapsedMicroseconds;
+    if (_lastFrameUs != 0) _gaps.add((now - _lastFrameUs) / 1000);
+    _lastFrameUs = now;
+  }
+
+  static Future<void> _frameRaw() async {
     await SchedulerBinding.instance.endOfFrame.timeout(
       const Duration(seconds: 20),
       onTimeout: () {
@@ -107,15 +137,14 @@ class PerfBench {
   static Future<void> _flush() async {
     final path = '${FileManager.documentsDirectory}/quill-bench.json';
     results['path'] = path;
-    await File(path).writeAsString(
-      const JsonEncoder.withIndent('  ').convert(results),
-    );
+    await File(path)
+        .writeAsString(const JsonEncoder.withIndent('  ').convert(results));
   }
 
   static const _notePath = '/quill-bench-heavy';
 
   static Future<void> run() async {
-    PlatformDispatcher.instance.onReportTimings = _onTimings;
+    SchedulerBinding.instance.addTimingsCallback(_onTimings);
     try {
       await _stageDone('begin');
       await WidgetsBinding.instance.waitUntilFirstFrameRasterized;
@@ -127,7 +156,7 @@ class PerfBench {
           PlatformDispatcher.instance.views.first.display.refreshRate;
 
       // Home screen idle: how much the app does by itself.
-      final mark = _frames.length;
+      final mark = _mark();
       await Future<void>.delayed(const Duration(seconds: 3));
       await _summarise('home_idle_3s', mark);
 
@@ -145,7 +174,7 @@ class PerfBench {
     } catch (e, st) {
       results['error'] = '$e\n$st';
     } finally {
-      PlatformDispatcher.instance.onReportTimings = null;
+      SchedulerBinding.instance.removeTimingsCallback(_onTimings);
       await _flush();
     }
   }
@@ -213,7 +242,7 @@ class PerfBench {
   }
 
   static Future<void> _openEditor() async {
-    final mark = _frames.length;
+    final mark = _mark();
     final open = Stopwatch()..start();
     EditorState.benchInstance = null;
     App.router.push(RoutePaths.editFilePath(_notePath));
@@ -238,7 +267,7 @@ class PerfBench {
     final box = page.renderBox!;
     Offset global(double x, double y) => box.localToGlobal(Offset(x, y));
 
-    var mark = _frames.length;
+    var mark = _mark();
     final frameCosts = <double>[];
     for (var s = 0; s < strokes; s++) {
       editor.dragPageIndex = 0;
@@ -272,7 +301,7 @@ class PerfBench {
         frameCosts[(frameCosts.length * 0.9).floor()];
 
     // The saves and syncing that follow the last stroke.
-    mark = _frames.length;
+    mark = _mark();
     await Future<void>.delayed(const Duration(seconds: 6));
     await _summarise('after_draw_6s_autosave', mark);
   }
@@ -283,7 +312,7 @@ class PerfBench {
     final base = controller.value.clone();
 
     // Scroll: a swipe down the note over 90 frames, then back.
-    var mark = _frames.length;
+    var mark = _mark();
     for (var pass = 0; pass < 2; pass++) {
       for (var i = 0; i <= 90; i++) {
         final t = pass == 0 ? i / 90 : 1 - i / 90;
@@ -296,7 +325,7 @@ class PerfBench {
     await _settle(10);
 
     // Zoom: 1x to 3x and back, twice.
-    mark = _frames.length;
+    mark = _mark();
     for (var pass = 0; pass < 2; pass++) {
       for (var i = 0; i <= 60; i++) {
         final t = pass == 0 ? i / 60 : 1 - i / 60;
