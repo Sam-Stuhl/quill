@@ -53,3 +53,13 @@ needs a sharper one. It falls back to vectors above 12 megapixels, while a
 selection is being moved, and in exports and previews. Code that changes
 strokes without changing their count must bump `strokesRevision` (undo and
 redo do, for every page).
+
+## Saving (2026-11-12)
+
+On the 1800-stroke note a save stalled the main isolate for 120 to 185 ms:
+encoding every stroke's points (about 100 ms), writing the BSON (about 80 to
+110 ms), and a preview image (about 300 ms) after every save. `Stroke` now keeps
+its encoded points until they change (`_pointsJson`, cleared wherever the points
+change), which cut the encoding to about 10 ms, and the preview is made after a
+2 s pause in writing, or when the note is closed, instead of after every save.
+The BSON write is unchanged.
