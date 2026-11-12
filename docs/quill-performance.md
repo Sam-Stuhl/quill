@@ -35,3 +35,18 @@ editor's own draw callbacks), the autosave that follows, scrolling 9000 px and
 zooming 1x to 3x. Per phase it records build and raster time per frame (Flutter's
 frame timings) and the gaps between frames seen from Dart. The test note is
 deleted when the run ends.
+
+## What the first measurements found (2026-11-11, iPad 10th gen, release)
+
+On the 12-page, 1800-stroke note, drawing, scrolling and zooming cost about
+20 ms of raster time per frame (about 30 fps) and under 2 ms of build time:
+the engine re-rasterises every visible stroke each frame, and Flutter's raster
+cache does not help. Splitting the page into a finished-strokes layer and a
+live layer (`CanvasLayer`) changed nothing by itself (raster 19.2 ms drawing,
+22.1 ms scrolling). So the editor on screen (`cacheStrokes`) draws each page's
+finished strokes from a bitmap kept on the page (`EditorPage.strokeBitmap`),
+redrawn only when `strokesRevision` or the stroke count changes or the zoom
+needs a sharper one. It falls back to vectors above 12 megapixels, while a
+selection is being moved, and in exports and previews. Code that changes
+strokes without changing their count must bump `strokesRevision` (undo and
+redo do, for every page).
