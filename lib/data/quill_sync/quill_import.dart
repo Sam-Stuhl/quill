@@ -14,6 +14,8 @@ import 'package:saber/data/editor/editor_core_info.dart';
 import 'package:saber/data/editor/editor_exporter.dart';
 import 'package:saber/data/editor/page.dart';
 import 'package:saber/data/file_manager/file_manager.dart';
+import 'package:saber/data/pen_activity.dart';
+import 'package:saber/data/perf_bench.dart';
 import 'package:saber/pages/editor/editor.dart';
 
 /// Turns a file sent from the mini into a note, without the editor open.
@@ -205,6 +207,15 @@ abstract class QuillImport {
   /// Renders the note at [notePath] (no extension) to PDF bytes, headless.
   /// Returns null for a note with nothing on it.
   static Future<Uint8List?> renderPdf(String notePath) async {
+    final renderTime = Stopwatch()..start();
+    try {
+      return await _renderPdf(notePath);
+    } finally {
+      PerfBench.time('pdf_render', renderTime);
+    }
+  }
+
+  static Future<Uint8List?> _renderPdf(String notePath) async {
     final coreInfo = await EditorCoreInfo.loadFromFilePath(notePath);
     try {
       if (coreInfo.readOnlyReason == .corrupted) {
@@ -273,10 +284,14 @@ abstract class QuillImport {
           }
           return pw.MemoryImage(jpeg);
         },
-        beforePage: (i) => Future.wait([
-          for (final image in [?pages[i].backgroundImage, ...pages[i].images])
-            image.prerender(width: (pages[i].size.width * 2).round()),
-        ]),
+        beforePage: (i) async {
+          // A page's screenshot is main-thread work: wait out the pen.
+          await PenActivity.untilQuiet();
+          await Future.wait([
+            for (final image in [?pages[i].backgroundImage, ...pages[i].images])
+              image.prerender(width: (pages[i].size.width * 2).round()),
+          ]);
+        },
         afterPage: (i) {
           for (final image in [?pages[i].backgroundImage, ...pages[i].images]) {
             image.releasePrerender();

@@ -19,6 +19,8 @@ iPad itself (release build). It does nothing unless asked.
    ```
 
    Setting the environment variable `QUILL_BENCH` at launch works too.
+   For a note closer to a real one (3 pages, 180 strokes instead of 12 pages,
+   1800), also copy the same marker to `Documents/Saber/.quill-bench-light`.
 3. Read the result:
 
    ```bash
@@ -30,9 +32,12 @@ iPad itself (release build). It does nothing unless asked.
 ## What it does
 
 Builds a 12-page note of 1800 strokes, then times: saving and loading it, opening
-it in the editor, 14 synthetic pen strokes (four points per frame, through the
-editor's own draw callbacks), the autosave that follows, scrolling 9000 px and
-zooming 1x to 3x. Per phase it records build and raster time per frame (Flutter's
+it in the editor, 14 synthetic pen strokes written with 400 ms pauses (four
+points per frame, through the editor's own draw callbacks), a 3 s pause long
+enough for the sync PDF render to start, 8 more strokes written while it runs,
+scrolling 9000 px and zooming 1x to 3x. It also records how late a 5 ms timer
+fires (`lag_*`: the main isolate's stalls, whatever the cause) and the time of
+each save's serialise and thumbnail steps and each PDF render (`timers_ms`). Per phase it records build and raster time per frame (Flutter's
 frame timings) and the gaps between frames seen from Dart. The test note is
 deleted when the run ends.
 
@@ -50,3 +55,22 @@ needs a sharper one. It falls back to vectors above 12 megapixels, while a
 selection is being moved, and in exports and previews. Code that changes
 strokes without changing their count must bump `strokesRevision` (undo and
 redo do, for every page).
+
+## Saving (2026-11-12)
+
+On the 1800-stroke note a save stalled the main isolate for 120 to 185 ms:
+encoding every stroke's points (about 100 ms), writing the BSON (about 80 to
+110 ms), and a preview image (about 300 ms) after every save. `Stroke` now keeps
+its encoded points until they change (`_pointsJson`, cleared wherever the points
+change), which cut the encoding to about 10 ms, and the preview is made after a
+2 s pause in writing, or when the note is closed, instead of after every save.
+The BSON write is unchanged.
+
+## Background work waits for the pen
+
+While writing, the sync PDF render (about 26 renders in a 46 s handwriting run,
+1.2 to 2.4 s each) and the preview image stalled the main isolate between
+strokes: 13% of frames were slow against 2% for long strokes. `PenActivity`
+(`lib/data/pen_activity.dart`) records when the pen last wrote or hovered; the
+PDF render starts only after 3 s without it (`QuillSync.penQuiet`), pauses
+between pages while the pen is in use, and the preview waits for 2 s.

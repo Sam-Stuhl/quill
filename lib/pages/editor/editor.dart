@@ -42,6 +42,8 @@ import 'package:saber/data/extensions/change_notifier_extensions.dart';
 import 'package:saber/data/extensions/matrix4_extensions.dart';
 import 'package:saber/data/file_manager/file_manager.dart';
 import 'package:saber/data/nextcloud/saber_syncer.dart';
+import 'package:saber/data/pen_activity.dart';
+import 'package:saber/data/perf_bench.dart';
 import 'package:saber/data/prefs.dart';
 import 'package:saber/data/scribble_erase.dart';
 import 'package:saber/data/tools/_tool.dart';
@@ -637,6 +639,7 @@ class EditorState extends State<Editor> {
   static const changePageThreshold = 50.0;
 
   void onDrawStart(ScaleStartDetails details) {
+    PenActivity.mark();
     final page = coreInfo.pages[dragPageIndex!];
     final position = page.renderBox!.globalToLocal(details.focalPoint);
     history.canRedo = false;
@@ -684,6 +687,7 @@ class EditorState extends State<Editor> {
   }
 
   void onDrawUpdate(ScaleUpdateDetails details) {
+    PenActivity.mark();
     if (dragPageIndex == null) {
       return;
     }
@@ -858,6 +862,7 @@ class EditorState extends State<Editor> {
   }
 
   void onDrawEnd(ScaleEndDetails details) {
+    PenActivity.mark();
     if (dragPageIndex == null) {
       return;
     }
@@ -956,6 +961,8 @@ class EditorState extends State<Editor> {
   }
 
   void onHovering() {
+    // A hovering Pencil is about to write: keep background work waiting.
+    PenActivity.mark();
     isHovering = true;
   }
 
@@ -1162,10 +1169,12 @@ class EditorState extends State<Editor> {
     final savedChange = history.lastChange;
     _unsavedSince = null;
     coreInfo.assetCache.allowRemovingAssets = false;
+    final serializeTime = Stopwatch()..start();
     try {
       (bson, assets) = coreInfo.saveToBinary(
         currentPageIndex: currentPageIndex,
       );
+      PerfBench.time('save_serialize', serializeTime);
     } finally {
       coreInfo.assetCache.allowRemovingAssets = true;
     }
@@ -1198,7 +1207,33 @@ class EditorState extends State<Editor> {
       return;
     }
 
-    if (!mounted) return;
+    // The preview takes about 300 ms: it is made after a pause in writing
+    // (or when the note is closed), not after every save.
+    _thumbnailPending = true;
+    _scheduleThumbnail();
+  }
+
+  var _thumbnailPending = false;
+  Timer? _thumbnailTimer;
+
+  void _scheduleThumbnail() {
+    _thumbnailTimer?.cancel();
+    _thumbnailTimer = Timer(const Duration(seconds: 3), () async {
+      if (!mounted || !_thumbnailPending) return;
+      if (PenActivity.sinceLast < const Duration(seconds: 2) ||
+          savingState.value == .saving) {
+        return _scheduleThumbnail();
+      }
+      await _writeThumbnail();
+    });
+  }
+
+  /// Renders the first page into the note's preview image (`.sbn2.p`).
+  Future<void> _writeThumbnail() async {
+    _thumbnailPending = false;
+    _thumbnailTimer?.cancel();
+    final filePath = coreInfo.filePath + Editor.extension;
+    final thumbnailTime = Stopwatch()..start();
     final page = coreInfo.pages.first;
     final previewHeight = page.previewHeight(lineHeight: coreInfo.lineHeight);
     final thumbnailSize = Size(720, 720 * previewHeight / page.size.width);
@@ -1218,6 +1253,7 @@ class EditorState extends State<Editor> {
       thumbnailPng!.buffer.asUint8List(),
       awaitWrite: true,
     );
+    PerfBench.time('save_thumbnail', thumbnailTime);
   }
 
   late final _filenameFormKey = GlobalKey<FormState>();
@@ -2631,6 +2667,7 @@ class EditorState extends State<Editor> {
     DynamicMaterialApp.removeFullscreenListener(_setState);
 
     _delayedSaveTimer?.cancel();
+    _thumbnailTimer?.cancel();
     _watchServerTimer?.cancel();
     _lastSeenPointerCountTimer?.cancel();
     _lifecycleListener?.dispose();
@@ -2655,6 +2692,7 @@ class EditorState extends State<Editor> {
         filenameTextEditingController.dispose();
       }
       await saveToFile();
+      if (_thumbnailPending && !coreInfo.readOnly) await _writeThumbnail();
     } finally {
       coreInfo.dispose();
     }

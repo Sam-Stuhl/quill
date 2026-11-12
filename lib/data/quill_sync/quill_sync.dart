@@ -10,6 +10,7 @@ import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:saber/data/file_manager/file_manager.dart';
+import 'package:saber/data/pen_activity.dart';
 import 'package:saber/data/quill_sync/quill_connect.dart';
 import 'package:saber/data/quill_sync/quill_import.dart';
 import 'package:saber/pages/editor/editor.dart';
@@ -180,9 +181,20 @@ class QuillSync {
     _kick();
   }
 
-  void _schedulePdf(String note) {
+  /// How long the pen must have been idle before a PDF is rendered.
+  static const penQuiet = Duration(seconds: 3);
+
+  void _schedulePdf(String note, {Duration? after}) {
     _pdfTimers[note]?.cancel();
-    _pdfTimers[note] = Timer(pdfDebounce, () {
+    _pdfTimers[note] = Timer(after ?? pdfDebounce, () {
+      // Rendering a note takes seconds of main-thread work: not while the
+      // pen is being used.
+      final idle = PenActivity.sinceLast;
+      if (idle < penQuiet) {
+        _pdfTimers.remove(note);
+        _schedulePdf(note, after: penQuiet - idle);
+        return;
+      }
       _pdfTimers.remove(note);
       pdfs.add(note);
       _save();

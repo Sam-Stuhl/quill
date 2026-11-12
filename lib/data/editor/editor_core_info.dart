@@ -15,6 +15,7 @@ import 'package:saber/components/canvas/image/editor_image.dart';
 import 'package:saber/data/editor/page.dart';
 import 'package:saber/data/file_manager/file_manager.dart';
 import 'package:saber/data/flavor_config.dart';
+import 'package:saber/data/perf_bench.dart';
 import 'package:saber/data/prefs.dart';
 import 'package:saber/data/tools/stroke_properties.dart';
 import 'package:saber/pages/editor/editor.dart';
@@ -522,8 +523,12 @@ class EditorCoreInfo {
     required int? currentPageIndex,
   }) {
     initialPageIndex = currentPageIndex ?? initialPageIndex;
+    final jsonTime = Stopwatch()..start();
     final (json, assets) = toJson();
+    PerfBench.time('save_to_json', jsonTime);
+    final codecTime = Stopwatch()..start();
     final bson = BsonCodec.serialize(json);
+    PerfBench.time('save_bson_codec', codecTime);
     return (bson.byteList, assets);
   }
 
