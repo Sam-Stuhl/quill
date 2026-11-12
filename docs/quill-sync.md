@@ -224,8 +224,9 @@ side is under `lib/data/quill_sync/` and `lib/data/quill_defaults.dart`.
   right; `Toolbar._topLayout`) instead of Saber's bottom bar. Edit
   the file and raise `version` to change a taste. The app's name is Quill on the
   home screen and in `Info.plist`; its text inside (settings, welcome) still says
-  Saber, as upstream's translations do. The icon is a quill on ink blue in light,
-  dark and tinted forms, drawn by `scripts/quill_icon.swift` (`swift
+  Saber, as upstream's translations do. The icon is a flat quill glyph (a solid feather
+  writing a small s and a line): black on off-white in light, cream on
+  near-black in dark, and a tinted form, drawn by `scripts/quill_icon.swift` (`swift
   scripts/quill_icon.swift`) into the iOS asset catalog only, so upstream's icons
   under `assets/icon` merge untouched.
 - Tests: `/usr/bin/python3 -m unittest test_connect test_stage test_server`, and
