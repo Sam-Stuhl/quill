@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:bson/bson.dart';
 import 'package:collection/collection.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:logging/logging.dart';
@@ -50,8 +51,14 @@ class Stroke {
       _lowQualityPath ??= getPath(lowQualityPolygon, smooth: false);
   Path get highQualityPath => _highQualityPath ??= getPath(highQualityPolygon);
 
+  /// The points as saved (see [toJson]), kept until they change: saving a
+  /// note re-encodes every stroke otherwise, which stalled the app for about
+  /// 170 ms per save on a 1800-stroke note.
+  List<BsonBinary>? _pointsJson;
+
   void shift(Offset offset) {
     if (offset == .zero) return;
+    _pointsJson = null;
 
     points.shift(offset);
     _lowQualityPolygon?.shift(offset);
@@ -159,7 +166,7 @@ class Stroke {
     // these json keys should not be the same as the ones in [StrokeOptions.toJson]
     return {
       'shape': null,
-      'p': points
+      'p': _pointsJson ??= points
           .where((point) => point.isFinite)
           .map((PointVector point) => point.toBsonBinary())
           .toList(),
@@ -178,6 +185,7 @@ class Stroke {
     }
 
     points.add(PointVector(point.dx, point.dy, pressure));
+    _pointsJson = null;
     markPolygonNeedsUpdating();
   }
 
@@ -189,6 +197,7 @@ class Stroke {
 
   void popFirstPoint() {
     points.removeAt(0);
+    _pointsJson = null;
     markPolygonNeedsUpdating();
   }
 
@@ -205,6 +214,7 @@ class Stroke {
   /// This function does not change [_polygonNeedsUpdating].
   void optimisePoints({double thresholdMultiplier = _optimisePointsThreshold}) {
     if (points.length <= 3) return;
+    _pointsJson = null;
 
     final minDistance = options.size * thresholdMultiplier;
 
@@ -368,6 +378,7 @@ class Stroke {
     // Snap to the horizontal or vertical axis
     (firstPoint, lastPoint) = snapLine(firstPoint, lastPoint);
 
+    _pointsJson = null;
     points.clear();
     points.add(firstPoint);
     points.add(lastPoint);

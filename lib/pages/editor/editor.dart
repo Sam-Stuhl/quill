@@ -637,7 +637,11 @@ class EditorState extends State<Editor> {
 
   static const changePageThreshold = 50.0;
 
+  /// When the pen last moved, so background work (the thumbnail) waits for a pause.
+  var _lastDrawAt = DateTime(0);
+
   void onDrawStart(ScaleStartDetails details) {
+    _lastDrawAt = DateTime.now();
     final page = coreInfo.pages[dragPageIndex!];
     final position = page.renderBox!.globalToLocal(details.focalPoint);
     history.canRedo = false;
@@ -685,6 +689,7 @@ class EditorState extends State<Editor> {
   }
 
   void onDrawUpdate(ScaleUpdateDetails details) {
+    _lastDrawAt = DateTime.now();
     if (dragPageIndex == null) {
       return;
     }
@@ -859,6 +864,7 @@ class EditorState extends State<Editor> {
   }
 
   void onDrawEnd(ScaleEndDetails details) {
+    _lastDrawAt = DateTime.now();
     if (dragPageIndex == null) {
       return;
     }
@@ -1201,7 +1207,32 @@ class EditorState extends State<Editor> {
       return;
     }
 
-    if (!mounted) return;
+    // The preview takes about 300 ms: it is made after a pause in writing
+    // (or when the note is closed), not after every save.
+    _thumbnailPending = true;
+    _scheduleThumbnail();
+  }
+
+  var _thumbnailPending = false;
+  Timer? _thumbnailTimer;
+
+  void _scheduleThumbnail() {
+    _thumbnailTimer?.cancel();
+    _thumbnailTimer = Timer(const Duration(seconds: 3), () async {
+      if (!mounted || !_thumbnailPending) return;
+      if (DateTime.now().difference(_lastDrawAt) < const Duration(seconds: 2) ||
+          savingState.value == .saving) {
+        return _scheduleThumbnail();
+      }
+      await _writeThumbnail();
+    });
+  }
+
+  /// Renders the first page into the note's preview image (`.sbn2.p`).
+  Future<void> _writeThumbnail() async {
+    _thumbnailPending = false;
+    _thumbnailTimer?.cancel();
+    final filePath = coreInfo.filePath + Editor.extension;
     final thumbnailTime = Stopwatch()..start();
     final page = coreInfo.pages.first;
     final previewHeight = page.previewHeight(lineHeight: coreInfo.lineHeight);
@@ -2636,6 +2667,7 @@ class EditorState extends State<Editor> {
     DynamicMaterialApp.removeFullscreenListener(_setState);
 
     _delayedSaveTimer?.cancel();
+    _thumbnailTimer?.cancel();
     _watchServerTimer?.cancel();
     _lastSeenPointerCountTimer?.cancel();
     _lifecycleListener?.dispose();
@@ -2660,6 +2692,7 @@ class EditorState extends State<Editor> {
         filenameTextEditingController.dispose();
       }
       await saveToFile();
+      if (_thumbnailPending && !coreInfo.readOnly) await _writeThumbnail();
     } finally {
       coreInfo.dispose();
     }
