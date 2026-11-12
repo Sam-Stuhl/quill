@@ -4,10 +4,10 @@ library;
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:saber/components/settings/update_manager.dart';
-import 'package:saber/data/locales.dart';
-import 'package:saber/data/saber_version.dart';
-import 'package:saber/data/version.dart';
+import 'package:quill/components/settings/update_manager.dart';
+import 'package:quill/data/locales.dart';
+import 'package:quill/data/quill_version.dart';
+import 'package:quill/data/version.dart';
 
 const dummyChangelog = 'Release_notes_will_be_added_here';
 
@@ -82,8 +82,8 @@ void main() {
   });
 
   test('Test that buildNumber parses to buildName', () {
-    final fromNumber = SaberVersion.fromNumber(buildNumber);
-    final fromName = SaberVersion.fromName(buildName);
+    final fromNumber = QuillVersion.fromNumber(buildNumber);
+    final fromName = QuillVersion.fromName(buildName);
 
     expect(
       fromNumber.buildNumberWithoutRevision,
@@ -123,9 +123,9 @@ void main() {
     }
   });
 
-  group('SaberVersion class', () {
+  group('QuillVersion class', () {
     test('getters', () {
-      final version = SaberVersion.fromNumber(127018);
+      final version = QuillVersion.fromNumber(127018);
       expect(version.buildName, '1.27.1');
       expect(version.buildNameWithCommas, '1,27,1');
       expect(version.buildNumber, 127018);
@@ -133,35 +133,35 @@ void main() {
       expect(version.copyWith(revision: 5).buildNumber, 127015);
     });
     test('Equality', () {
-      final version = SaberVersion.fromNumber(127018);
+      final version = QuillVersion.fromNumber(127018);
 
-      final sameVersion = SaberVersion.fromNumber(127018);
+      final sameVersion = QuillVersion.fromNumber(127018);
       expect(version == sameVersion, true);
-      final sameVersionRevised = SaberVersion.fromNumber(127019);
+      final sameVersionRevised = QuillVersion.fromNumber(127019);
       expect(version == sameVersionRevised, true);
 
-      final previousVersion = SaberVersion.fromNumber(127000);
+      final previousVersion = QuillVersion.fromNumber(127000);
       expect(version == previousVersion, false);
-      final nextVersion = SaberVersion.fromNumber(127020);
+      final nextVersion = QuillVersion.fromNumber(127020);
       expect(version == nextVersion, false);
     });
     test('Object overrides', () {
-      final version = SaberVersion.fromNumber(127018);
+      final version = QuillVersion.fromNumber(127018);
       expect(version.toString(), '1.27.1');
       expect(version.hashCode, Object.hash(1, 27, 1));
     });
     test('bumpMajor', () {
-      final version = SaberVersion.fromNumber(127018);
+      final version = QuillVersion.fromNumber(127018);
       final bumped = version.bumpMajor();
       expect(bumped.buildName, '2.0.0');
     });
     test('bumpMinor', () {
-      final version = SaberVersion.fromNumber(127018);
+      final version = QuillVersion.fromNumber(127018);
       final bumped = version.bumpMinor();
       expect(bumped.buildName, '1.28.0');
     });
     test('bumpPatch', () {
-      final version = SaberVersion.fromNumber(127018);
+      final version = QuillVersion.fromNumber(127018);
       final bumped = version.bumpPatch();
       expect(bumped.buildName, '1.27.2');
     });

@@ -15,48 +15,48 @@ import 'package:logging/logging.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:path/path.dart' as p;
 import 'package:pdfrx/pdfrx.dart';
-import 'package:saber/components/canvas/_asset_cache.dart';
-import 'package:saber/components/canvas/_stroke.dart';
-import 'package:saber/components/canvas/canvas.dart';
-import 'package:saber/components/canvas/canvas_gesture_detector.dart';
-import 'package:saber/components/canvas/canvas_image.dart';
-import 'package:saber/components/canvas/image/editor_image.dart';
-import 'package:saber/components/canvas/save_indicator.dart';
-import 'package:saber/components/editor/read_only_banner.dart';
-import 'package:saber/components/quill/quill_send.dart';
-import 'package:saber/components/theming/adaptive_alert_dialog.dart';
-import 'package:saber/components/theming/adaptive_icon.dart';
-import 'package:saber/components/theming/dynamic_material_app.dart';
-import 'package:saber/components/theming/saber_theme.dart';
-import 'package:saber/components/toolbar/color_bar.dart';
-import 'package:saber/components/toolbar/editor_bottom_sheet.dart';
-import 'package:saber/components/toolbar/editor_page_manager.dart';
-import 'package:saber/components/toolbar/selection_menu.dart';
-import 'package:saber/components/toolbar/toolbar.dart';
-import 'package:saber/data/clipboard_shelf.dart';
-import 'package:saber/data/editor/editor_core_info.dart';
-import 'package:saber/data/editor/editor_exporter.dart';
-import 'package:saber/data/editor/editor_history.dart';
-import 'package:saber/data/editor/page.dart';
-import 'package:saber/data/extensions/change_notifier_extensions.dart';
-import 'package:saber/data/extensions/matrix4_extensions.dart';
-import 'package:saber/data/file_manager/file_manager.dart';
-import 'package:saber/data/nextcloud/saber_syncer.dart';
-import 'package:saber/data/pen_activity.dart';
-import 'package:saber/data/perf_bench.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/data/scribble_erase.dart';
-import 'package:saber/data/tools/_tool.dart';
-import 'package:saber/data/tools/eraser.dart';
-import 'package:saber/data/tools/highlighter.dart';
-import 'package:saber/data/tools/laser_pointer.dart';
-import 'package:saber/data/tools/pen.dart';
-import 'package:saber/data/tools/pencil.dart';
-import 'package:saber/data/tools/select.dart';
-import 'package:saber/data/tools/shape_pen.dart';
-import 'package:saber/data/touch_gestures.dart';
-import 'package:saber/i18n/strings.g.dart';
-import 'package:saber/pages/home/whiteboard.dart';
+import 'package:quill/components/canvas/_asset_cache.dart';
+import 'package:quill/components/canvas/_stroke.dart';
+import 'package:quill/components/canvas/canvas.dart';
+import 'package:quill/components/canvas/canvas_gesture_detector.dart';
+import 'package:quill/components/canvas/canvas_image.dart';
+import 'package:quill/components/canvas/image/editor_image.dart';
+import 'package:quill/components/canvas/save_indicator.dart';
+import 'package:quill/components/editor/read_only_banner.dart';
+import 'package:quill/components/quill/quill_send.dart';
+import 'package:quill/components/theming/adaptive_alert_dialog.dart';
+import 'package:quill/components/theming/adaptive_icon.dart';
+import 'package:quill/components/theming/dynamic_material_app.dart';
+import 'package:quill/components/theming/quill_theme.dart';
+import 'package:quill/components/toolbar/color_bar.dart';
+import 'package:quill/components/toolbar/editor_bottom_sheet.dart';
+import 'package:quill/components/toolbar/editor_page_manager.dart';
+import 'package:quill/components/toolbar/selection_menu.dart';
+import 'package:quill/components/toolbar/toolbar.dart';
+import 'package:quill/data/clipboard_shelf.dart';
+import 'package:quill/data/editor/editor_core_info.dart';
+import 'package:quill/data/editor/editor_exporter.dart';
+import 'package:quill/data/editor/editor_history.dart';
+import 'package:quill/data/editor/page.dart';
+import 'package:quill/data/extensions/change_notifier_extensions.dart';
+import 'package:quill/data/extensions/matrix4_extensions.dart';
+import 'package:quill/data/file_manager/file_manager.dart';
+import 'package:quill/data/nextcloud/quill_syncer.dart';
+import 'package:quill/data/pen_activity.dart';
+import 'package:quill/data/perf_bench.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/data/scribble_erase.dart';
+import 'package:quill/data/tools/_tool.dart';
+import 'package:quill/data/tools/eraser.dart';
+import 'package:quill/data/tools/highlighter.dart';
+import 'package:quill/data/tools/laser_pointer.dart';
+import 'package:quill/data/tools/pen.dart';
+import 'package:quill/data/tools/pencil.dart';
+import 'package:quill/data/tools/select.dart';
+import 'package:quill/data/tools/shape_pen.dart';
+import 'package:quill/data/touch_gestures.dart';
+import 'package:quill/i18n/strings.g.dart';
+import 'package:quill/pages/home/whiteboard.dart';
 import 'package:sbn/change.dart';
 import 'package:super_clipboard/super_clipboard.dart';
 
@@ -1069,11 +1069,11 @@ class EditorState extends State<Editor> {
 
     final relativeFilePath = coreInfo.filePath;
     assert(relativeFilePath.isNotEmpty, 'Cannot refresh unnamed file');
-    final syncFile = await SaberSyncFile.relative(
+    final syncFile = await QuillSyncFile.relative(
       relativeFilePath + Editor.extension,
     );
 
-    final bestFile = await SaberSyncInterface.getBestFile(
+    final bestFile = await QuillSyncInterface.getBestFile(
       syncFile,
       onLocalFileNotFound: .local,
       onEqualFiles: .local,
@@ -1081,8 +1081,8 @@ class EditorState extends State<Editor> {
     );
     if (bestFile != .remote) return;
 
-    late final StreamSubscription<SaberSyncFile> subscription;
-    void listener(SaberSyncFile transferred) {
+    late final StreamSubscription<QuillSyncFile> subscription;
+    void listener(QuillSyncFile transferred) {
       if (transferred != syncFile) return;
       subscription.cancel();
       _loadCoreInfo(relativeFilePath)
@@ -1989,7 +1989,7 @@ class EditorState extends State<Editor> {
     );
   }
 
-  /// Exports the current note as an SBA (Saber Archive) file.
+  /// Exports the current note as an SBA (Quill Archive) file.
   Future exportAsSba(BuildContext context) async {
     final sba = await coreInfo.saveToSba(currentPageIndex: currentPageIndex);
     if (!context.mounted) return;

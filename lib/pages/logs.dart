@@ -3,9 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:logging/logging.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/theming/adaptive_icon.dart';
-import 'package:saber/components/theming/saber_theme.dart';
-import 'package:saber/i18n/strings.g.dart';
+import 'package:quill/components/theming/adaptive_icon.dart';
+import 'package:quill/components/theming/quill_theme.dart';
+import 'package:quill/i18n/strings.g.dart';
 import 'package:sbn/font_fallbacks.dart';
 
 final logsHistory = _LogsHistory();
@@ -193,7 +193,7 @@ class _LogsItem extends StatelessWidget {
                 record.stackTrace.toString(),
                 style: const TextStyle(
                   fontFamily: 'FiraMono',
-                  fontFamilyFallback: saberMonoFontFallbacks,
+                  fontFamilyFallback: quillMonoFontFallbacks,
                   fontSize: 11,
                   color: Colors.white,
                 ),

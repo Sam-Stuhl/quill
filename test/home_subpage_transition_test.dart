@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/data/flavor_config.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/data/routes.dart';
-import 'package:saber/main.dart';
-import 'package:saber/pages/home/home.dart';
+import 'package:quill/data/flavor_config.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/data/routes.dart';
+import 'package:quill/main.dart';
+import 'package:quill/pages/home/home.dart';
 
 void main() {
   group('Home subpage transition', () {
@@ -31,7 +31,7 @@ void main() {
         addTearDown(router.dispose);
         await tester.pumpWidget(
           MaterialApp.router(
-            title: 'Saber',
+            title: 'Quill',
             routeInformationProvider: router.routeInformationProvider,
             routeInformationParser: router.routeInformationParser,
             routerDelegate: router.routerDelegate,
@@ -43,7 +43,7 @@ void main() {
         await tester.pump(const Duration(milliseconds: 100));
 
         expect(
-          [find.text('Welcome to Saber'), find.text('Logged out')],
+          [find.text('Welcome to Quill'), find.text('Logged out')],
           [findsOneWidget, findsOneWidget],
         );
       });

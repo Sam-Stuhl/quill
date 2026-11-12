@@ -1,9 +1,9 @@
 import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/files/file_tree.dart';
-import 'package:saber/components/theming/adaptive_icon.dart';
-import 'package:saber/data/routes.dart';
+import 'package:quill/components/files/file_tree.dart';
+import 'package:quill/components/theming/adaptive_icon.dart';
+import 'package:quill/data/routes.dart';
 
 class const LeftNavbar({
   super.key,

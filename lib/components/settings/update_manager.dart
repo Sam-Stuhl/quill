@@ -7,10 +7,10 @@ import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:open_file/open_file.dart';
-import 'package:saber/components/settings/update_dialog.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/data/saber_version.dart';
-import 'package:saber/data/version.dart' as version;
+import 'package:quill/components/settings/update_dialog.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/data/quill_version.dart';
+import 'package:quill/data/version.dart' as version;
 
 abstract class UpdateManager {
   static final log = Logger('UpdateManager');
@@ -104,9 +104,9 @@ abstract class UpdateManager {
     int currentVersionNumber,
     int newestVersionNumber,
   ) {
-    final currentVersion = SaberVersion.fromNumber(currentVersionNumber)
+    final currentVersion = QuillVersion.fromNumber(currentVersionNumber)
         .copyWith(revision: 0);
-    final newestVersion = SaberVersion.fromNumber(newestVersionNumber)
+    final newestVersion = QuillVersion.fromNumber(newestVersionNumber)
         .copyWith(revision: 0);
 
     // Check if we're up to date
@@ -118,7 +118,7 @@ abstract class UpdateManager {
     if (!stows.shouldAlwaysAlertForUpdates.value) {
       // Only prompt user every second patch
       if (newestVersion.buildNumber - currentVersion.buildNumber <
-          SaberVersion.fromName('0.0.2').buildNumber) {
+          QuillVersion.fromName('0.0.2').buildNumber) {
         return .updateOptional;
       }
 

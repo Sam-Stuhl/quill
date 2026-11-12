@@ -1,11 +1,11 @@
 import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/data/constants.dart';
-import 'package:saber/data/prefs.dart';
+import 'package:quill/data/constants.dart';
+import 'package:quill/data/prefs.dart';
 import 'package:sbn/font_fallbacks.dart';
 import 'package:yaru/yaru.dart';
 
-abstract class SaberTheme {
+abstract class QuillTheme {
   static ThemeData createTheme(
     ColorScheme colorScheme,
     TargetPlatform platform,
@@ -94,14 +94,14 @@ abstract class SaberTheme {
             fontFamily: stows.hyperlegibleFont.value
                 ? 'AtkinsonHyperlegibleNext'
                 : 'Adwaita Sans',
-            fontFamilyFallback: saberSansSerifFontFallbacks,
+            fontFamilyFallback: quillSansSerifFontFallbacks,
           )
         : createYaruDarkTheme(
             primaryColor: primaryColor,
             fontFamily: stows.hyperlegibleFont.value
                 ? 'AtkinsonHyperlegibleNext'
                 : 'Adwaita Sans',
-            fontFamilyFallback: saberSansSerifFontFallbacks,
+            fontFamilyFallback: quillSansSerifFontFallbacks,
           );
     base = base.copyWith(visualDensity: .defaultDensityForPlatform(platform));
     return getThemeFromYaruFixed(base, platform);
@@ -164,7 +164,7 @@ abstract class _Components {
     if (stows.hyperlegibleFont.value) {
       return textTheme.withFont(
         fontFamily: 'AtkinsonHyperlegibleNext',
-        fontFamilyFallback: saberSansSerifFontFallbacks,
+        fontFamilyFallback: quillSansSerifFontFallbacks,
       );
     } else if (platform == .linux) {
       // Flutter picks Roboto but Adwaita Sans is a better default
@@ -187,12 +187,12 @@ abstract class _Components {
       surfaceTintColor: Colors.transparent,
       shadowColor: Colors.transparent,
       shape: RoundedRectangleBorder(
-        borderRadius: const .all(.circular(kSaberCardRadius)),
+        borderRadius: const .all(.circular(kQuillCardRadius)),
         side: BorderSide(
           color: colorScheme.onSurface.withValues(alpha: 0.12),
           width: colorScheme.isHighContrast
-              ? kSaberBorderWidthAccessible
-              : kSaberBorderWidthInaccessible,
+              ? kQuillBorderWidthAccessible
+              : kQuillBorderWidthInaccessible,
         ),
       ),
     );
@@ -205,7 +205,7 @@ abstract class _Components {
   static const appBarTheme = AppBarTheme(centerTitle: false);
 }
 
-extension SaberThemePlatform on TargetPlatform {
+extension QuillThemePlatform on TargetPlatform {
   bool get isCupertino => switch (this) {
     .iOS => true,
     .macOS => true,

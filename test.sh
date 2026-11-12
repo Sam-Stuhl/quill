@@ -50,8 +50,8 @@ if [ ! -d "${PUB_CACHE:=$HOME/.pub-cache}" ]; then
 fi
 
 buildName=$(grep -oP "(?<=buildName = ').*(?=')" lib/data/version.dart)
-IMAGE_NAME="ghcr.io/saber-notes/saber_test_env:$buildName"
-CONTAINER_NAME="saber_test_container"
+IMAGE_NAME="ghcr.io/saber-notes/quill_test_env:$buildName"
+CONTAINER_NAME="quill_test_container"
 
 # Remove image and container by running `./test.sh --clean`
 if [[ "$1" == "--clean" ]]; then

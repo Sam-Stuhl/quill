@@ -84,11 +84,11 @@ ca:
       autosave(OUTDATED): Auto-save
       shapeRecognitionDelay(OUTDATED): Shape recognition delay
       autoStraightenLines(OUTDATED): Auto straighten lines
-      customDataDir(OUTDATED): Custom Saber folder
+      customDataDir(OUTDATED): Custom Quill folder
       sentry(OUTDATED): Error reporting
     prefDescriptions:
       hyperlegibleFont(OUTDATED): Increases legibility for users with low vision
-      allowInsecureConnections(OUTDATED): (Not recommended) Allow Saber to connect to servers with self-signed/untrusted certificates
+      allowInsecureConnections(OUTDATED): (Not recommended) Allow Quill to connect to servers with self-signed/untrusted certificates
       preferGreyscale(OUTDATED): For e-ink displays
       autoClearWhiteboardOnExit(OUTDATED): Clears the whiteboard after you exit the app
       disableEraserAfterUse(OUTDATED): Automatically switches back to the pen after using the eraser
@@ -129,7 +129,7 @@ ca:
       title(OUTDATED): Reset this setting?
       button(OUTDATED): Reset
     resyncEverything(OUTDATED): Resync everything
-    openDataDir(OUTDATED): Open Saber folder
+    openDataDir(OUTDATED): Open Quill folder
     customDataDir:
       cancel(OUTDATED): Cancel
       select(OUTDATED): Select
@@ -158,18 +158,18 @@ ca:
       loggedIn(OUTDATED): Logged in with Nextcloud
     ncLoginStep:
       whereToStoreData(OUTDATED): "Choose where you want to store your data:"
-      saberNcServer(OUTDATED): Saber's Nextcloud server
+      quillNcServer(OUTDATED): Quill's Nextcloud server
       otherNcServer(OUTDATED): Other Nextcloud server
       serverUrl(OUTDATED): Server URL
-      loginWithSaber(OUTDATED): Login with Saber
+      loginWithQuill(OUTDATED): Login with Quill
       loginWithNextcloud(OUTDATED): Login with Nextcloud
       loginFlow:
-        pleaseAuthorize(OUTDATED): Please authorize Saber to access your Nextcloud account
+        pleaseAuthorize(OUTDATED): Please authorize Quill to access your Nextcloud account
         followPrompts(OUTDATED): Please follow the prompts in the Nextcloud interface
         browserDidntOpen(OUTDATED): Login page didn't open? Click here
     encLoginStep:
       enterEncPassword(OUTDATED): "To protect your data, please enter your encryption password:"
-      newToSaber(OUTDATED): New to Saber? Just enter a new encryption password.
+      newToQuill(OUTDATED): New to Quill? Just enter a new encryption password.
       encPassword(OUTDATED): Encryption password
       encFaqTitle(OUTDATED): Frequently asked questions
       wrongEncPassword(OUTDATED): Decryption failed with the provided password. Please try entering it again.
@@ -308,7 +308,7 @@ es:
         activeUntilRestart(OUTDATED): Active until you restart the app
         inactiveUntilRestart(OUTDATED): Inactive until you restart the app
     resyncEverything(OUTDATED): Resync everything
-    openDataDir(OUTDATED): Open Saber folder
+    openDataDir(OUTDATED): Open Quill folder
     customDataDir:
       cancel(OUTDATED): Cancel
       select(OUTDATED): Select
@@ -330,18 +330,18 @@ es:
       almostDone(OUTDATED): Almost ready for syncing, tap to finish logging in
     ncLoginStep:
       whereToStoreData(OUTDATED): "Choose where you want to store your data:"
-      saberNcServer(OUTDATED): Saber's Nextcloud server
+      quillNcServer(OUTDATED): Quill's Nextcloud server
       otherNcServer(OUTDATED): Other Nextcloud server
       serverUrl(OUTDATED): Server URL
-      loginWithSaber(OUTDATED): Login with Saber
+      loginWithQuill(OUTDATED): Login with Quill
       loginWithNextcloud(OUTDATED): Login with Nextcloud
       loginFlow:
-        pleaseAuthorize(OUTDATED): Please authorize Saber to access your Nextcloud account
+        pleaseAuthorize(OUTDATED): Please authorize Quill to access your Nextcloud account
         followPrompts(OUTDATED): Please follow the prompts in the Nextcloud interface
         browserDidntOpen(OUTDATED): Login page didn't open? Click here
     encLoginStep:
       enterEncPassword(OUTDATED): "To protect your data, please enter your encryption password:"
-      newToSaber(OUTDATED): New to Saber? Just enter a new encryption password.
+      newToQuill(OUTDATED): New to Quill? Just enter a new encryption password.
       encPassword(OUTDATED): Encryption password
       encFaqTitle(OUTDATED): Frequently asked questions
       wrongEncPassword(OUTDATED): Decryption failed with the provided password. Please try entering it again.
@@ -355,7 +355,7 @@ es:
       - q: I haven't set an encryption password yet. Where do I get it?
         a: |-
           Choose a new encryption password and enter it above.
-          Saber will generate your encryption keys from this password automatically.
+          Quill will generate your encryption keys from this password automatically.
       - q: Can I use the same password as my Nextcloud account?
         a: Yes, but keep in mind that it would be easier for the server administrator or someone else to access your notes if they gain access to your Nextcloud account.
   profile:
@@ -411,7 +411,7 @@ fa:
       simpleGrid(OUTDATED): Simple grid
   sentry:
     consent:
-      title(OUTDATED): Help improve Saber?
+      title(OUTDATED): Help improve Quill?
       description:
         question(OUTDATED): Would you like to automatically report unexpected errors? This helps me identify and fix issues faster.
         scope(OUTDATED): The reports may contain information about the error and your device. I've made every effort to filter out personal data but some may remain.
@@ -426,7 +426,7 @@ fa:
       autoDisableFingerDrawingWhenStylusDetected(OUTDATED): Auto-disable finger drawing
       autosave(OUTDATED): Auto-save
       autoStraightenLines(OUTDATED): Auto straighten lines
-      customDataDir(OUTDATED): Custom Saber folder
+      customDataDir(OUTDATED): Custom Quill folder
       sentry(OUTDATED): Error reporting
     prefDescriptions:
       autoDisableFingerDrawingWhenStylusDetected(OUTDATED): Turn off finger drawing when a stylus is detected
@@ -438,7 +438,7 @@ fa:
         activeUntilRestart(OUTDATED): Active until you restart the app
         inactiveUntilRestart(OUTDATED): Inactive until you restart the app
     resyncEverything(OUTDATED): Resync everything
-    openDataDir(OUTDATED): Open Saber folder
+    openDataDir(OUTDATED): Open Quill folder
     customDataDir:
       cancel(OUTDATED): Cancel
       select(OUTDATED): Select
@@ -460,18 +460,18 @@ fa:
       almostDone(OUTDATED): Almost ready for syncing, tap to finish logging in
     ncLoginStep:
       whereToStoreData(OUTDATED): "Choose where you want to store your data:"
-      saberNcServer(OUTDATED): Saber's Nextcloud server
+      quillNcServer(OUTDATED): Quill's Nextcloud server
       otherNcServer(OUTDATED): Other Nextcloud server
       serverUrl(OUTDATED): Server URL
-      loginWithSaber(OUTDATED): Login with Saber
+      loginWithQuill(OUTDATED): Login with Quill
       loginWithNextcloud(OUTDATED): Login with Nextcloud
       loginFlow:
-        pleaseAuthorize(OUTDATED): Please authorize Saber to access your Nextcloud account
+        pleaseAuthorize(OUTDATED): Please authorize Quill to access your Nextcloud account
         followPrompts(OUTDATED): Please follow the prompts in the Nextcloud interface
         browserDidntOpen(OUTDATED): Login page didn't open? Click here
     encLoginStep:
       enterEncPassword(OUTDATED): "To protect your data, please enter your encryption password:"
-      newToSaber(OUTDATED): New to Saber? Just enter a new encryption password.
+      newToQuill(OUTDATED): New to Quill? Just enter a new encryption password.
       encPassword(OUTDATED): Encryption password
       encFaqTitle(OUTDATED): Frequently asked questions
       wrongEncPassword(OUTDATED): Decryption failed with the provided password. Please try entering it again.
@@ -485,7 +485,7 @@ fa:
       - q: I haven't set an encryption password yet. Where do I get it?
         a: |-
           Choose a new encryption password and enter it above.
-          Saber will generate your encryption keys from this password automatically.
+          Quill will generate your encryption keys from this password automatically.
       - q: Can I use the same password as my Nextcloud account?
         a: Yes, but keep in mind that it would be easier for the server administrator or someone else to access your notes if they gain access to your Nextcloud account.
   profile:
@@ -562,7 +562,7 @@ ja:
     prefLabels:
       hideFingerDrawingToggle(OUTDATED): Hide the finger drawing toggle
       autoDisableFingerDrawingWhenStylusDetected(OUTDATED): Auto-disable finger drawing
-      customDataDir(OUTDATED): Custom Saber folder
+      customDataDir(OUTDATED): Custom Quill folder
     prefDescriptions:
       hideFingerDrawing:
         fixedOn(OUTDATED): Finger drawing is fixed as enabled
@@ -706,7 +706,7 @@ tr:
       simpleGrid(OUTDATED): Simple grid
   sentry:
     consent:
-      title(OUTDATED): Help improve Saber?
+      title(OUTDATED): Help improve Quill?
       description:
         question(OUTDATED): Would you like to automatically report unexpected errors? This helps me identify and fix issues faster.
         scope(OUTDATED): The reports may contain information about the error and your device. I've made every effort to filter out personal data but some may remain.
@@ -775,7 +775,7 @@ uk:
       lastModifiedOldToNew(OUTDATED): Edited (Oldest first)
   sentry:
     consent:
-      title(OUTDATED): Help improve Saber?
+      title(OUTDATED): Help improve Quill?
       description:
         question(OUTDATED): Would you like to automatically report unexpected errors? This helps me identify and fix issues faster.
         scope(OUTDATED): The reports may contain information about the error and your device. I've made every effort to filter out personal data but some may remain.
@@ -800,7 +800,7 @@ uk:
       layoutSize(OUTDATED): Layout type
       customAccentColor(OUTDATED): Custom accent color
       hyperlegibleFont(OUTDATED): Atkinson Hyperlegible font
-      shouldCheckForUpdates(OUTDATED): Check for Saber updates
+      shouldCheckForUpdates(OUTDATED): Check for Quill updates
       shouldAlwaysAlertForUpdates(OUTDATED): Faster updates
       allowInsecureConnections(OUTDATED): Allow insecure connections
       editorToolbarAlignment(OUTDATED): Toolbar position
@@ -819,11 +819,11 @@ uk:
       autosave(OUTDATED): Auto-save
       shapeRecognitionDelay(OUTDATED): Shape recognition delay
       autoStraightenLines(OUTDATED): Auto straighten lines
-      customDataDir(OUTDATED): Custom Saber folder
+      customDataDir(OUTDATED): Custom Quill folder
       sentry(OUTDATED): Error reporting
     prefDescriptions:
       hyperlegibleFont(OUTDATED): Increases legibility for users with low vision
-      allowInsecureConnections(OUTDATED): (Not recommended) Allow Saber to connect to servers with self-signed/untrusted certificates
+      allowInsecureConnections(OUTDATED): (Not recommended) Allow Quill to connect to servers with self-signed/untrusted certificates
       preferGreyscale(OUTDATED): For e-ink displays
       autoClearWhiteboardOnExit(OUTDATED): Clears the whiteboard after you exit the app
       disableEraserAfterUse(OUTDATED): Automatically switches back to the pen after using the eraser
@@ -864,7 +864,7 @@ uk:
       title(OUTDATED): Reset this setting?
       button(OUTDATED): Reset
     resyncEverything(OUTDATED): Resync everything
-    openDataDir(OUTDATED): Open Saber folder
+    openDataDir(OUTDATED): Open Quill folder
     customDataDir:
       cancel(OUTDATED): Cancel
       select(OUTDATED): Select
@@ -893,18 +893,18 @@ uk:
       loggedIn(OUTDATED): Logged in with Nextcloud
     ncLoginStep:
       whereToStoreData(OUTDATED): "Choose where you want to store your data:"
-      saberNcServer(OUTDATED): Saber's Nextcloud server
+      quillNcServer(OUTDATED): Quill's Nextcloud server
       otherNcServer(OUTDATED): Other Nextcloud server
       serverUrl(OUTDATED): Server URL
-      loginWithSaber(OUTDATED): Login with Saber
+      loginWithQuill(OUTDATED): Login with Quill
       loginWithNextcloud(OUTDATED): Login with Nextcloud
       loginFlow:
-        pleaseAuthorize(OUTDATED): Please authorize Saber to access your Nextcloud account
+        pleaseAuthorize(OUTDATED): Please authorize Quill to access your Nextcloud account
         followPrompts(OUTDATED): Please follow the prompts in the Nextcloud interface
         browserDidntOpen(OUTDATED): Login page didn't open? Click here
     encLoginStep:
       enterEncPassword(OUTDATED): "To protect your data, please enter your encryption password:"
-      newToSaber(OUTDATED): New to Saber? Just enter a new encryption password.
+      newToQuill(OUTDATED): New to Quill? Just enter a new encryption password.
       encPassword(OUTDATED): Encryption password
       encFaqTitle(OUTDATED): Frequently asked questions
       wrongEncPassword(OUTDATED): Decryption failed with the provided password. Please try entering it again.
@@ -1028,7 +1028,7 @@ uk:
       watchingServer(OUTDATED): You are currently watching for updates on the server. Editing is disabled in this mode.
       corrupted(OUTDATED): Failed to load note. It may be corrupted or still being downloaded.
     versionTooNew:
-      title(OUTDATED): This note was edited using a newer version of Saber
+      title(OUTDATED): This note was edited using a newer version of Quill
       subtitle(OUTDATED): Editing this note may result in some information being lost. Do you want to ignore this and edit it anyway?
       allowEditing(OUTDATED): Allow editing
     quill:
@@ -1074,7 +1074,7 @@ pt-BR:
       masonryGrid(OUTDATED): Masonry grid
   settings:
     prefLabels:
-      customDataDir(OUTDATED): Custom Saber folder
+      customDataDir(OUTDATED): Custom Quill folder
       sentry(OUTDATED): Error reporting
     prefDescriptions:
       autoDisableFingerDrawingWhenStylusDetected(OUTDATED): Turn off finger drawing when a stylus is detected
@@ -1089,7 +1089,7 @@ pt-BR:
     layoutSizes:
       tablet(OUTDATED): Tablet
     resyncEverything(OUTDATED): Resync everything
-    openDataDir(OUTDATED): Open Saber folder
+    openDataDir(OUTDATED): Open Quill folder
     customDataDir:
       cancel(OUTDATED): Cancel
       select(OUTDATED): Select
@@ -1111,18 +1111,18 @@ pt-BR:
       almostDone(OUTDATED): Almost ready for syncing, tap to finish logging in
     ncLoginStep:
       whereToStoreData(OUTDATED): "Choose where you want to store your data:"
-      saberNcServer(OUTDATED): Saber's Nextcloud server
+      quillNcServer(OUTDATED): Quill's Nextcloud server
       otherNcServer(OUTDATED): Other Nextcloud server
       serverUrl(OUTDATED): Server URL
-      loginWithSaber(OUTDATED): Login with Saber
+      loginWithQuill(OUTDATED): Login with Quill
       loginWithNextcloud(OUTDATED): Login with Nextcloud
       loginFlow:
-        pleaseAuthorize(OUTDATED): Please authorize Saber to access your Nextcloud account
+        pleaseAuthorize(OUTDATED): Please authorize Quill to access your Nextcloud account
         followPrompts(OUTDATED): Please follow the prompts in the Nextcloud interface
         browserDidntOpen(OUTDATED): Login page didn't open? Click here
     encLoginStep:
       enterEncPassword(OUTDATED): "To protect your data, please enter your encryption password:"
-      newToSaber(OUTDATED): New to Saber? Just enter a new encryption password.
+      newToQuill(OUTDATED): New to Quill? Just enter a new encryption password.
       encPassword(OUTDATED): Encryption password
       encFaqTitle(OUTDATED): Frequently asked questions
       wrongEncPassword(OUTDATED): Decryption failed with the provided password. Please try entering it again.
@@ -1136,7 +1136,7 @@ pt-BR:
       - q: I haven't set an encryption password yet. Where do I get it?
         a: |-
           Choose a new encryption password and enter it above.
-          Saber will generate your encryption keys from this password automatically.
+          Quill will generate your encryption keys from this password automatically.
       - q: Can I use the same password as my Nextcloud account?
         a: Yes, but keep in mind that it would be easier for the server administrator or someone else to access your notes if they gain access to your Nextcloud account.
   profile:

@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:perfect_freehand/perfect_freehand.dart';
-import 'package:saber/components/canvas/_stroke.dart';
+import 'package:quill/components/canvas/_stroke.dart';
 import 'package:sbn/has_size.dart';
 
 const _pageSize = Size(100, 100);

@@ -1,6 +1,6 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/theming/adaptive_circular_progress_indicator.dart';
-import 'package:saber/i18n/strings.g.dart';
+import 'package:quill/components/theming/adaptive_circular_progress_indicator.dart';
+import 'package:quill/i18n/strings.g.dart';
 
 class ExportBar extends StatefulWidget {
   const new({

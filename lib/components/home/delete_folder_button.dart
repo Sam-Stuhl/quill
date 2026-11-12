@@ -1,7 +1,7 @@
 import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/theming/adaptive_alert_dialog.dart';
-import 'package:saber/i18n/strings.g.dart';
+import 'package:quill/components/theming/adaptive_alert_dialog.dart';
+import 'package:quill/i18n/strings.g.dart';
 
 class DeleteFolderButton extends StatelessWidget {
   const new({

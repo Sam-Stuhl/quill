@@ -1,12 +1,12 @@
 import 'package:cupertino_ui/cupertino_ui.dart' show CupertinoIcons;
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/home/delete_folder_button.dart';
-import 'package:saber/components/home/new_folder_dialog.dart';
-import 'package:saber/components/home/rename_folder_button.dart';
-import 'package:saber/components/theming/adaptive_icon.dart';
-import 'package:saber/data/extensions/list_extensions.dart';
-import 'package:saber/i18n/strings.g.dart';
+import 'package:quill/components/home/delete_folder_button.dart';
+import 'package:quill/components/home/new_folder_dialog.dart';
+import 'package:quill/components/home/rename_folder_button.dart';
+import 'package:quill/components/theming/adaptive_icon.dart';
+import 'package:quill/data/extensions/list_extensions.dart';
+import 'package:quill/i18n/strings.g.dart';
 
 class GridFolders extends StatelessWidget {
   const new({

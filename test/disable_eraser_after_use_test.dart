@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/data/file_manager/file_manager.dart';
-import 'package:saber/data/flavor_config.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/data/tools/eraser.dart';
-import 'package:saber/data/tools/pen.dart';
-import 'package:saber/pages/editor/editor.dart';
+import 'package:quill/data/file_manager/file_manager.dart';
+import 'package:quill/data/flavor_config.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/data/tools/eraser.dart';
+import 'package:quill/data/tools/pen.dart';
+import 'package:quill/pages/editor/editor.dart';
 
 import 'utils/test_mock_channel_handlers.dart';
 

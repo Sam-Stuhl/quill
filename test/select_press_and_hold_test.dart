@@ -1,9 +1,9 @@
 import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:perfect_freehand/perfect_freehand.dart';
-import 'package:saber/components/canvas/_stroke.dart';
-import 'package:saber/data/clipboard_shelf.dart';
-import 'package:saber/data/tools/select.dart';
+import 'package:quill/components/canvas/_stroke.dart';
+import 'package:quill/data/clipboard_shelf.dart';
+import 'package:quill/data/tools/select.dart';
 import 'package:sbn/has_size.dart';
 import 'package:sbn/tool_id.dart';
 

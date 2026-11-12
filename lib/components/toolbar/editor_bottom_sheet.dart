@@ -1,15 +1,15 @@
 import 'package:flutter/gestures.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/canvas/canvas_background_preview.dart';
-import 'package:saber/components/canvas/canvas_image_dialog.dart';
-import 'package:saber/components/canvas/inner_canvas.dart';
-import 'package:saber/data/editor/editor_core_info.dart';
-import 'package:saber/data/editor/page.dart';
-import 'package:saber/data/extensions/list_extensions.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/i18n/extensions/box_fit_localized.dart';
-import 'package:saber/i18n/extensions/canvas_background_pattern_localized.dart';
-import 'package:saber/i18n/strings.g.dart';
+import 'package:quill/components/canvas/canvas_background_preview.dart';
+import 'package:quill/components/canvas/canvas_image_dialog.dart';
+import 'package:quill/components/canvas/inner_canvas.dart';
+import 'package:quill/data/editor/editor_core_info.dart';
+import 'package:quill/data/editor/page.dart';
+import 'package:quill/data/extensions/list_extensions.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/i18n/extensions/box_fit_localized.dart';
+import 'package:quill/i18n/extensions/canvas_background_pattern_localized.dart';
+import 'package:quill/i18n/strings.g.dart';
 import 'package:sbn/canvas_background_pattern.dart';
 
 class EditorBottomSheet extends StatefulWidget {

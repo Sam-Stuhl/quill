@@ -9,14 +9,14 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdfrx/pdfrx.dart';
-import 'package:saber/components/canvas/image/editor_image.dart';
-import 'package:saber/data/editor/editor_core_info.dart';
-import 'package:saber/data/editor/editor_exporter.dart';
-import 'package:saber/data/editor/page.dart';
-import 'package:saber/data/file_manager/file_manager.dart';
-import 'package:saber/data/pen_activity.dart';
-import 'package:saber/data/perf_bench.dart';
-import 'package:saber/pages/editor/editor.dart';
+import 'package:quill/components/canvas/image/editor_image.dart';
+import 'package:quill/data/editor/editor_core_info.dart';
+import 'package:quill/data/editor/editor_exporter.dart';
+import 'package:quill/data/editor/page.dart';
+import 'package:quill/data/file_manager/file_manager.dart';
+import 'package:quill/data/pen_activity.dart';
+import 'package:quill/data/perf_bench.dart';
+import 'package:quill/pages/editor/editor.dart';
 
 /// Turns a file sent from the mini into a note, without the editor open.
 /// See docs/quill-sync.md.

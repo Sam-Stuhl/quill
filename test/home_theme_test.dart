@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:golden_screenshot/golden_screenshot.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/theming/saber_theme.dart';
-import 'package:saber/data/flavor_config.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/pages/home/home.dart';
+import 'package:quill/components/theming/quill_theme.dart';
+import 'package:quill/data/flavor_config.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/pages/home/home.dart';
 
 void main() {
   group('Home themes', () {
@@ -14,7 +14,7 @@ void main() {
           FlavorConfig.setup();
           stows.sentryConsent.value = .granted;
 
-          final theme = SaberTheme.createThemeFromSeed(
+          final theme = QuillTheme.createThemeFromSeed(
             Colors.yellow,
             brightness,
             platform,
@@ -22,7 +22,7 @@ void main() {
           await tester.pumpWidget(
             ScreenshotApp.withConditionalTitlebar(
               device: GoldenScreenshotDevices.androidPhone.device,
-              title: 'Saber',
+              title: 'Quill',
               theme: theme,
               home: Theme(
                 data: theme,

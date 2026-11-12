@@ -7,12 +7,12 @@ import 'dart:io';
 import 'package:args/args.dart';
 import 'package:collection/collection.dart';
 import 'package:intl/intl.dart';
-import 'package:saber/data/list_eq.dart';
-import 'package:saber/data/saber_version.dart';
-import 'package:saber/data/version.dart' as old_version_file;
+import 'package:quill/data/list_eq.dart';
+import 'package:quill/data/quill_version.dart';
+import 'package:quill/data/version.dart' as old_version_file;
 
-final oldVersion = SaberVersion.fromName(old_version_file.buildName);
-late final SaberVersion newVersion;
+final oldVersion = QuillVersion.fromName(old_version_file.buildName);
+late final QuillVersion newVersion;
 late final String editor;
 late final bool failOnChanges;
 late final bool quiet;

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/i18n/extensions/box_fit_localized.dart';
+import 'package:quill/i18n/extensions/box_fit_localized.dart';
 
 void main() {
   test('Test that BoxFit is localized', () {

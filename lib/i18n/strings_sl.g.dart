@@ -69,7 +69,7 @@ class _Translations$home$sl extends Translations$home$en {
 	@override late final _Translations$home$titles$sl titles = _Translations$home$titles$sl._(_root);
 	@override late final _Translations$home$tooltips$sl tooltips = _Translations$home$tooltips$sl._(_root);
 	@override late final _Translations$home$create$sl create = _Translations$home$create$sl._(_root);
-	@override String get welcome => 'Dobrodošli v Saber';
+	@override String get welcome => 'Dobrodošli v Quill';
 	@override String get invalidFormat => 'Izbrana datoteka ni podprta. Prosim, izberi datoteko sbn, sbn2, sba ali pdf.';
 	@override String get noFiles => 'Ni najdenih datotek';
 	@override String get noPreviewAvailable => 'Predogled ni na voljo';
@@ -118,7 +118,7 @@ class _Translations$settings$sl extends Translations$settings$en {
 	];
 	@override late final _Translations$settings$reset$sl reset = _Translations$settings$reset$sl._(_root);
 	@override String get resyncEverything => 'Ponovno sinhroniziraj vse';
-	@override String get openDataDir => 'Odpri mapo Saber';
+	@override String get openDataDir => 'Odpri mapo Quill';
 	@override late final _Translations$settings$customDataDir$sl customDataDir = _Translations$settings$customDataDir$sl._(_root);
 	@override String get autosaveDisabled => 'Nikoli';
 	@override String get shapeRecognitionDisabled => 'Nikoli';
@@ -408,7 +408,7 @@ class _Translations$sentry$consent$sl extends Translations$sentry$consent$en {
 	final TranslationsSl _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Ali želiš pomagati izboljšati Saber?';
+	@override String get title => 'Ali želiš pomagati izboljšati Quill?';
 	@override late final _Translations$sentry$consent$description$sl description = _Translations$sentry$consent$description$sl._(_root);
 	@override late final _Translations$sentry$consent$answers$sl answers = _Translations$sentry$consent$answers$sl._(_root);
 }
@@ -440,7 +440,7 @@ class _Translations$settings$prefLabels$sl extends Translations$settings$prefLab
 	@override String get layoutSize => 'Vrsta postavitve';
 	@override String get customAccentColor => 'Barva poudarka po meri';
 	@override String get hyperlegibleFont => 'Pisava Atkinson Hyperlegible';
-	@override String get shouldCheckForUpdates => 'Preveri posodobitve za Saber';
+	@override String get shouldCheckForUpdates => 'Preveri posodobitve za Quill';
 	@override String get shouldAlwaysAlertForUpdates => 'Hitrejše posodobitve';
 	@override String get allowInsecureConnections => 'Dovoli nezavarovane povezave';
 	@override String get editorToolbarAlignment => 'Položaj orodne vrstice';
@@ -459,7 +459,7 @@ class _Translations$settings$prefLabels$sl extends Translations$settings$prefLab
 	@override String get autosave => 'Samodejno shranjevanje';
 	@override String get shapeRecognitionDelay => 'Zakasnitev prepoznave oblik';
 	@override String get autoStraightenLines => 'Samodejno poravnaj črte';
-	@override String get customDataDir => 'Mapa Saber po meri';
+	@override String get customDataDir => 'Mapa Quill po meri';
 	@override String get sentry => 'Poročanje o napakah';
 }
 
@@ -471,7 +471,7 @@ class _Translations$settings$prefDescriptions$sl extends Translations$settings$p
 
 	// Translations
 	@override String get hyperlegibleFont => 'Poveča čitljivost za uporabnike s slabšim vidom';
-	@override String get allowInsecureConnections => '(Ni priporočljivo) Dovoli Saberju povezovanje s strežniki s samopodpisanimi/nezaupanja vrednimi potrdili';
+	@override String get allowInsecureConnections => '(Ni priporočljivo) Dovoli Quillju povezovanje s strežniki s samopodpisanimi/nezaupanja vrednimi potrdili';
 	@override String get preferGreyscale => 'Za zaslone e-ink';
 	@override String get autoClearWhiteboardOnExit => 'Počisti tablo, ko zapustiš aplikacijo';
 	@override String get disableEraserAfterUse => 'Po uporabi radirke samodejno preklopi nazaj na pero';
@@ -582,10 +582,10 @@ class _Translations$login$ncLoginStep$sl extends Translations$login$ncLoginStep$
 
 	// Translations
 	@override String get whereToStoreData => 'Izberi, kje želiš shraniti svoje podatke:';
-	@override String get saberNcServer => 'Saberjev Nextcloud strežnik';
+	@override String get quillNcServer => 'Quilljev Nextcloud strežnik';
 	@override String get otherNcServer => 'Drug Nextcloud strežnik';
 	@override String get serverUrl => 'URL strežnika';
-	@override String get loginWithSaber => 'Prijava v Saber';
+	@override String get loginWithQuill => 'Prijava v Quill';
 	@override String get loginWithNextcloud => 'Prijava v Nextcloud';
 	@override late final _Translations$login$ncLoginStep$loginFlow$sl loginFlow = _Translations$login$ncLoginStep$loginFlow$sl._(_root);
 }
@@ -598,7 +598,7 @@ class _Translations$login$encLoginStep$sl extends Translations$login$encLoginSte
 
 	// Translations
 	@override String get enterEncPassword => 'Za zaščito tvojih podatkov vnesi geslo za šifriranje:';
-	@override String get newToSaber => 'Si nov v Saberju? Samo vnesi novo geslo za šifriranje.';
+	@override String get newToQuill => 'Si nov v Quillju? Samo vnesi novo geslo za šifriranje.';
 	@override String get encPassword => 'Geslo za šifriranje';
 	@override String get encFaqTitle => 'Pogosta vprašanja';
 	@override String get wrongEncPassword => 'Dešifriranje s podanim geslom ni uspelo. Prosim, poskusi znova vnesti geslo.';
@@ -640,7 +640,7 @@ class _Translations$profile$faq$1$sl extends Translations$profile$faq$1$en {
 
 	// Translations
 	@override String get q => 'Kako spremenim geslo za Nextcloud?';
-	@override String get a => 'Pojdi na spletno stran tvojega strežnika in se prijavi. Nato pojdi na Nastavitve > Varnost > Spremeni geslo. Po spremembi gesla se boš moral odjaviti in znova prijaviti v Saber.';
+	@override String get a => 'Pojdi na spletno stran tvojega strežnika in se prijavi. Nato pojdi na Nastavitve > Varnost > Spremeni geslo. Po spremembi gesla se boš moral odjaviti in znova prijaviti v Quill.';
 }
 
 // Path: profile.faq.2
@@ -651,7 +651,7 @@ class _Translations$profile$faq$2$sl extends Translations$profile$faq$2$en {
 
 	// Translations
 	@override String get q => 'Kako spremenim geslo za šifriranje?';
-	@override String get a => '0. Prepričaj se, da je sinhronizacija končana (glej napredek sinhronizacije na domačem zaslonu).\n1. Odjavi se iz Saberja.\n2. Pojdi na spletno stran tvojega strežnika in izbriši mapo \'Saber\'. S tem boš izbrisal vse svoje zapiske s strežnika.\n3. Znova se prijavi v Saber. Pri prijavi lahko izbereš novo geslo za šifriranje.\n4. Ne pozabi se odjaviti in znova prijaviti v Saber tudi na drugih napravah.';
+	@override String get a => '0. Prepričaj se, da je sinhronizacija končana (glej napredek sinhronizacije na domačem zaslonu).\n1. Odjavi se iz Quillja.\n2. Pojdi na spletno stran tvojega strežnika in izbriši mapo \'Quill\'. S tem boš izbrisal vse svoje zapiske s strežnika.\n3. Znova se prijavi v Quill. Pri prijavi lahko izbereš novo geslo za šifriranje.\n4. Ne pozabi se odjaviti in znova prijaviti v Quill tudi na drugih napravah.';
 }
 
 // Path: profile.faq.3
@@ -826,7 +826,7 @@ class _Translations$editor$versionTooNew$sl extends Translations$editor$versionT
 	final TranslationsSl _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Ta zapisek je bil urejen z novejšo različico Saberja';
+	@override String get title => 'Ta zapisek je bil urejen z novejšo različico Quillja';
 	@override String get subtitle => 'Urejanje tega zapiska lahko povzroči izgubo nekaterih informacij. Ali želiš to prezreti in vseeno urejati?';
 	@override String get allowEditing => 'Dovoli urejanje';
 }
@@ -918,7 +918,7 @@ class _Translations$login$ncLoginStep$loginFlow$sl extends Translations$login$nc
 	final TranslationsSl _root; // ignore: unused_field
 
 	// Translations
-	@override String get pleaseAuthorize => 'Prosim, pooblasti Saber za dostop do tvojega Nextcloud računa';
+	@override String get pleaseAuthorize => 'Prosim, pooblasti Quill za dostop do tvojega Nextcloud računa';
 	@override String get followPrompts => 'Prosim, sledi navodilom v vmesniku Nextcloud';
 	@override String get browserDidntOpen => 'Prijavna stran se ni odprla? Klikni tukaj';
 }
@@ -942,7 +942,7 @@ class _Translations$login$encLoginStep$encFaq$1$sl extends Translations$login$en
 
 	// Translations
 	@override String get q => 'Še nisem nastavil gesla za šifriranje. Kje ga dobim?';
-	@override String get a => 'Izberi novo geslo za šifriranje in ga vnesi zgoraj.\nSaber bo iz tega gesla samodejno ustvaril tvoje šifrirne ključe.';
+	@override String get a => 'Izberi novo geslo za šifriranje in ga vnesi zgoraj.\nQuill bo iz tega gesla samodejno ustvaril tvoje šifrirne ključe.';
 }
 
 // Path: login.encLoginStep.encFaq.2

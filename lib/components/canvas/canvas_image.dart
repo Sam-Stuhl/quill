@@ -3,12 +3,12 @@ import 'dart:math';
 import 'package:defer_pointer/defer_pointer.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/canvas/canvas_image_dialog.dart';
-import 'package:saber/components/canvas/image/editor_image.dart';
-import 'package:saber/components/theming/adaptive_alert_dialog.dart';
-import 'package:saber/data/extensions/change_notifier_extensions.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/i18n/strings.g.dart';
+import 'package:quill/components/canvas/canvas_image_dialog.dart';
+import 'package:quill/components/canvas/image/editor_image.dart';
+import 'package:quill/components/theming/adaptive_alert_dialog.dart';
+import 'package:quill/data/extensions/change_notifier_extensions.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/i18n/strings.g.dart';
 
 class CanvasImage extends StatefulHookWidget {
   new({

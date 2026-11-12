@@ -37,7 +37,7 @@
       "url": "https://api.github.com/repos/saber-notes/saber/releases/assets/131746542",
       "id": 131746542,
       "node_id": "RA_kwDOHsqsMs4H2kru",
-      "name": "Saber-0.17.0-x86_64.AppImage",
+      "name": "Quill-0.17.0-x86_64.AppImage",
       "label": "",
       "uploader": {
         "login": "github-actions[bot]",
@@ -71,7 +71,7 @@
       "url": "https://api.github.com/repos/saber-notes/saber/releases/assets/131746541",
       "id": 131746541,
       "node_id": "RA_kwDOHsqsMs4H2krt",
-      "name": "Saber-0.17.0-x86_64.AppImage.zsync",
+      "name": "Quill-0.17.0-x86_64.AppImage.zsync",
       "label": "",
       "uploader": {
         "login": "github-actions[bot]",
@@ -105,7 +105,7 @@
       "url": "https://api.github.com/repos/saber-notes/saber/releases/assets/131743278",
       "id": 131743278,
       "node_id": "RA_kwDOHsqsMs4H2j4u",
-      "name": "SaberInstaller_v0.17.0.exe",
+      "name": "QuillInstaller_v0.17.0.exe",
       "label": "",
       "uploader": {
         "login": "github-actions[bot]",
@@ -139,7 +139,7 @@
       "url": "https://api.github.com/repos/saber-notes/saber/releases/assets/131742987",
       "id": 131742987,
       "node_id": "RA_kwDOHsqsMs4H2j0L",
-      "name": "Saber_FOSS_v0.17.0.apk",
+      "name": "Quill_FOSS_v0.17.0.apk",
       "label": "",
       "uploader": {
         "login": "github-actions[bot]",
@@ -173,7 +173,7 @@
       "url": "https://api.github.com/repos/saber-notes/saber/releases/assets/131743420",
       "id": 131743420,
       "node_id": "RA_kwDOHsqsMs4H2j68",
-      "name": "Saber_v0.17.0.apk",
+      "name": "Quill_v0.17.0.apk",
       "label": "",
       "uploader": {
         "login": "github-actions[bot]",
@@ -207,7 +207,7 @@
       "url": "https://api.github.com/repos/saber-notes/saber/releases/assets/131747309",
       "id": 131747309,
       "node_id": "RA_kwDOHsqsMs4H2k3t",
-      "name": "Saber_v0.17.0_Linux_arm64.tar.gz",
+      "name": "Quill_v0.17.0_Linux_arm64.tar.gz",
       "label": "",
       "uploader": {
         "login": "github-actions[bot]",
@@ -241,7 +241,7 @@
       "url": "https://api.github.com/repos/saber-notes/saber/releases/assets/131746228",
       "id": 131746228,
       "node_id": "RA_kwDOHsqsMs4H2km0",
-      "name": "Saber_v0.17.0_Linux_x86_64.tar.gz",
+      "name": "Quill_v0.17.0_Linux_x86_64.tar.gz",
       "label": "",
       "uploader": {
         "login": "github-actions[bot]",

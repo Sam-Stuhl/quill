@@ -69,7 +69,7 @@ class _Translations$home$es extends Translations$home$en {
 	@override late final _Translations$home$titles$es titles = _Translations$home$titles$es._(_root);
 	@override late final _Translations$home$tooltips$es tooltips = _Translations$home$tooltips$es._(_root);
 	@override late final _Translations$home$create$es create = _Translations$home$create$es._(_root);
-	@override String get welcome => 'Te damos la bienvenida a Saber';
+	@override String get welcome => 'Te damos la bienvenida a Quill';
 	@override String get invalidFormat => 'El archivo que seleccionaste no es válido. Por favor, selecciona un archivo .sbn, .sbn2, .sba or .pdf.';
 	@override String get noFiles => 'No se ha encontrado ninguna nota';
 	@override String get noPreviewAvailable => 'Vista previa no disponible';
@@ -120,7 +120,7 @@ class _Translations$settings$es extends Translations$settings$en {
 	@override late final _Translations$settings$customDataDir$es customDataDir = _Translations$settings$customDataDir$es._(_root);
 	@override String get autosaveDisabled => 'Nunca';
 	@override String get shapeRecognitionDisabled => 'Nunca';
-	@override String get openDataDir => 'Abrir carpeta Saber';
+	@override String get openDataDir => 'Abrir carpeta Quill';
 	@override String get resyncEverything => 'Resync todo';
 }
 
@@ -405,7 +405,7 @@ class _Translations$sentry$consent$es extends Translations$sentry$consent$en {
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => '¿Quieres mejorar Saber?';
+	@override String get title => '¿Quieres mejorar Quill?';
 	@override late final _Translations$sentry$consent$description$es description = _Translations$sentry$consent$description$es._(_root);
 	@override late final _Translations$sentry$consent$answers$es answers = _Translations$sentry$consent$answers$es._(_root);
 }
@@ -437,7 +437,7 @@ class _Translations$settings$prefLabels$es extends Translations$settings$prefLab
 	@override String get layoutSize => 'Tipo de disposición';
 	@override String get customAccentColor => 'Color de acento personalizado';
 	@override String get hyperlegibleFont => 'Fuente hiperlegible';
-	@override String get shouldCheckForUpdates => 'Buscar actualizaciones de Saber automáticamente';
+	@override String get shouldCheckForUpdates => 'Buscar actualizaciones de Quill automáticamente';
 	@override String get shouldAlwaysAlertForUpdates => 'Actualizaciones más rápidas';
 	@override String get allowInsecureConnections => 'Permitir conexiones inseguras';
 	@override String get editorToolbarAlignment => 'Alineación de la barra de herramientas del editor';
@@ -456,7 +456,7 @@ class _Translations$settings$prefLabels$es extends Translations$settings$prefLab
 	@override String get autosave => 'Guardado automático';
 	@override String get shapeRecognitionDelay => 'Retraso en el reconocimiento de formas';
 	@override String get autoStraightenLines => 'Enderezar líneas automáticamente';
-	@override String get customDataDir => 'Carpeta de Saber personalizada';
+	@override String get customDataDir => 'Carpeta de Quill personalizada';
 	@override String get sentry => 'Informes de errores';
 }
 
@@ -468,7 +468,7 @@ class _Translations$settings$prefDescriptions$es extends Translations$settings$p
 
 	// Translations
 	@override String get hyperlegibleFont => 'Atkinson Hyperlegible aumenta la legibilidad para lectores con poca visión';
-	@override String get allowInsecureConnections => '(No recomendado) Autorizar a Saber a conectarse a servidores con certificados autofirmados o no fiables';
+	@override String get allowInsecureConnections => '(No recomendado) Autorizar a Quill a conectarse a servidores con certificados autofirmados o no fiables';
 	@override String get preferGreyscale => 'Para pantallas con tinta electrónica';
 	@override String get autoClearWhiteboardOnExit => 'Aún se sincronizará con tus otros dispositivos';
 	@override String get disableEraserAfterUse => 'Volver automáticamente al bolígrafo tras usar la goma';
@@ -580,10 +580,10 @@ class _Translations$login$ncLoginStep$es extends Translations$login$ncLoginStep$
 	// Translations
 	@override late final _Translations$login$ncLoginStep$loginFlow$es loginFlow = _Translations$login$ncLoginStep$loginFlow$es._(_root);
 	@override String get whereToStoreData => 'Elige dónde quieres almacenar tus datos:';
-	@override String get saberNcServer => 'Servidor Nextcloud de Saber';
+	@override String get quillNcServer => 'Servidor Nextcloud de Quill';
 	@override String get otherNcServer => 'Otro servidor Nextcloud';
 	@override String get serverUrl => 'URL del servidor';
-	@override String get loginWithSaber => 'Iniciar sesión con Saber';
+	@override String get loginWithQuill => 'Iniciar sesión con Quill';
 	@override String get loginWithNextcloud => 'Iniciar sesión con Nextcloud';
 }
 
@@ -595,7 +595,7 @@ class _Translations$login$encLoginStep$es extends Translations$login$encLoginSte
 
 	// Translations
 	@override String get enterEncPassword => 'Para proteger sus datos, ingrese su contraseña de cifrado:';
-	@override String get newToSaber => 'Nuevo en Saber';
+	@override String get newToQuill => 'Nuevo en Quill';
 	@override String get encPassword => 'Contraseña de cifrado';
 	@override String get encFaqTitle => 'Preguntas frecuentes';
 	@override String get wrongEncPassword => 'El descifrado falló con la contraseña proporcionada. Intente ingresarlo nuevamente.';
@@ -637,7 +637,7 @@ class _Translations$profile$faq$1$es extends Translations$profile$faq$1$en {
 
 	// Translations
 	@override String get q => '¿Cómo puedo cambiar mi contraseña de Nextcloud?';
-	@override String get a => 'Accede a la web de tu servidor e inicia sesión. Luego, accede a Ajustes > Seguridad > Cambiar contraseña. Necesitarás cerrar la sesión e iniciarla de nuevo en Saber tras cambiar la contraseña.';
+	@override String get a => 'Accede a la web de tu servidor e inicia sesión. Luego, accede a Ajustes > Seguridad > Cambiar contraseña. Necesitarás cerrar la sesión e iniciarla de nuevo en Quill tras cambiar la contraseña.';
 }
 
 // Path: profile.faq.2
@@ -648,7 +648,7 @@ class _Translations$profile$faq$2$es extends Translations$profile$faq$2$en {
 
 	// Translations
 	@override String get q => '¿Cómo cambio mi contraseña de cifrado?';
-	@override String get a => '1. Cierra la sesión en Saber. Asegúrate de que la sincronización se completó antes de cerrar la sesión para asegurarte de que no pierdes nada (puedes ver el progreso en la pantalla de inicio).\n2. Accede a la web de tu servidor y elimina la carpeta \'Saber\'. Esto eliminará todas las notas del servidor.\n3. Inicia sesión de nuevo en Saber. Puedes elegir una nueva contraseña de cifrado al iniciar la sesión.\n4. No te olvides de cerrar e iniciar la sesión de Saber de nuevo en el resto de tus dispositivos.';
+	@override String get a => '1. Cierra la sesión en Quill. Asegúrate de que la sincronización se completó antes de cerrar la sesión para asegurarte de que no pierdes nada (puedes ver el progreso en la pantalla de inicio).\n2. Accede a la web de tu servidor y elimina la carpeta \'Quill\'. Esto eliminará todas las notas del servidor.\n3. Inicia sesión de nuevo en Quill. Puedes elegir una nueva contraseña de cifrado al iniciar la sesión.\n4. No te olvides de cerrar e iniciar la sesión de Quill de nuevo en el resto de tus dispositivos.';
 }
 
 // Path: profile.faq.3
@@ -823,7 +823,7 @@ class _Translations$editor$versionTooNew$es extends Translations$editor$versionT
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Esta nota fue editada usando una versión más reciente de Saber';
+	@override String get title => 'Esta nota fue editada usando una versión más reciente de Quill';
 	@override String get subtitle => 'La edición de esta nota puede resultar en la pérdida de cierta información. ¿Quieres ignorar esto y editarlo de todos modos?';
 	@override String get allowEditing => 'Editar';
 }
@@ -915,7 +915,7 @@ class _Translations$login$ncLoginStep$loginFlow$es extends Translations$login$nc
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override String get pleaseAuthorize => 'Autorice a Saber a acceder a su cuenta de Nextcloud';
+	@override String get pleaseAuthorize => 'Autorice a Quill a acceder a su cuenta de Nextcloud';
 	@override String get followPrompts => 'Siga las indicaciones en su navegador.';
 	@override String get browserDidntOpen => 'El navegador no se abrió';
 }
@@ -928,7 +928,7 @@ class _Translations$login$encLoginStep$encFaq$0$es extends Translations$login$en
 
 	// Translations
 	@override String get q => '¿Qué es la contraseña de cifrado?';
-	@override String get a => 'La contraseña de cifrado se utiliza para cifrar tus datos antes de enviarlos al servidor. La eliges cuando inicias sesión por primera vez en Saber, y no está relacionada con tu cuenta/contraseña de Nextcloud.\nNadie puede acceder a tus notas en el servidor sin tu contraseña de cifrado. Esto significa que si olvidas tu contraseña de cifrado, perderás el acceso a tus datos.';
+	@override String get a => 'La contraseña de cifrado se utiliza para cifrar tus datos antes de enviarlos al servidor. La eliges cuando inicias sesión por primera vez en Quill, y no está relacionada con tu cuenta/contraseña de Nextcloud.\nNadie puede acceder a tus notas en el servidor sin tu contraseña de cifrado. Esto significa que si olvidas tu contraseña de cifrado, perderás el acceso a tus datos.';
 }
 
 // Path: login.encLoginStep.encFaq.1

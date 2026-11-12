@@ -7,7 +7,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:saber/data/locales.dart';
+import 'package:quill/data/locales.dart';
 import 'package:yaml/yaml.dart';
 
 import 'src/fix_spelling.dart';

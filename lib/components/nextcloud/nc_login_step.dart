@@ -8,21 +8,21 @@ import 'package:material_ui/material_ui.dart';
 import 'package:nextcloud/core.dart';
 import 'package:nextcloud/nextcloud.dart';
 import 'package:regexed_validator/regexed_validator.dart';
-import 'package:saber/components/settings/app_info.dart';
-import 'package:saber/components/theming/adaptive_circular_progress_indicator.dart';
-import 'package:saber/data/nextcloud/login_flow.dart';
-import 'package:saber/data/nextcloud/nextcloud_client_extension.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/i18n/strings.g.dart';
-import 'package:saber/pages/user/login.dart';
+import 'package:quill/components/settings/app_info.dart';
+import 'package:quill/components/theming/adaptive_circular_progress_indicator.dart';
+import 'package:quill/data/nextcloud/login_flow.dart';
+import 'package:quill/data/nextcloud/nextcloud_client_extension.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/i18n/strings.g.dart';
+import 'package:quill/pages/user/login.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 const _width = 400.0;
 
-/// Lighter than the actual Saber color for better contrast
-const _saberColor = Color(0xFFffd642);
-const _onSaberColor = Colors.black;
-const _saberColorDarkened = Color(0xFFc29800);
+/// Lighter than the actual Quill color for better contrast
+const _quillColor = Color(0xFFffd642);
+const _onQuillColor = Colors.black;
+const _quillColorDarkened = Color(0xFFc29800);
 const _ncColor = Color(0xFF0082c9);
 
 class NcLoginStep extends HookWidget {
@@ -30,8 +30,8 @@ class NcLoginStep extends HookWidget {
 
   final void Function() recheckCurrentStep;
 
-  SaberLoginFlow _createLoginFlow(BuildContext context, Uri serverUrl) {
-    final loginFlow = SaberLoginFlow.start(serverUrl: serverUrl);
+  QuillLoginFlow _createLoginFlow(BuildContext context, Uri serverUrl) {
+    final loginFlow = QuillLoginFlow.start(serverUrl: serverUrl);
 
     showAdaptiveDialog(
       context: context,
@@ -71,7 +71,7 @@ class NcLoginStep extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final loginFlow = useState<SaberLoginFlow?>(null);
+    final loginFlow = useState<QuillLoginFlow?>(null);
     // dispose the login flow when it changes or the widget is disposed
     useEffect(() => loginFlow.value?.dispose, [loginFlow.value]);
 
@@ -96,7 +96,7 @@ class NcLoginStep extends HookWidget {
                     mainAxisSize: .min,
                     spacing: 48,
                     children: [
-                      _LoginWithSaber(
+                      _LoginWithQuill(
                         login: () => loginFlow.value = _createLoginFlow(
                           context,
                           NextcloudClientExtension.defaultNextcloudUri,
@@ -128,7 +128,7 @@ class NcLoginStep extends HookWidget {
           const SizedBox(height: 16),
           _Header(shouldUseTwoColumns: shouldUseTwoColumns),
           const SizedBox(height: 32),
-          _LoginWithSaber(
+          _LoginWithQuill(
             login: () => loginFlow.value = _createLoginFlow(
               context,
               NextcloudClientExtension.defaultNextcloudUri,
@@ -205,12 +205,12 @@ class const _HeaderImage({required final bool shouldUseTwoColumns})
   }
 }
 
-class const _LoginWithSaber({required final VoidCallback login})
+class const _LoginWithQuill({required final VoidCallback login})
     extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final buttonStyle = useMemoized(
-      () => _buttonStyleFromBrand(_saberColor, _onSaberColor),
+      () => _buttonStyleFromBrand(_quillColor, _onQuillColor),
       const [],
     );
 
@@ -225,7 +225,7 @@ class const _LoginWithSaber({required final VoidCallback login})
             const SizedBox(width: 16),
             Expanded(
               child: Text(
-                t.login.ncLoginStep.saberNcServer,
+                t.login.ncLoginStep.quillNcServer,
                 style: theme.textTheme.headlineSmall,
               ),
             ),
@@ -235,7 +235,7 @@ class const _LoginWithSaber({required final VoidCallback login})
         ElevatedButton(
           onPressed: login,
           style: buttonStyle,
-          child: Text(t.login.ncLoginStep.loginWithSaber),
+          child: Text(t.login.ncLoginStep.loginWithQuill),
         ),
         const SizedBox(height: 4),
         Text.rich(
@@ -244,8 +244,8 @@ class const _LoginWithSaber({required final VoidCallback login})
               text: text,
               style: TextStyle(
                 color: theme.colorScheme.brightness == .dark
-                    ? _saberColor
-                    : _saberColorDarkened,
+                    ? _quillColor
+                    : _quillColorDarkened,
               ),
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
@@ -325,7 +325,7 @@ class const _LoginWithNextcloud({
   }
 }
 
-class const _LoginFlowDialog({required final SaberLoginFlow loginFlow})
+class const _LoginFlowDialog({required final QuillLoginFlow loginFlow})
     extends HookWidget {
   @override
   Widget build(BuildContext context) {
@@ -363,7 +363,7 @@ class const _LoginFlowDialog({required final SaberLoginFlow loginFlow})
   }
 }
 
-/// [SaberLoginFlow] polls the login flow and completes automatically.
+/// [QuillLoginFlow] polls the login flow and completes automatically.
 ///
 /// The done button isn't needed, but it's added to prevent the user from
 /// closing the dialog before the login flow is completed.
