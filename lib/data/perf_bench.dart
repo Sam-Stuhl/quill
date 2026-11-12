@@ -352,6 +352,87 @@ class PerfBench {
         frameCosts[(frameCosts.length * 0.9).floor()];
   }
 
+  /// Handwriting: sentences and numbers as many short strokes (8 to 24
+  /// points, one to a few letters' worth each), the pen lifted for 1 to 3
+  /// frames between them and for longer between words, on page 1 of the
+  /// open note. Records the time the editor's own stroke start and end
+  /// handlers take (the work done each time the pen goes down and up), and
+  /// how many of the strokes made it onto the page.
+  static Future<void> _handwrite(String name, {int strokes = 260}) async {
+    final editor = EditorState.benchInstance!;
+    final page = editor.coreInfo.pages[1];
+    final box = page.renderBox!;
+    Offset global(double x, double y) => box.localToGlobal(Offset(x, y));
+    final rng = Random(11);
+    final before = page.strokes.length;
+    final mark = _mark();
+    final lagFrom = _lags.length;
+    final starts = <double>[], ends = <double>[], moves = <double>[];
+    var x = 60.0, y = 150.0;
+    for (var n = 0; n < strokes; n++) {
+      final pts = 8 + rng.nextInt(17);
+      final x0 = x, y0 = y + rng.nextDouble() * 6;
+      Offset at(int i) =>
+          global(x0 + i * 1.6 + sin(i / 3) * 4, y0 + cos(i / 2.5) * 9);
+      editor.dragPageIndex = 1;
+      var t = Stopwatch()..start();
+      editor.onDrawStart(
+        ScaleStartDetails(focalPoint: at(0), localFocalPoint: at(0)),
+      );
+      starts.add(t.elapsedMicroseconds / 1000);
+      // Two points per frame: letters are drawn fast.
+      for (var i = 1; i < pts; i += 2) {
+        await _frame();
+        t = Stopwatch()..start();
+        for (var k = 0; k < 2 && i + k < pts; k++) {
+          editor.currentPressure = 0.4 + 0.3 * rng.nextDouble();
+          editor.onDrawUpdate(
+            ScaleUpdateDetails(
+              focalPoint: at(i + k),
+              localFocalPoint: at(i + k),
+            ),
+          );
+        }
+        moves.add(t.elapsedMicroseconds / 1000);
+      }
+      t = Stopwatch()..start();
+      editor.onDrawEnd(ScaleEndDetails());
+      ends.add(t.elapsedMicroseconds / 1000);
+      x += 14 + rng.nextDouble() * 10;
+      var lift = 1 + rng.nextInt(3);
+      if (n % 6 == 5) {
+        lift += 6; // between words
+        x += 24;
+      }
+      if (x > 900) {
+        x = 60;
+        y += 70;
+      }
+      for (var f = 0; f < lift; f++) {
+        await _frame();
+      }
+    }
+    await _summarise(name, mark);
+    _lagSummary(name, lagFrom);
+    double q(List<double> v, double p) {
+      v.sort();
+      return v[min(v.length - 1, (v.length * p).floor())];
+    }
+
+    results['${name}_registered'] = {
+      'attempted': strokes,
+      'on_page': page.strokes.length - before,
+    };
+    results['${name}_handler_ms'] = {
+      'pen_down_p50': q(starts, 0.5),
+      'pen_down_max': starts.reduce(max),
+      'pen_move_p90': q(moves, 0.9),
+      'pen_up_p50': q(ends, 0.5),
+      'pen_up_p90': q(ends, 0.9),
+      'pen_up_max': ends.reduce(max),
+    };
+  }
+
   /// Writing, then a pause long enough for the PDF render to start (it waits
   /// 2 s after the last save), then writing again while it runs.
   static Future<void> _drawStrokes() async {
@@ -363,6 +444,9 @@ class PerfBench {
     _lagSummary('pause_3s_pdf_starts', lagFrom);
     await _write('write_8_strokes_during_pdf', strokes: 8);
     await Future<void>.delayed(const Duration(seconds: 8));
+    // Sentences and numbers, on the next page, with saves and the PDF render
+    // going on around them as they would be.
+    await _handwrite('handwriting_260_strokes');
   }
 
   static Future<void> _scrollAndZoom() async {
