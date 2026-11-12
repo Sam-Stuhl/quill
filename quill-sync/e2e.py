@@ -75,7 +75,7 @@ def main():
         subprocess.run(
             ["ssh", "-o", "BatchMode=yes", "mac-mini-sam",
              f"f=/tmp/e2e-{i}.pdf; printf '%%PDF-1.4 e2e {i}' > $f; "
-             f"/usr/local/bin/python3 ~/repos/saber/quill-sync/server.py put $f --to _e2e >/dev/null; rm $f"],
+             f"/usr/local/bin/python3 ~/repos/quill/quill-sync/server.py put $f --to _e2e >/dev/null; rm $f"],
             check=True,
         )
         put_done = time.time()

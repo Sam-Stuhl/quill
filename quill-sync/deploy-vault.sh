@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # Quill's PDFs into the vault: install (or update) on the mini's console account.
 #   cat quill-sync/deploy-vault.sh | ssh mac-mini-console bash -s -- [--status]
-# Reads stage.py and notasync-quill.yaml from ~sam/repos/saber/quill-sync (sam's
+# Reads stage.py and notasync-quill.yaml from ~sam/repos/quill/quill-sync (sam's
 # home is readable by console). Installs:
 #   ~/opt/quill-stage/{stage.py,notasync-quill.yaml}
 #   LaunchAgent com.samstuhl.quill-stage (gui domain, KeepAlive)
 #   container notasync-quill: notasync's own image, a second router instance
 set -euo pipefail
 export PATH=/usr/local/bin:$PATH
-SRC=/Users/sam/repos/saber/quill-sync
+SRC=/Users/sam/repos/quill/quill-sync
 OPT=$HOME/opt/quill-stage
 STATE=$HOME/.local/state/notasync-quill
 STAGING=$HOME/Quill/staging
@@ -31,7 +31,7 @@ docker image inspect notasync:local >/dev/null  # built by notasync's container.
 cat > "$PLIST" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<!-- quill-stage (saber quill-sync/stage.py): ~sam/quill/Notes to ~/Quill/staging for notasync-quill. -->
+<!-- quill-stage (quill quill-sync/stage.py): ~sam/quill/Notes to ~/Quill/staging for notasync-quill. -->
 <plist version="1.0">
 <dict>
   <key>Label</key><string>$LABEL</string>
