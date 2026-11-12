@@ -69,7 +69,23 @@ class PerfBench {
     };
   }
 
-  static Future<void> _frame() => SchedulerBinding.instance.endOfFrame;
+  static Future<void> _frame() async {
+    // Frames stop while the screen is locked: say so rather than hang.
+    await SchedulerBinding.instance.endOfFrame.timeout(
+      const Duration(seconds: 20),
+      onTimeout: () {
+        results['stalled_at'] = _stage;
+        throw TimeoutException('no frame for 20 s (screen locked?)');
+      },
+    );
+  }
+
+  static String _stage = 'start';
+  static Future<void> _stageDone(String name) async {
+    _stage = name;
+    results['last_stage'] = name;
+    await _flush();
+  }
 
   static Future<void> _settle([int frames = 20]) async {
     for (var i = 0; i < frames; i++) {
@@ -89,6 +105,7 @@ class PerfBench {
   static Future<void> run() async {
     PlatformDispatcher.instance.onReportTimings = _onTimings;
     try {
+      await _stageDone('begin');
       await WidgetsBinding.instance.waitUntilFirstFrameRasterized;
       results['startup_main_to_first_frame_ms'] =
           _sinceMain.elapsedMilliseconds;
@@ -103,9 +120,13 @@ class PerfBench {
       _summarise('home_idle_3s', mark);
 
       await _makeHeavyNote();
+      await _stageDone('note');
       await _openEditor();
+      await _stageDone('open');
       await _drawStrokes();
+      await _stageDone('draw');
       await _scrollAndZoom();
+      await _stageDone('scroll');
       await _closeEditor();
       await FileManager.deleteFile('$_notePath${Editor.extension}');
       results['done'] = true;
