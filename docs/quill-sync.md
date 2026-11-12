@@ -228,7 +228,10 @@ side is under `lib/data/quill_sync/` and `lib/data/quill_defaults.dart`.
   writing a small s and a line): black on off-white in light, cream on
   near-black in dark, and a tinted form, drawn by `scripts/quill_icon.swift` (`swift
   scripts/quill_icon.swift`) into the iOS asset catalog only, so upstream's icons
-  under `assets/icon` merge untouched.
+  under `assets/icon` merge untouched. Upstream's Icon Composer icon
+  (`ios/Runner/AppIcon.icon`, Saber's yellow S) is kept on disk but taken out of the
+  Runner target: with the same name, Xcode builds it in place of the asset catalog's.
+  An upstream merge that adds it back to `project.pbxproj` brings the S back.
 - Tests: `/usr/bin/python3 -m unittest test_connect test_stage test_server`, and
   `flutter test test/quill_connect_test.dart` for the app side.
 
