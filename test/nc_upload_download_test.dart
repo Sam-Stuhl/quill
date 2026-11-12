@@ -33,7 +33,7 @@ void main() async {
     final localFile = FileManager.getFile('/helloworld${randomString(10)}.txt');
     final syncFile = await syncer.interface.getSyncFileFromLocalFile(localFile);
     printOnFailure(syncFile.toString());
-    expect(syncFile.remotePath, matches(RegExp(r'^Quill/[a-zA-Z0-9]+\.sbe$')));
+    expect(syncFile.remotePath, matches(RegExp(r'^Saber/[a-zA-Z0-9]+\.sbe$')));
 
     // Create local file
     const content = 'Hello, world!';
