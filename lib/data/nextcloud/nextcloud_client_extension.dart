@@ -8,10 +8,10 @@ import 'package:http/io_client.dart';
 import 'package:nextcloud/nextcloud.dart';
 import 'package:nextcloud/provisioning_api.dart';
 import 'package:nextcloud/webdav.dart';
-import 'package:saber/data/file_manager/file_manager.dart';
-import 'package:saber/data/nextcloud/errors.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/data/version.dart';
+import 'package:quill/data/file_manager/file_manager.dart';
+import 'package:quill/data/nextcloud/errors.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/data/version.dart';
 
 extension NextcloudClientExtension on NextcloudClient {
   static final Uri defaultNextcloudUri = Uri.parse(
@@ -19,7 +19,7 @@ extension NextcloudClientExtension on NextcloudClient {
   );
 
   static final userAgent =
-      'Saber/$buildName '
+      'Quill/$buildName '
       '(${Platform.operatingSystem}) '
       'Dart/${Platform.version.split(' ').first}';
   static IOClient newHttpClient() =>

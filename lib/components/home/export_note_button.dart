@@ -4,11 +4,11 @@ import 'package:archive/archive_io.dart';
 import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/theming/adaptive_circular_progress_indicator.dart';
-import 'package:saber/data/editor/editor_core_info.dart';
-import 'package:saber/data/editor/editor_exporter.dart';
-import 'package:saber/data/file_manager/file_manager.dart';
-import 'package:saber/i18n/strings.g.dart';
+import 'package:quill/components/theming/adaptive_circular_progress_indicator.dart';
+import 'package:quill/data/editor/editor_core_info.dart';
+import 'package:quill/data/editor/editor_exporter.dart';
+import 'package:quill/data/file_manager/file_manager.dart';
+import 'package:quill/i18n/strings.g.dart';
 
 class ExportNoteButton extends StatefulWidget {
   const new({super.key, required this.selectedFiles});

@@ -10,13 +10,13 @@ import 'package:image/image.dart' as im;
 import 'package:pdf/pdf.dart' show PdfPageFormat;
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdfrx/pdfrx.dart';
-import 'package:saber/data/editor/editor_core_info.dart';
-import 'package:saber/data/editor/editor_history.dart';
-import 'package:saber/data/editor/page.dart';
-import 'package:saber/data/file_manager/file_manager.dart';
-import 'package:saber/data/flavor_config.dart';
-import 'package:saber/data/quill_sync/quill_import.dart';
-import 'package:saber/data/quill_sync/quill_sync.dart';
+import 'package:quill/data/editor/editor_core_info.dart';
+import 'package:quill/data/editor/editor_history.dart';
+import 'package:quill/data/editor/page.dart';
+import 'package:quill/data/file_manager/file_manager.dart';
+import 'package:quill/data/flavor_config.dart';
+import 'package:quill/data/quill_sync/quill_import.dart';
+import 'package:quill/data/quill_sync/quill_sync.dart';
 
 import 'utils/test_mock_channel_handlers.dart';
 

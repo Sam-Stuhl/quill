@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:saber/data/file_manager/file_manager.dart';
-import 'package:saber/data/flavor_config.dart';
-import 'package:saber/data/nextcloud/saber_syncer.dart';
-import 'package:saber/data/prefs.dart';
+import 'package:quill/data/file_manager/file_manager.dart';
+import 'package:quill/data/flavor_config.dart';
+import 'package:quill/data/nextcloud/quill_syncer.dart';
+import 'package:quill/data/prefs.dart';
 
 import 'utils/test_mock_channel_handlers.dart';
 

@@ -1,4 +1,4 @@
-# <img src="https://github.com/saber-notes/saber/raw/main/assets/icon/icon.png" width="30" height="30" alt="Logo"> Saber
+# <img src="https://github.com/saber-notes/saber/raw/main/assets/icon/icon.png" width="30" height="30" alt="Logo"> Quill
 
 [<img src='https://github.com/saber-notes/saber/blob/main/assets_raw/badges/google-play-badge.svg'
     alt='Ke stažení na Google Play'
@@ -33,21 +33,21 @@
 [Tiếng Việt](https://github.com/saber-notes/saber/blob/main/README-vi.md) |
 [Bahasa Indonesia](https://github.com/saber-notes/saber/blob/main/README-id.md)
 
-Saber je aplikace pro psaní poznámek uzpůsobená pro ruční psaní.
+Quill je aplikace pro psaní poznámek uzpůsobená pro ruční psaní.
 
-Je navržena pro nejjednodušší a nejintuitivnější možné používání, přičemž stále nabízí unikátní funkce, které opravdu využijete. Navíc je Saber dostupný napříč všemi vašimi zařízeními, velkými i malými, mezi nimiž se bez povšimnutí synchronizuje.
+Je navržena pro nejjednodušší a nejintuitivnější možné používání, přičemž stále nabízí unikátní funkce, které opravdu využijete. Navíc je Quill dostupný napříč všemi vašimi zařízeními, velkými i malými, mezi nimiž se bez povšimnutí synchronizuje.
 
 Je na místě poznamenat, že umí invertovat vaše poznámky, pokud jste v temném módu. To vám umožňuje psát bílým inkoustem na černém pozadí, což je daleko příjemnější pro oči v prostředí s nedostatkem světla, jako když učitel ve třídě vypne osvětlení. Obrázky a PDF jsou také invertovány, takže stále můžete bez problému používat digitální výtisky nebo učebnice.
 
-Saber používá systém dvou hesel, aby ochránil vaše poznámky před kýmkoliv kromě vás, i kdyby měl kompletní přístup k serveru. Můžete bezpečně ukládat své poznámky na oficiální server aplikace Saber, jiný server či dokonce pro tyto účely provozovat svůj vlastní server!
+Quill používá systém dvou hesel, aby ochránil vaše poznámky před kýmkoliv kromě vás, i kdyby měl kompletní přístup k serveru. Můžete bezpečně ukládat své poznámky na oficiální server aplikace Quill, jiný server či dokonce pro tyto účely provozovat svůj vlastní server!
 
 Aplikace má kompletně otevřené zdrojové kódy, takže si je každý může prohlédnout a přesně vidět, co aplikace dělá a jakým způsobem jsou zpracovává vaše data. Spousta dalších aplikací pro pořizování poznámek má uzavřené zdrojové kódy a je proprietární, což znamená, že co se děje uvnitř, je pro veřejnost záhadou.
 
-Jako někdo, kdo studuje matematiku, mohu říct, že pro mě vždy bylo utrpení zvýrazňovat víceřádkové rovnice v jiných aplikacích, kde zvýrazňovač mění barvu po přetažení již zvýrazněné části. Další problém, který jsem měl v některých aplikacích, spočíval v tom, že se zvýrazňovač vykresloval nad textem, takže se text ztrácel a špatně se četl. Zvýrazňovač aplikace Saber těmito neduhy netrpí. Využívá kompozice plátna k vykreslování zvýrazňovače způsobem, který je konzistentní s tradičním papírem, ba možná i lepší, jelikož řeší překrývání a udržuje konzistenci barev.
+Jako někdo, kdo studuje matematiku, mohu říct, že pro mě vždy bylo utrpení zvýrazňovat víceřádkové rovnice v jiných aplikacích, kde zvýrazňovač mění barvu po přetažení již zvýrazněné části. Další problém, který jsem měl v některých aplikacích, spočíval v tom, že se zvýrazňovač vykresloval nad textem, takže se text ztrácel a špatně se četl. Zvýrazňovač aplikace Quill těmito neduhy netrpí. Využívá kompozice plátna k vykreslování zvýrazňovače způsobem, který je konzistentní s tradičním papírem, ba možná i lepší, jelikož řeší překrývání a udržuje konzistenci barev.
 
-Saber má vše, co potřebujete k tomu, abyste dokázali organizovat své poznámky. Tvořte složky uvnitř složek uvnitř složek, jak jen chcete bez omezení na počet zanořených složek. Ačkoliv může být poznámka pohřbena hluboko uvnitř vnořené složky, pořád k ní můžete jednoduše přistoupit, jelikož jsou nejnovější poznámky vždy k dispozici na domovské obrazovce.
+Quill má vše, co potřebujete k tomu, abyste dokázali organizovat své poznámky. Tvořte složky uvnitř složek uvnitř složek, jak jen chcete bez omezení na počet zanořených složek. Ačkoliv může být poznámka pohřbena hluboko uvnitř vnořené složky, pořád k ní můžete jednoduše přistoupit, jelikož jsou nejnovější poznámky vždy k dispozici na domovské obrazovce.
 
-Objevte zcela nový způsob zaznamenávání a organizace vašich myšlenek s aplikací Saber. Ať již jste student, profesionál nebo kreativní duše, Saber je vaším důvěryhodným společníkem pro digitální psaní. Stáhněte si jej nyní a nechte volně plynout své nápady!
+Objevte zcela nový způsob zaznamenávání a organizace vašich myšlenek s aplikací Quill. Ať již jste student, profesionál nebo kreativní duše, Quill je vaším důvěryhodným společníkem pro digitální psaní. Stáhněte si jej nyní a nechte volně plynout své nápady!
 
 [![Vydání na GitHubu (nejnovější)](https://img.shields.io/github/v/release/saber-notes/saber?label=vyd%C3%A1n%C3%AD)](https://github.com/saber-notes/saber/releases/latest)
 [![Flathub](https://img.shields.io/flathub/v/com.adilhanney.saber)](https://flathub.org/apps/details/com.adilhanney.saber)
@@ -73,34 +73,34 @@ Objevte zcela nový způsob zaznamenávání a organizace vašich myšlenek s ap
 ## Funkce
 
 Podívejte se na
-[#1 Plán vývoje aplikace Saber][progress]
+[#1 Plán vývoje aplikace Quill][progress]
 (anglicky).
 
 ## Instalace
 
 Podívejte se na wiki stránku
-[Instalace aplikace Saber](https://github.com/saber-notes/saber/wiki/install)
+[Instalace aplikace Quill](https://github.com/saber-notes/saber/wiki/install)
 (anglicky).
 
 ## Sestavení ze zdrojového kódu
 
 Podívejte se na wiki stránku
-[Sestavení aplikace Saber](https://github.com/saber-notes/saber/wiki/build)
+[Sestavení aplikace Quill](https://github.com/saber-notes/saber/wiki/build)
 (anglicky).
 
 ## Překlady
 
 Všechny překlady vznikají díky naší komunitě přispěvatelů.
 
-Pokud byste chtěli pomoci s překladem aplikace Saber, přejděte na [Weblate](https://hosted.weblate.org/engage/saber-notes/)!
+Pokud byste chtěli pomoci s překladem aplikace Quill, přejděte na [Weblate](https://hosted.weblate.org/engage/saber-notes/)!
 
 [![Stav překladů](https://hosted.weblate.org/widget/saber-notes/multi-auto.svg)](https://hosted.weblate.org/engage/saber-notes/)
 
 Poznámka: Abychom předešli nutnosti vyplňovat mezery v překladech angličtinou, jsou chybějící překlady podchyceny strojovým překladem, a to do doby, než se k překladu dostane lidský přispěvovatel.
 
-## Podpora aplikace Saber
+## Podpora aplikace Quill
 
-Pokud máte rádi Saber, zvažte prosím jeho podporu pomocí
+Pokud máte rádi Quill, zvažte prosím jeho podporu pomocí
 - Poděkování!
 - Hvězdičky pro projekt na GitHubu
 - Sponzorství prostřednictvím [GitHub Sponsors](https://github.com/sponsors/adil192)

@@ -14,19 +14,19 @@ iPad itself (release build). It does nothing unless asked.
    touch /tmp/.quill-bench
    xcrun devicectl device copy to --device <coredevice id> \
      --domain-type appDataContainer --domain-identifier com.samstuhl.saber \
-     --source /tmp/.quill-bench --destination Documents/Saber/.quill-bench
+     --source /tmp/.quill-bench --destination Documents/Quill/.quill-bench
    xcrun devicectl device process launch --device <coredevice id> com.samstuhl.saber
    ```
 
    Setting the environment variable `QUILL_BENCH` at launch works too.
    For a note closer to a real one (3 pages, 180 strokes instead of 12 pages,
-   1800), also copy the same marker to `Documents/Saber/.quill-bench-light`.
+   1800), also copy the same marker to `Documents/Quill/.quill-bench-light`.
 3. Read the result:
 
    ```bash
    xcrun devicectl device copy from --device <coredevice id> \
      --domain-type appDataContainer --domain-identifier com.samstuhl.saber \
-     --source Documents/Saber/quill-bench.json --destination quill-bench.json
+     --source Documents/Quill/quill-bench.json --destination quill-bench.json
    ```
 
 ## What it does

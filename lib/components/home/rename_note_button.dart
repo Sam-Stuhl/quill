@@ -2,11 +2,11 @@ import 'dart:io';
 
 import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/theming/adaptive_alert_dialog.dart';
-import 'package:saber/components/theming/adaptive_text_field.dart';
-import 'package:saber/data/file_manager/file_manager.dart';
-import 'package:saber/i18n/strings.g.dart';
-import 'package:saber/pages/editor/editor.dart';
+import 'package:quill/components/theming/adaptive_alert_dialog.dart';
+import 'package:quill/components/theming/adaptive_text_field.dart';
+import 'package:quill/data/file_manager/file_manager.dart';
+import 'package:quill/i18n/strings.g.dart';
+import 'package:quill/pages/editor/editor.dart';
 
 class RenameNoteButton extends StatelessWidget {
   const new({

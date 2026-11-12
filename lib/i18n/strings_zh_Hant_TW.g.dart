@@ -69,7 +69,7 @@ class Translations$home$zh_Hant_TW extends Translations$home$en {
 	@override late final Translations$home$titles$zh_Hant_TW titles = Translations$home$titles$zh_Hant_TW.internal(_root);
 	@override late final Translations$home$tooltips$zh_Hant_TW tooltips = Translations$home$tooltips$zh_Hant_TW.internal(_root);
 	@override late final Translations$home$create$zh_Hant_TW create = Translations$home$create$zh_Hant_TW.internal(_root);
-	@override String get welcome => '歡迎使用 Saber';
+	@override String get welcome => '歡迎使用 Quill';
 	@override String get invalidFormat => '不支援您選取的檔案，請選擇 .sbn、.sbn2、.sba 或 .pdf 檔案。';
 	@override String get noFiles => '未找到檔案';
 	@override String get noPreviewAvailable => '無可用的預覽';
@@ -118,7 +118,7 @@ class Translations$settings$zh_Hant_TW extends Translations$settings$en {
 	];
 	@override late final Translations$settings$reset$zh_Hant_TW reset = Translations$settings$reset$zh_Hant_TW.internal(_root);
 	@override String get resyncEverything => '全部重新同步';
-	@override String get openDataDir => '開啟 Saber 資料夾';
+	@override String get openDataDir => '開啟 Quill 資料夾';
 	@override late final Translations$settings$customDataDir$zh_Hant_TW customDataDir = Translations$settings$customDataDir$zh_Hant_TW.internal(_root);
 	@override String get autosaveDisabled => '永不';
 	@override String get shapeRecognitionDisabled => '永不';
@@ -408,7 +408,7 @@ class Translations$sentry$consent$zh_Hant_TW extends Translations$sentry$consent
 	final TranslationsZhHantTw _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => '協助改善 Saber？';
+	@override String get title => '協助改善 Quill？';
 	@override late final Translations$sentry$consent$description$zh_Hant_TW description = Translations$sentry$consent$description$zh_Hant_TW.internal(_root);
 	@override late final Translations$sentry$consent$answers$zh_Hant_TW answers = Translations$sentry$consent$answers$zh_Hant_TW.internal(_root);
 }
@@ -440,7 +440,7 @@ class Translations$settings$prefLabels$zh_Hant_TW extends Translations$settings$
 	@override String get layoutSize => '佈局大小';
 	@override String get customAccentColor => '自訂主題色';
 	@override String get hyperlegibleFont => 'Atkinson Hyperlegible 字型';
-	@override String get shouldCheckForUpdates => '自動檢查 Saber 更新';
+	@override String get shouldCheckForUpdates => '自動檢查 Quill 更新';
 	@override String get shouldAlwaysAlertForUpdates => '更快的更新';
 	@override String get allowInsecureConnections => '允許不安全連線';
 	@override String get editorToolbarAlignment => '編輯器工具列的對齊方式';
@@ -459,7 +459,7 @@ class Translations$settings$prefLabels$zh_Hant_TW extends Translations$settings$
 	@override String get autosave => '自動儲存';
 	@override String get shapeRecognitionDelay => '形狀辨識延遲';
 	@override String get autoStraightenLines => '自動拉直線條';
-	@override String get customDataDir => '自訂 Saber 資料夾';
+	@override String get customDataDir => '自訂 Quill 資料夾';
 	@override String get sentry => '錯誤回報';
 }
 
@@ -471,7 +471,7 @@ class Translations$settings$prefDescriptions$zh_Hant_TW extends Translations$set
 
 	// Translations
 	@override String get hyperlegibleFont => 'Atkinson Hyperlegible 字型為低視力讀者提高易讀性';
-	@override String get allowInsecureConnections => '（不推薦）允許 Saber 連線到有自行簽署/不受信任憑證的伺服器';
+	@override String get allowInsecureConnections => '（不推薦）允許 Quill 連線到有自行簽署/不受信任憑證的伺服器';
 	@override String get preferGreyscale => '用於電子紙螢幕';
 	@override String get autoClearWhiteboardOnExit => '在您結束應用程式後清除白板';
 	@override String get disableEraserAfterUse => '使用橡皮擦後自動切換回筆';
@@ -582,10 +582,10 @@ class Translations$login$ncLoginStep$zh_Hant_TW extends Translations$login$ncLog
 
 	// Translations
 	@override String get whereToStoreData => '選擇您要儲存資料的位置：';
-	@override String get saberNcServer => 'Saber 的 Nextcloud 伺服器';
+	@override String get quillNcServer => 'Quill 的 Nextcloud 伺服器';
 	@override String get otherNcServer => '其他 Nextcloud 伺服器';
 	@override String get serverUrl => '伺服器網址';
-	@override String get loginWithSaber => '使用 Saber 登入';
+	@override String get loginWithQuill => '使用 Quill 登入';
 	@override String get loginWithNextcloud => '使用 Nextcloud 登入';
 	@override late final Translations$login$ncLoginStep$loginFlow$zh_Hant_TW loginFlow = Translations$login$ncLoginStep$loginFlow$zh_Hant_TW.internal(_root);
 }
@@ -598,7 +598,7 @@ class Translations$login$encLoginStep$zh_Hant_TW extends Translations$login$encL
 
 	// Translations
 	@override String get enterEncPassword => '為了保護您的資料，請輸入您的加密密碼：';
-	@override String get newToSaber => '第一次使用 Saber？只需輸入新的加密密碼即可。';
+	@override String get newToQuill => '第一次使用 Quill？只需輸入新的加密密碼即可。';
 	@override String get encPassword => '加密密碼';
 	@override String get encFaqTitle => '常見問題';
 	@override String get wrongEncPassword => '使用提供的密碼解密失敗。請嘗試再次輸入。';
@@ -640,7 +640,7 @@ class Translations$profile$faq$1$zh_Hant_TW extends Translations$profile$faq$1$e
 
 	// Translations
 	@override String get q => '如何變更我的 Nextcloud 密碼？';
-	@override String get a => '進入您的伺服器網站並登入，然後進入「設定」→「安全」→「變更密碼」。更改密碼後，您必須登出並重新登入 Saber。';
+	@override String get a => '進入您的伺服器網站並登入，然後進入「設定」→「安全」→「變更密碼」。更改密碼後，您必須登出並重新登入 Quill。';
 }
 
 // Path: profile.faq.2
@@ -651,7 +651,7 @@ class Translations$profile$faq$2$zh_Hant_TW extends Translations$profile$faq$2$e
 
 	// Translations
 	@override String get q => '如何變更我的加密密碼？';
-	@override String get a => '0. 確定同步處理已完成（請參閱主畫面上的同步處理進度）。\n1. 登出 Saber，在登出前確保同步已經完成，這樣您就不會丟失任何資料（在主畫面上可以看到同步進度）。\n2. 進入您的伺服器網站並登入，刪除「Saber」資料夾，這將從伺服器上刪除您所有的筆記。\n3. 重新登入 Saber，您可以在登入時選擇一個新的加密密碼。\n4. 也不要忘記在您的其他裝置上登出並重新登入 Saber。';
+	@override String get a => '0. 確定同步處理已完成（請參閱主畫面上的同步處理進度）。\n1. 登出 Quill，在登出前確保同步已經完成，這樣您就不會丟失任何資料（在主畫面上可以看到同步進度）。\n2. 進入您的伺服器網站並登入，刪除「Quill」資料夾，這將從伺服器上刪除您所有的筆記。\n3. 重新登入 Quill，您可以在登入時選擇一個新的加密密碼。\n4. 也不要忘記在您的其他裝置上登出並重新登入 Quill。';
 }
 
 // Path: profile.faq.3
@@ -826,7 +826,7 @@ class Translations$editor$versionTooNew$zh_Hant_TW extends Translations$editor$v
 	final TranslationsZhHantTw _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => '這篇筆記是使用較新版本的 Saber 編輯的';
+	@override String get title => '這篇筆記是使用較新版本的 Quill 編輯的';
 	@override String get subtitle => '編輯此筆記可能會導致某些資訊遺失。您要忽略並編輯它嗎？';
 	@override String get allowEditing => '允許編輯';
 }
@@ -918,7 +918,7 @@ class Translations$login$ncLoginStep$loginFlow$zh_Hant_TW extends Translations$l
 	final TranslationsZhHantTw _root; // ignore: unused_field
 
 	// Translations
-	@override String get pleaseAuthorize => '請授權 Saber 存取您的 Nextcloud 帳號';
+	@override String get pleaseAuthorize => '請授權 Quill 存取您的 Nextcloud 帳號';
 	@override String get followPrompts => '請依照 Nextcloud 介面的提示進行操作';
 	@override String get browserDidntOpen => '登入頁面打不開？點擊這裡';
 }
@@ -942,7 +942,7 @@ class Translations$login$encLoginStep$encFaq$1$zh_Hant_TW extends Translations$l
 
 	// Translations
 	@override String get q => '我還沒設定加密密碼。該去哪裡取得呢？';
-	@override String get a => '選擇一個新的加密密碼並在上方輸入。\nSaber 將自動根據該密碼產生您的加密金鑰。';
+	@override String get a => '選擇一個新的加密密碼並在上方輸入。\nQuill 將自動根據該密碼產生您的加密金鑰。';
 }
 
 // Path: login.encLoginStep.encFaq.2

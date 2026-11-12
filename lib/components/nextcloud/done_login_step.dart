@@ -3,12 +3,12 @@ import 'dart:math';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:logging/logging.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/misc/faq.dart';
-import 'package:saber/data/extensions/string_extensions.dart';
-import 'package:saber/data/nextcloud/nextcloud_client_extension.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/data/quota.dart';
-import 'package:saber/i18n/strings.g.dart';
+import 'package:quill/components/misc/faq.dart';
+import 'package:quill/data/extensions/string_extensions.dart';
+import 'package:quill/data/nextcloud/nextcloud_client_extension.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/data/quota.dart';
+import 'package:quill/i18n/strings.g.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DoneLoginStep extends StatelessWidget {
@@ -39,7 +39,7 @@ class DoneLoginStep extends StatelessWidget {
     final screenHeight = MediaQuery.sizeOf(context).height;
     final quota = stows.lastStorageQuota.value;
     final serverName =
-        stows.url.value.ifNotEmpty ?? t.login.ncLoginStep.saberNcServer;
+        stows.url.value.ifNotEmpty ?? t.login.ncLoginStep.quillNcServer;
     late final serverUri = stows.url.value.isEmpty
         ? NextcloudClientExtension.defaultNextcloudUri
         : Uri.parse(stows.url.value);

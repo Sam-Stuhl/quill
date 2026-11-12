@@ -9,11 +9,11 @@ import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:saber/data/file_manager/file_manager.dart';
-import 'package:saber/data/pen_activity.dart';
-import 'package:saber/data/quill_sync/quill_connect.dart';
-import 'package:saber/data/quill_sync/quill_import.dart';
-import 'package:saber/pages/editor/editor.dart';
+import 'package:quill/data/file_manager/file_manager.dart';
+import 'package:quill/data/pen_activity.dart';
+import 'package:quill/data/quill_sync/quill_connect.dart';
+import 'package:quill/data/quill_sync/quill_import.dart';
+import 'package:quill/pages/editor/editor.dart';
 
 /// Quill sync: keeps a folder on the mini current with every note, and imports
 /// whatever lands in its inbox. See docs/quill-sync.md.

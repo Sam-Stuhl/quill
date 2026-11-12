@@ -50,7 +50,7 @@ app.*.map.json
 # Flatpak/linux build files
 .flatpak-builder
 build-dir
-Saber-Linux-Portable.tar.gz
+Quill-Linux-Portable.tar.gz
 AppDir/
 *.AppImage*
 

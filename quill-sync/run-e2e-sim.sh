@@ -30,7 +30,7 @@ ssh -o BatchMode=yes mac-mini-sam "
     && [ \$(grep '\"ev\": \"pdf\"' ~/quill/.quill/events.jsonl | grep '/_e2e/sim' | tail -1 | python3 -c 'import json,sys; print(json.load(sys.stdin)[\"t\"])') -gt $start_ms ]; do sleep 0.5; done
   sleep 20
   for f in /tmp/e2e-inbound.pdf /tmp/e2e-inbound.png; do
-    /usr/local/bin/python3 ~/repos/saber/quill-sync/server.py put \$f --to _e2e --wait --timeout 60
+    /usr/local/bin/python3 ~/repos/quill/quill-sync/server.py put \$f --to _e2e --wait --timeout 60
     rm -f \$f
   done" &
 dropper=$!
@@ -38,4 +38,4 @@ dropper=$!
 flutter test integration_test/quill_sync_e2e_test.dart -d "$sim" --no-dds \
   --dart-define-from-file="$defines_file" 2>&1 | tee /tmp/qs-e2e-flutter.log | grep -E 'QUILL_E2E|All tests|Some tests|\[E\]|Expected|Error' || true
 wait "$dropper" 2>/dev/null || true
-ssh -o BatchMode=yes mac-mini-sam '/usr/local/bin/python3 ~/repos/saber/quill-sync/measure.py --since 15'
+ssh -o BatchMode=yes mac-mini-sam '/usr/local/bin/python3 ~/repos/quill/quill-sync/measure.py --since 15'

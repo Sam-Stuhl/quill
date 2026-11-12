@@ -1,15 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/theming/dynamic_material_app.dart';
-import 'package:saber/components/theming/saber_theme.dart';
-import 'package:saber/data/file_manager/file_manager.dart';
-import 'package:saber/data/flavor_config.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/data/routes.dart';
-import 'package:saber/i18n/strings.g.dart';
-import 'package:saber/pages/home/browse.dart';
-import 'package:saber/pages/home/home.dart';
+import 'package:quill/components/theming/dynamic_material_app.dart';
+import 'package:quill/components/theming/quill_theme.dart';
+import 'package:quill/data/file_manager/file_manager.dart';
+import 'package:quill/data/flavor_config.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/data/routes.dart';
+import 'package:quill/i18n/strings.g.dart';
+import 'package:quill/pages/home/browse.dart';
+import 'package:quill/pages/home/home.dart';
 
 import 'utils/test_mock_channel_handlers.dart';
 
@@ -63,7 +63,7 @@ class _BrowseApp extends StatelessWidget {
   final String? path;
   @override
   Widget build(BuildContext context) {
-    final theme = SaberTheme.createThemeFromSeed(
+    final theme = QuillTheme.createThemeFromSeed(
       Colors.yellow,
       .light,
       .android,
@@ -82,7 +82,7 @@ class _BrowseApp extends StatelessWidget {
     );
     return TranslationProvider(
       child: ExplicitlyThemedApp(
-        title: 'Saber',
+        title: 'Quill',
         router: router,
         themeMode: ThemeMode.light,
         theme: theme,

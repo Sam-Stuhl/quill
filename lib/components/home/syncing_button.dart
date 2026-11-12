@@ -1,9 +1,9 @@
 import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/theming/adaptive_icon.dart';
-import 'package:saber/data/nextcloud/saber_syncer.dart';
-import 'package:saber/data/prefs.dart';
+import 'package:quill/components/theming/adaptive_icon.dart';
+import 'package:quill/data/nextcloud/quill_syncer.dart';
+import 'package:quill/data/prefs.dart';
 
 class const SyncingButton({super.key}) extends HookWidget {
   /// The number of files transferred this session.

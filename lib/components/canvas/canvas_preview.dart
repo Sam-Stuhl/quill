@@ -1,9 +1,9 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/canvas/inner_canvas.dart';
-import 'package:saber/data/editor/editor_core_info.dart';
-import 'package:saber/data/editor/page.dart';
-import 'package:saber/data/extensions/list_extensions.dart';
-import 'package:saber/data/prefs.dart';
+import 'package:quill/components/canvas/inner_canvas.dart';
+import 'package:quill/data/editor/editor_core_info.dart';
+import 'package:quill/data/editor/page.dart';
+import 'package:quill/data/extensions/list_extensions.dart';
+import 'package:quill/data/prefs.dart';
 
 class CanvasPreview extends StatelessWidget implements PreferredSizeWidget {
   new({

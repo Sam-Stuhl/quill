@@ -1,4 +1,4 @@
-# <img src="https://github.com/saber-notes/saber/raw/main/assets/icon/icon.png" width="30" height="30" alt="Logo"> Saber
+# <img src="https://github.com/saber-notes/saber/raw/main/assets/icon/icon.png" width="30" height="30" alt="Logo"> Quill
 
 [<img src='https://github.com/saber-notes/saber/blob/main/assets_raw/badges/google-play-badge.svg'
     alt='Dapatkan di Google Play'
@@ -33,23 +33,23 @@
 [Tiếng Việt](https://github.com/saber-notes/saber/blob/main/README-vi.md) |
 [Bahasa Indonesia](https://github.com/saber-notes/saber/blob/main/README-id.md)
 
-Saber merupakan aplikasi catatan yang dirancang khusus untuk tulisan tangan.
+Quill merupakan aplikasi catatan yang dirancang khusus untuk tulisan tangan.
 
-Aplikasi ini dibuat sesederhana dan seintuitif mungkin, namun tetap menghadirkan fitur-fitur unik yang akan kamu pakai. Saber juga dapat digunakan di semua perangkatmu, dari yang besar sampai kecil, dan sinkronisasinya berjalan mulus di antara semuanya.
+Aplikasi ini dibuat sesederhana dan seintuitif mungkin, namun tetap menghadirkan fitur-fitur unik yang akan kamu pakai. Quill juga dapat digunakan di semua perangkatmu, dari yang besar sampai kecil, dan sinkronisasinya berjalan mulus di antara semuanya.
 
-Salah satu keunggulannya yaitu Saber dapat membalik warna catatanmu saat mode gelap aktif. Jadi kamu dapat menulis dengan tinta putih di atas latar hitam, yang jauh lebih nyaman di mata saat berada di tempat minim cahaya, misalnya ketika lampu kelas dimatikan guru.
+Salah satu keunggulannya yaitu Quill dapat membalik warna catatanmu saat mode gelap aktif. Jadi kamu dapat menulis dengan tinta putih di atas latar hitam, yang jauh lebih nyaman di mata saat berada di tempat minim cahaya, misalnya ketika lampu kelas dimatikan guru.
 Gambar dan PDF pun ikut dibalik warnanya, sehingga kamu tetap dapat memakai cetakan digital atau buku teks tanpa ribet.
 
-Saber menerapkan sistem dua kata sandi untuk melindungi catatanmu dari siapa pun, bahkan dari pihak yang memiliki kendali penuh atas server sekalipun. Kamu dapat menyimpan catatan dengan aman di server resmi Saber, server lain, atau bahkan meng-host servermu sendiri!
+Quill menerapkan sistem dua kata sandi untuk melindungi catatanmu dari siapa pun, bahkan dari pihak yang memiliki kendali penuh atas server sekalipun. Kamu dapat menyimpan catatan dengan aman di server resmi Quill, server lain, atau bahkan meng-host servermu sendiri!
 
 Aplikasi ini sepenuhnya open-source, sehingga siapa saja dapat melihat kode sumbernya dan mengetahui persis apa yang dilakukan aplikasi ini serta bagaimana data kamu diperlakukan. Banyak aplikasi pencatat lain yang closed-source dan proprietary, artinya cara kerjanya di balik layar tetap menjadi misteri bagi publik.
 
 Sebagai seorang yang belajar matematika, menyorot (highlight) persamaan yang panjangnya berbaris-baris selalu menjadi masalah tersendiri di aplikasi lain, karena warna stabilo sering berubah begitu tumpang tindih dengan dirinya sendiri. Masalah lain yang saya alami sepertinya, di beberapa aplikasi stabilonya malah tampil di atas teks, membuat tulisan menjadi pudar dan sulit untuk dibaca.
-Stabilo di Saber tidak memiliki masalah seperti itu. Fitur ini memanfaatkan canvas compositing untuk menampilkan hasil stabilo secara konsisten, bahkan lebih baik dibanding kertas biasa, karena dapat menangani tumpang tindih warna dengan rapi dan tetap konsisten.
+Stabilo di Quill tidak memiliki masalah seperti itu. Fitur ini memanfaatkan canvas compositing untuk menampilkan hasil stabilo secara konsisten, bahkan lebih baik dibanding kertas biasa, karena dapat menangani tumpang tindih warna dengan rapi dan tetap konsisten.
 
-Saber memiliki semua yang kamu butuhkan untuk menjaga catatanmu agar tetap rapi. Kamu dapat membuat folder di dalam folder dan di dalam folder lagi sesuka hati, tanpa batasan jumlah folder bersarang. Dan meskipun sebuah catatan terkubur jauh di dalam folder yang berlapis-lapis, kamu tetap dapat mengaksesnya dengan mudah karena catatan terbarumu selalu tersedia di layar utama.
+Quill memiliki semua yang kamu butuhkan untuk menjaga catatanmu agar tetap rapi. Kamu dapat membuat folder di dalam folder dan di dalam folder lagi sesuka hati, tanpa batasan jumlah folder bersarang. Dan meskipun sebuah catatan terkubur jauh di dalam folder yang berlapis-lapis, kamu tetap dapat mengaksesnya dengan mudah karena catatan terbarumu selalu tersedia di layar utama.
 
-Temukan cara baru untuk menangkap dan mengatur pikiranmu bersama Saber. Baik kamu seorang pelajar, profesional, maupun berjiwa kreatif, Saber merupakan teman andalan untuk tulisan tangan digital. Unduh sekarang dan biarkan ide-idemu mengalir!
+Temukan cara baru untuk menangkap dan mengatur pikiranmu bersama Quill. Baik kamu seorang pelajar, profesional, maupun berjiwa kreatif, Quill merupakan teman andalan untuk tulisan tangan digital. Unduh sekarang dan biarkan ide-idemu mengalir!
 
 [![Latest release](https://img.shields.io/github/v/release/saber-notes/saber)](https://github.com/saber-notes/saber/releases/latest)
 [![Flathub](https://img.shields.io/flathub/v/com.adilhanney.saber)](https://flathub.org/apps/details/com.adilhanney.saber)
@@ -74,18 +74,18 @@ Temukan cara baru untuk menangkap dan mengatur pikiranmu bersama Saber. Baik kam
 
 ## Fitur
 
-Silakan lihat di [#1 Perkembangan Saber][progress].
+Silakan lihat di [#1 Perkembangan Quill][progress].
 
 ## Instalasi
 
 Silakan lihat di halaman
-[Instal Saber](https://github.com/saber-notes/saber/wiki/install)
+[Instal Quill](https://github.com/saber-notes/saber/wiki/install)
 di wiki.
 
 ## Build dari kode sumber
 
 Silakan lihat di halaman
-[Build Saber](https://github.com/saber-notes/saber/wiki/build)
+[Build Quill](https://github.com/saber-notes/saber/wiki/build)
 di wiki.
 
 ## Tautan
@@ -99,16 +99,16 @@ di wiki.
 
 Semua terjemahan ini berkat komunitas kontributor kami.
 
-Kalau kamu ingin membantu menerjemahkan Saber, langsung saja ke [Weblate](https://hosted.weblate.org/engage/saber-notes/)!
+Kalau kamu ingin membantu menerjemahkan Quill, langsung saja ke [Weblate](https://hosted.weblate.org/engage/saber-notes/)!
 
 [![Translation status](https://hosted.weblate.org/widget/saber-notes/multi-auto.svg)](https://hosted.weblate.org/engage/saber-notes/)
 
 Catatan: Agar tidak jatuh kembali ke bahasa Inggris, bagian terjemahan yang belum lengkap
 akan diisi sementara dengan terjemahan mesin sampai ada kontributor manusia yang melengkapinya.
 
-## Mendukung Saber
+## Mendukung Quill
 
-Jika kamu menyukai Saber, kamu dapat mendukungnya dengan berbagai cara berikut ini:
+Jika kamu menyukai Quill, kamu dapat mendukungnya dengan berbagai cara berikut ini:
 - Membagikan ke orang lain!
 - Memberi bintang pada proyek ini di GitHub
 - Menjadi sponsor saya di [GitHub Sponsors](https://github.com/sponsors/adil192)

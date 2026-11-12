@@ -2,18 +2,18 @@ import 'dart:async';
 
 import 'package:animations/animations.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/canvas/_stroke.dart';
-import 'package:saber/components/canvas/inner_canvas.dart';
-import 'package:saber/components/canvas/invert_widget.dart';
-import 'package:saber/components/home/sync_indicator.dart';
-import 'package:saber/data/constants.dart';
-import 'package:saber/data/extensions/color_extensions.dart';
-import 'package:saber/data/file_manager/file_manager.dart';
-import 'package:saber/data/is_this_a_test.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/data/routes.dart';
-import 'package:saber/i18n/strings.g.dart';
-import 'package:saber/pages/editor/editor.dart';
+import 'package:quill/components/canvas/_stroke.dart';
+import 'package:quill/components/canvas/inner_canvas.dart';
+import 'package:quill/components/canvas/invert_widget.dart';
+import 'package:quill/components/home/sync_indicator.dart';
+import 'package:quill/data/constants.dart';
+import 'package:quill/data/extensions/color_extensions.dart';
+import 'package:quill/data/file_manager/file_manager.dart';
+import 'package:quill/data/is_this_a_test.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/data/routes.dart';
+import 'package:quill/i18n/strings.g.dart';
+import 'package:quill/pages/editor/editor.dart';
 
 class PreviewCard extends StatefulWidget {
   new({
@@ -101,8 +101,8 @@ class _PreviewCardState extends State<PreviewCard> {
     final invert = theme.brightness == .dark && stows.editorAutoInvert.value;
 
     final borderWidth = MediaQuery.highContrastOf(context)
-        ? kSaberBorderWidthAccessible
-        : kSaberBorderWidthInaccessible;
+        ? kQuillBorderWidthAccessible
+        : kQuillBorderWidthInaccessible;
 
     final Widget card = MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -118,7 +118,7 @@ class _PreviewCardState extends State<PreviewCard> {
               child: Stack(
                 children: [
                   Positioned.fill(
-                    top: kSaberCardRadius,
+                    top: kQuillCardRadius,
                     left: borderWidth,
                     right: borderWidth,
                     child: ColoredBox(
@@ -146,10 +146,10 @@ class _PreviewCardState extends State<PreviewCard> {
                           child: ClipRRect(
                             borderRadius: .only(
                               topLeft: .circular(
-                                kSaberCardRadius - borderWidth,
+                                kQuillCardRadius - borderWidth,
                               ),
                               topRight: .circular(
-                                kSaberCardRadius - borderWidth,
+                                kQuillCardRadius - borderWidth,
                               ),
                             ),
                             child: InvertWidget(
@@ -233,7 +233,7 @@ class _PreviewCardState extends State<PreviewCard> {
                   : colorScheme.onSurface.withValues(alpha: 0.12),
               width: borderWidth,
             ),
-            borderRadius: const .all(.circular(kSaberCardRadius)),
+            borderRadius: const .all(.circular(kQuillCardRadius)),
           ),
           closedElevation: 0,
           closedBuilder: (context, action) => card,

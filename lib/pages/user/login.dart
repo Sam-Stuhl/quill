@@ -1,12 +1,12 @@
 import 'package:logging/logging.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/nextcloud/done_login_step.dart';
-import 'package:saber/components/nextcloud/enc_login_step.dart';
-import 'package:saber/components/nextcloud/nc_login_step.dart';
-import 'package:saber/components/theming/adaptive_circular_progress_indicator.dart';
-import 'package:saber/components/theming/adaptive_linear_progress_indicator.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/i18n/strings.g.dart';
+import 'package:quill/components/nextcloud/done_login_step.dart';
+import 'package:quill/components/nextcloud/enc_login_step.dart';
+import 'package:quill/components/nextcloud/nc_login_step.dart';
+import 'package:quill/components/theming/adaptive_circular_progress_indicator.dart';
+import 'package:quill/components/theming/adaptive_linear_progress_indicator.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/i18n/strings.g.dart';
 
 class NcLoginPage extends StatefulWidget {
   const new({

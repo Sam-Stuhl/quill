@@ -1,8 +1,8 @@
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/data/tools/pen.dart';
-import 'package:saber/i18n/strings.g.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/data/tools/pen.dart';
+import 'package:quill/i18n/strings.g.dart';
 
 class Pencil extends Pen {
   new()

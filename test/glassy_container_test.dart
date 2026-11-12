@@ -2,10 +2,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:golden_screenshot/golden_screenshot.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/navbar/bottom_navbar.dart';
-import 'package:saber/components/theming/saber_theme.dart';
-import 'package:saber/components/theming/uni_icon.dart';
-import 'package:saber/data/flavor_config.dart';
+import 'package:quill/components/navbar/bottom_navbar.dart';
+import 'package:quill/components/theming/quill_theme.dart';
+import 'package:quill/components/theming/uni_icon.dart';
+import 'package:quill/data/flavor_config.dart';
 
 void main() {
   testGoldens('GlassyContainer', (tester) async {
@@ -61,7 +61,7 @@ class _TestTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = SaberTheme.createThemeFromSeed(
+    final theme = QuillTheme.createThemeFromSeed(
       Colors.yellow,
       brightness,
       platform,

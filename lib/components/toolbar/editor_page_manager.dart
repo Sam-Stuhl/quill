@@ -1,11 +1,11 @@
 import 'package:cupertino_ui/cupertino_ui.dart' show CupertinoIcons;
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/canvas/canvas_gesture_detector.dart';
-import 'package:saber/components/canvas/canvas_preview.dart';
-import 'package:saber/components/theming/adaptive_icon.dart';
-import 'package:saber/components/theming/saber_theme.dart';
-import 'package:saber/data/editor/editor_core_info.dart';
-import 'package:saber/i18n/strings.g.dart';
+import 'package:quill/components/canvas/canvas_gesture_detector.dart';
+import 'package:quill/components/canvas/canvas_preview.dart';
+import 'package:quill/components/theming/adaptive_icon.dart';
+import 'package:quill/components/theming/quill_theme.dart';
+import 'package:quill/data/editor/editor_core_info.dart';
+import 'package:quill/i18n/strings.g.dart';
 
 class EditorPageManager extends StatefulWidget {
   const new({

@@ -1,4 +1,4 @@
-# <img src="https://github.com/saber-notes/saber/raw/main/assets/icon/icon.png" width="30" height="30" alt="Logo"> Saber
+# <img src="https://github.com/saber-notes/saber/raw/main/assets/icon/icon.png" width="30" height="30" alt="Logo"> Quill
 
 [<img src='https://github.com/saber-notes/saber/blob/main/assets_raw/badges/google-play-badge.svg'
     alt='在 Google Play 上取得'
@@ -33,21 +33,21 @@
 [Tiếng Việt](https://github.com/saber-notes/saber/blob/main/README-vi.md) |
 [Bahasa Indonesia](https://github.com/saber-notes/saber/blob/main/README-id.md)
 
-Saber是一個專為手寫而生的筆記應用程式。
+Quill是一個專為手寫而生的筆記應用程式。
 
-它被設計得盡可能簡單和直觀，同時仍提供您實際會使用的獨特功能。此外，Saber可以在您所有的設備上使用，無論大小，並在它們之間無縫同步。
+它被設計得盡可能簡單和直觀，同時仍提供您實際會使用的獨特功能。此外，Quill可以在您所有的設備上使用，無論大小，並在它們之間無縫同步。
 
 值得注意的是，當您處於深色模式時，它可以反轉您的筆記。這使您可以在黑色背景上用白色墨水書寫，這在低光源環境下，例如老師在課堂上關燈時，對眼睛更加友好。圖片和PDF文件也會反轉，因此您仍然可以使用數位教科書而無需煩惱。
 
-Saber使用雙密碼系統來保護您的筆記，使其只能被您存取，即使有人對伺服器擁有完全控制權也是如此。您可以安全地將筆記存儲在官方的Saber伺服器上，或者是其他伺服器，甚至是自己搭建！
+Quill使用雙密碼系統來保護您的筆記，使其只能被您存取，即使有人對伺服器擁有完全控制權也是如此。您可以安全地將筆記存儲在官方的Quill伺服器上，或者是其他伺服器，甚至是自己搭建！
 
 本應用程式是完全開源的，任何人都可以查看原始碼，了解它的具體運作方式以及如何處理您的資料。許多其他筆記應用程式是閉源和專有的，這意味著它們的內部運作對公眾來說是一個謎。
 
-作為一名數學生，我在其他應用中經常遇到的問題之一是，使用其他應用時，突出顯示多行方程總是很麻煩，因為突出顯示在重疊時會改變顏色。我遇到的另一個問題是，在某些應用程式中，突出顯示會在文字上方渲染，將其淡化，使其難以閱讀。Saber的突出顯示沒有這些問題。它使用的畫布合成技術以一種優於傳統紙張相一致的方式呈現突出顯示，在處理重疊時保持顏色一致。
+作為一名數學生，我在其他應用中經常遇到的問題之一是，使用其他應用時，突出顯示多行方程總是很麻煩，因為突出顯示在重疊時會改變顏色。我遇到的另一個問題是，在某些應用程式中，突出顯示會在文字上方渲染，將其淡化，使其難以閱讀。Quill的突出顯示沒有這些問題。它使用的畫布合成技術以一種優於傳統紙張相一致的方式呈現突出顯示，在處理重疊時保持顏色一致。
 
-Saber具有使筆記井井有條所需的一切功能。在無限嵌套的資料夾中創建資料夾，盡情發揮您的創意，而且對於嵌套資料夾的數量沒有限制。即使筆記可能深藏在嵌套的資料夾中，您仍然可以輕鬆存取，因為最近的筆記始終顯示在主螢幕上。
+Quill具有使筆記井井有條所需的一切功能。在無限嵌套的資料夾中創建資料夾，盡情發揮您的創意，而且對於嵌套資料夾的數量沒有限制。即使筆記可能深藏在嵌套的資料夾中，您仍然可以輕鬆存取，因為最近的筆記始終顯示在主螢幕上。
 
-透過Saber，發現一種全新的捕捉和組織思緒的方式。無論您是學生、專業人士還是具有創造力的思維者，Saber都是您在數位手寫中信賴的伙伴。立即下載，讓您的思想自由流暢！
+透過Quill，發現一種全新的捕捉和組織思緒的方式。無論您是學生、專業人士還是具有創造力的思維者，Quill都是您在數位手寫中信賴的伙伴。立即下載，讓您的思想自由流暢！
 
 [![Latest release](https://img.shields.io/github/v/release/saber-notes/saber)](https://github.com/saber-notes/saber/releases/latest)
 [![Flathub](https://img.shields.io/flathub/v/com.adilhanney.saber)](https://flathub.org/apps/details/com.adilhanney.saber)
@@ -73,18 +73,18 @@ Saber具有使筆記井井有條所需的一切功能。在無限嵌套的資料
 ## 特色
 
 請參閱
-[#1 Saber progress][progress]。
+[#1 Quill progress][progress]。
 
 ## 安裝
 
 請參閱
-[Install Saber](https://github.com/saber-notes/saber/wiki/install)
+[Install Quill](https://github.com/saber-notes/saber/wiki/install)
 在維基上。
 
 ## 從原始碼構建
 
 請參閱
-[Build Saber](https://github.com/saber-notes/saber/wiki/build)
+[Build Quill](https://github.com/saber-notes/saber/wiki/build)
 在維基上。
 
 ## 連結
@@ -98,13 +98,13 @@ Saber具有使筆記井井有條所需的一切功能。在無限嵌套的資料
 
 所有翻譯均由我們的社區貢獻者完成。
 
-如果您想參與 Saber 的翻譯，請造訪 [Weblate](https://hosted.weblate.org/engage/saber-notes/)！
+如果您想參與 Quill 的翻譯，請造訪 [Weblate](https://hosted.weblate.org/engage/saber-notes/)！
 
 [![翻譯狀態](https://hosted.weblate.org/widget/saber-notes/multi-auto.svg)](https://hosted.weblate.org/engage/saber-notes/)
 
-## 支持Saber
+## 支持Quill
 
-如果您喜歡 Saber，請考慮通過以下方式支持它：
+如果您喜歡 Quill，請考慮通過以下方式支持它：
 
 - 傳播這個詞！
 - 在 GitHub 上為該倉庫加星標

@@ -3,9 +3,9 @@ import 'dart:io';
 
 import 'package:flutter/painting.dart';
 import 'package:logging/logging.dart';
-import 'package:saber/components/canvas/image/editor_image.dart';
-import 'package:saber/components/canvas/image/pdf_document_cache.dart';
-import 'package:saber/data/list_eq.dart';
+import 'package:quill/components/canvas/image/editor_image.dart';
+import 'package:quill/components/canvas/image/pdf_document_cache.dart';
+import 'package:quill/data/list_eq.dart';
 
 /// A cache for assets that are loaded from disk.
 ///

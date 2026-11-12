@@ -1,5 +1,5 @@
 {
-  "project_name": "Saber",
+  "project_name": "Quill",
   "wrap_guides": [80],
   "file_scan_exclusions": [
     // Defaults from Zed
@@ -12,7 +12,7 @@
     "**/Thumbs.db",
     "**/.classpath",
     "**/.settings",
-    // For Saber
+    // For Quill
     ".sentry-native",
     "android/.gradle/",
     "android/.kotlin/",

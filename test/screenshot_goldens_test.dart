@@ -4,19 +4,19 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:golden_screenshot/golden_screenshot.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/canvas/pencil_shader.dart';
-import 'package:saber/components/home/syncing_button.dart';
-import 'package:saber/components/settings/nextcloud_profile.dart';
-import 'package:saber/components/theming/saber_theme.dart';
-import 'package:saber/data/file_manager/file_manager.dart';
-import 'package:saber/data/flavor_config.dart';
-import 'package:saber/data/locales.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/data/sentry/sentry_init.dart';
-import 'package:saber/i18n/strings.g.dart';
-import 'package:saber/pages/editor/editor.dart';
-import 'package:saber/pages/home/home.dart';
-import 'package:saber/pages/user/login.dart';
+import 'package:quill/components/canvas/pencil_shader.dart';
+import 'package:quill/components/home/syncing_button.dart';
+import 'package:quill/components/settings/nextcloud_profile.dart';
+import 'package:quill/components/theming/quill_theme.dart';
+import 'package:quill/data/file_manager/file_manager.dart';
+import 'package:quill/data/flavor_config.dart';
+import 'package:quill/data/locales.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/data/sentry/sentry_init.dart';
+import 'package:quill/i18n/strings.g.dart';
+import 'package:quill/pages/editor/editor.dart';
+import 'package:quill/pages/home/home.dart';
+import 'package:quill/pages/user/login.dart';
 import 'package:yaru/yaru.dart';
 
 import 'utils/test_mock_channel_handlers.dart';
@@ -78,17 +78,17 @@ void main() {
     });
 
     const seedColor = YaruColors.blue;
-    final materialTheme = SaberTheme.createThemeFromSeed(
+    final materialTheme = QuillTheme.createThemeFromSeed(
       seedColor,
       .light,
       .android,
     );
-    final cupertinoTheme = SaberTheme.createThemeFromSeed(
+    final cupertinoTheme = QuillTheme.createThemeFromSeed(
       seedColor,
       .light,
       .iOS,
     );
-    final yaruTheme = SaberTheme.createThemeFromSeed(seedColor, .light, .linux);
+    final yaruTheme = QuillTheme.createThemeFromSeed(seedColor, .light, .linux);
 
     _screenshot(
       materialTheme: materialTheme,
@@ -184,7 +184,7 @@ void _screenshot({
           theme: theme,
           device: device,
           frameColors: frameColors,
-          title: 'Saber',
+          title: 'Quill',
           home: TranslationProvider(child: child),
         );
         await tester.pumpWidget(widget);
