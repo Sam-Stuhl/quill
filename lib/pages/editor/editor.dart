@@ -195,8 +195,13 @@ class EditorState extends State<Editor> {
   /// If we add customized button bindings, we may have to separate this again.
   var stylusButtonWasPressed = false;
 
+  /// The open editor, for the benchmark (lib/data/perf_bench.dart).
+  static EditorState? benchInstance;
+  TransformationController get benchTransform => _transformationController;
+
   @override
   void initState() {
+    benchInstance = this;
     DynamicMaterialApp.addFullscreenListener(_setState);
 
     _initAsync();

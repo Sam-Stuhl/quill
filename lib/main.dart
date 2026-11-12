@@ -20,6 +20,7 @@ import 'package:saber/data/file_manager/file_manager.dart';
 import 'package:saber/data/flavor_config.dart';
 import 'package:saber/data/nextcloud/nc_http_overrides.dart';
 import 'package:saber/data/nextcloud/saber_syncer.dart';
+import 'package:saber/data/perf_bench.dart';
 import 'package:saber/data/prefs.dart';
 import 'package:saber/data/quill_defaults.dart';
 import 'package:saber/data/quill_sync/quill_sync.dart';
@@ -48,6 +49,7 @@ Future<void> main(List<String> args) async {
 }
 
 Future<void> appRunner(List<String> args) async {
+  PerfBench.markMain();
   WidgetsFlutterBinding.ensureInitialized();
 
   final parser = ArgParser()..addFlag('verbose', abbr: 'v', negatable: false);
@@ -129,6 +131,7 @@ Future<void> appRunner(List<String> args) async {
   setupBackgroundSync();
   unawaited(QuillSync.startIfConfigured());
   unawaited(QuillDefaults.applyOnce());
+  if (PerfBench.enabled) unawaited(PerfBench.run());
 }
 
 void startSyncAfterLoaded() async {
@@ -243,6 +246,7 @@ class const App({super.key}) extends StatefulWidget {
   static String initialLocation = pathToFunction(RoutePaths.home)({
     'subpage': HomePage.recentSubpage,
   });
+  static GoRouter get router => _router;
   static final _router = GoRouter(
     initialLocation: initialLocation,
     routes: <GoRoute>[
