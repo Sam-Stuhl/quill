@@ -1,8 +1,8 @@
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/canvas/_stroke.dart';
-import 'package:saber/components/canvas/image/editor_image.dart';
-import 'package:saber/data/editor/page.dart';
+import 'package:quill/components/canvas/_stroke.dart';
+import 'package:quill/components/canvas/image/editor_image.dart';
+import 'package:quill/data/editor/page.dart';
 import 'package:sbn/canvas_background_pattern.dart';
 import 'package:sbn/change.dart';
 

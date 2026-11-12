@@ -8,21 +8,21 @@ import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:nextcloud/nextcloud.dart';
 import 'package:nextcloud/webdav.dart';
-import 'package:saber/data/file_manager/file_manager.dart';
-import 'package:saber/data/nextcloud/errors.dart';
-import 'package:saber/data/nextcloud/nextcloud_client_extension.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/pages/editor/editor.dart';
+import 'package:quill/data/file_manager/file_manager.dart';
+import 'package:quill/data/nextcloud/errors.dart';
+import 'package:quill/data/nextcloud/nextcloud_client_extension.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/pages/editor/editor.dart';
 import 'package:worker_manager/worker_manager.dart';
 
-final syncer = Syncer<SaberSyncInterface, SaberSyncFile, File, WebDavFile>(
-  const SaberSyncInterface(),
+final syncer = Syncer<QuillSyncInterface, QuillSyncFile, File, WebDavFile>(
+  const QuillSyncInterface(),
   failureTimeout: const Duration(seconds: 4),
 );
 
-class const SaberSyncInterface()
-    extends AbstractSyncInterface<SaberSyncFile, File, WebDavFile> {
-  static final log = Logger('SaberSyncInterface');
+class const QuillSyncInterface()
+    extends AbstractSyncInterface<QuillSyncFile, File, WebDavFile> {
+  static final log = Logger('QuillSyncInterface');
 
   @override
   bool areRemoteFilesEqual(WebDavFile a, WebDavFile b) => a.path == b.path;
@@ -31,13 +31,13 @@ class const SaberSyncInterface()
   bool areLocalFilesEqual(File a, File b) => a.path == b.path;
 
   @override
-  Future<List<SaberSyncFile>> findLocalChanges() async {
+  Future<List<QuillSyncFile>> findLocalChanges() async {
     for (var tries = 0; tries < 10 && remoteFiles.isEmpty; ++tries) {
       // Wait for [findRemoteChanges] to populate [remoteFiles]
       await Future.delayed(const Duration(milliseconds: 200));
     }
 
-    final syncFiles = <SaberSyncFile>[];
+    final syncFiles = <QuillSyncFile>[];
     await for (final localFile in FileManager.getRootDirectory().list(
       recursive: true,
     )) {
@@ -62,16 +62,16 @@ class const SaberSyncInterface()
   }
 
   @override
-  Future<List<SaberSyncFile>> findRemoteChanges() async {
-    final client = SaberSyncInterface.client;
+  Future<List<QuillSyncFile>> findRemoteChanges() async {
+    final client = QuillSyncInterface.client;
     if (client == null) return const [];
 
     remoteFiles = await findRemoteFiles();
     if (remoteFiles.isEmpty) return const [];
 
-    final List<SaberSyncFile> changedFiles = await Future.wait(
+    final List<QuillSyncFile> changedFiles = await Future.wait(
       remoteFiles.map((remoteFile) async {
-        final SaberSyncFile syncFile;
+        final QuillSyncFile syncFile;
         try {
           syncFile = await getSyncFileFromRemoteFile(remoteFile);
         } catch (e, st) {
@@ -133,7 +133,7 @@ class const SaberSyncInterface()
   }
 
   @override
-  Future<SaberSyncFile> getSyncFileFromLocalFile(File localFile) async {
+  Future<QuillSyncFile> getSyncFileFromLocalFile(File localFile) async {
     final relativePath = localFile.path
         .substring(FileManager.documentsDirectory.length)
         // Compensate for Windows using backslashes
@@ -148,7 +148,7 @@ class const SaberSyncInterface()
 
     final remoteFile = await getWebDavFile(remotePath);
 
-    return SaberSyncFile(
+    return QuillSyncFile(
       remoteFile: remoteFile,
       remotePath: remotePath,
       localFile: localFile,
@@ -156,17 +156,17 @@ class const SaberSyncInterface()
   }
 
   @override
-  Future<SaberSyncFile> getSyncFileFromRemoteFile(WebDavFile remoteFile) async {
+  Future<QuillSyncFile> getSyncFileFromRemoteFile(WebDavFile remoteFile) async {
     final relativeLocalPath = await decryptPath(client!, remoteFile.path.path);
     if (relativeLocalPath == null)
       throw Exception('Decryption failed for ${remoteFile.path.path}');
     final localFile = FileManager.getFile(relativeLocalPath);
 
-    return SaberSyncFile(remoteFile: remoteFile, localFile: localFile);
+    return QuillSyncFile(remoteFile: remoteFile, localFile: localFile);
   }
 
   @override
-  Future<Uint8List> downloadRemoteFile(SaberSyncFile file) async {
+  Future<Uint8List> downloadRemoteFile(QuillSyncFile file) async {
     if (file.localFile.path.endsWith(NextcloudClientExtension.configFileName)) {
       // Config file changed
       try {
@@ -183,7 +183,7 @@ class const SaberSyncInterface()
       return Uint8List(0);
     }
 
-    final client = SaberSyncInterface.client;
+    final client = QuillSyncInterface.client;
     if (client == null)
       throw Exception('Tried to download file without being logged in');
 
@@ -192,7 +192,7 @@ class const SaberSyncInterface()
 
   @override
   Future<void> writeLocalFile(
-    SaberSyncFile file,
+    QuillSyncFile file,
     // ignore: avoid_renaming_method_parameters
     Uint8List encryptedBytes, {
     @visibleForTesting bool awaitWrite = false,
@@ -210,7 +210,7 @@ class const SaberSyncInterface()
       return;
     }
 
-    final client = SaberSyncInterface.client;
+    final client = QuillSyncInterface.client;
     if (client == null)
       throw Exception('Tried to decrypt file without being logged in');
 
@@ -246,7 +246,7 @@ class const SaberSyncInterface()
   }
 
   @override
-  Future<Uint8List> readLocalFile(SaberSyncFile file) async {
+  Future<Uint8List> readLocalFile(QuillSyncFile file) async {
     final decryptedBytes = file.localFile.existsSync()
         ? await file.localFile.readAsBytes()
         : Uint8List(0);
@@ -255,7 +255,7 @@ class const SaberSyncInterface()
       return decryptedBytes;
     }
 
-    final client = SaberSyncInterface.client;
+    final client = QuillSyncInterface.client;
     if (client == null)
       throw Exception('Tried to encrypt file without being logged in');
 
@@ -282,7 +282,7 @@ class const SaberSyncInterface()
 
   @override
   Future<void> uploadRemoteFile(
-    SaberSyncFile file,
+    QuillSyncFile file,
     // ignore: avoid_renaming_method_parameters
     Uint8List encryptedBytes,
   ) async {
@@ -296,7 +296,7 @@ class const SaberSyncInterface()
       lastModified = stows.fileSyncResyncEverythingDate.value;
     }
 
-    final client = SaberSyncInterface.client;
+    final client = QuillSyncInterface.client;
     if (client == null)
       throw Exception('Tried to upload file without being logged in');
 
@@ -335,7 +335,7 @@ class const SaberSyncInterface()
   static final _decryptMap = <String, String>{};
 
   static Future<Set<WebDavFile>> findRemoteFiles() async {
-    final client = SaberSyncInterface.client;
+    final client = QuillSyncInterface.client;
     if (client == null) return {};
 
     try {
@@ -460,7 +460,7 @@ class const SaberSyncInterface()
   /// If the remote and local files have the same last modified date,
   /// [onEqualFiles] is returned.
   static Future<BestFile> getBestFile(
-    SaberSyncFile file, {
+    QuillSyncFile file, {
     required BestFile onLocalFileNotFound,
     required BestFile onEqualFiles,
     bool preferCache = true,
@@ -528,7 +528,7 @@ class const SaberSyncInterface()
   }
 
   static Future<WebDavFile?> _getWebDavFileUncached(String remotePath) async {
-    final client = SaberSyncInterface.client;
+    final client = QuillSyncInterface.client;
     if (client == null) return null;
 
     try {
@@ -556,7 +556,7 @@ class const SaberSyncInterface()
   static const _ignoredFiles = <String>['/Readme.md'];
 }
 
-class SaberSyncFile extends AbstractSyncFile<File, WebDavFile> {
+class QuillSyncFile extends AbstractSyncFile<File, WebDavFile> {
   late final relativeLocalPath = localFile.path.substring(
     FileManager.documentsDirectory.length,
   );
@@ -571,28 +571,28 @@ class SaberSyncFile extends AbstractSyncFile<File, WebDavFile> {
     this.remotePath = remotePath ?? remoteFile!.path.path;
   }
 
-  static Future<SaberSyncFile> relative(String relativeFilePath) {
+  static Future<QuillSyncFile> relative(String relativeFilePath) {
     final localFile = FileManager.getFile(relativeFilePath);
-    return const SaberSyncInterface().getSyncFileFromLocalFile(localFile);
+    return const QuillSyncInterface().getSyncFileFromLocalFile(localFile);
   }
 
   @override
   String toString() =>
-      'SaberSyncFile(local: $relativeLocalPath, remote: $remotePath)';
+      'QuillSyncFile(local: $relativeLocalPath, remote: $remotePath)';
 
   @override
   bool operator ==(Object other) =>
-      other is SaberSyncFile && other.localFile.path == localFile.path;
+      other is QuillSyncFile && other.localFile.path == localFile.path;
 
   @override
   int get hashCode => localFile.path.hashCode;
 }
 
-extension SaberSyncerComponent on SyncerComponent {
+extension QuillSyncerComponent on SyncerComponent {
   Future<bool> enqueueRel(String relativeFilePath) async {
     if (!stows.loggedIn) return false;
 
-    final syncFile = await SaberSyncFile.relative(relativeFilePath);
+    final syncFile = await QuillSyncFile.relative(relativeFilePath);
     return enqueue(syncFile: syncFile);
   }
 }

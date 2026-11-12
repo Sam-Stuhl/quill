@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/theming/adaptive_toggle_buttons.dart';
-import 'package:saber/components/theming/uni_icon.dart';
-import 'package:saber/pages/home/settings.dart';
+import 'package:quill/components/theming/adaptive_toggle_buttons.dart';
+import 'package:quill/components/theming/uni_icon.dart';
+import 'package:quill/pages/home/settings.dart';
 import 'package:stow/stow.dart';
 import 'package:yaru/yaru.dart';
 

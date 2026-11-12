@@ -2,11 +2,11 @@ import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/theming/adaptive_alert_dialog.dart';
-import 'package:saber/components/theming/adaptive_switch.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/i18n/strings.g.dart';
-import 'package:saber/pages/home/settings.dart';
+import 'package:quill/components/theming/adaptive_alert_dialog.dart';
+import 'package:quill/components/theming/adaptive_switch.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/i18n/strings.g.dart';
+import 'package:quill/pages/home/settings.dart';
 import 'package:stow/stow.dart';
 
 class SettingsColor extends HookWidget {

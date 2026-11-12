@@ -10,11 +10,11 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/theming/saber_theme.dart';
-import 'package:saber/components/theming/yaru_builder.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/i18n/extensions/redirecting_localization_delegate.dart';
-import 'package:saber/i18n/strings.g.dart';
+import 'package:quill/components/theming/quill_theme.dart';
+import 'package:quill/components/theming/yaru_builder.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/i18n/extensions/redirecting_localization_delegate.dart';
+import 'package:quill/i18n/strings.g.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:yaru/yaru.dart';
 
@@ -121,12 +121,12 @@ class DynamicMaterialAppState extends State<DynamicMaterialApp>
         title: widget.title,
         router: widget.router,
         themeMode: themeMode,
-        theme: SaberTheme.createThemeFromSeed(
+        theme: QuillTheme.createThemeFromSeed(
           chosenAccentColor,
           .light,
           platform,
         ),
-        darkTheme: SaberTheme.createThemeFromSeed(
+        darkTheme: QuillTheme.createThemeFromSeed(
           chosenAccentColor,
           .dark,
           platform,
@@ -142,15 +142,15 @@ class DynamicMaterialAppState extends State<DynamicMaterialApp>
           router: widget.router,
           themeMode: themeMode,
           theme: (platform.isMaterialNative && lightColorScheme != null)
-              ? SaberTheme.createTheme(lightColorScheme, platform)
-              : SaberTheme.createThemeFromSeed(
+              ? QuillTheme.createTheme(lightColorScheme, platform)
+              : QuillTheme.createThemeFromSeed(
                   lightColorScheme?.primary ?? widget.defaultSwatch,
                   .light,
                   platform,
                 ),
           darkTheme: (platform.isMaterialNative && darkColorScheme != null)
-              ? SaberTheme.createTheme(darkColorScheme, platform)
-              : SaberTheme.createThemeFromSeed(
+              ? QuillTheme.createTheme(darkColorScheme, platform)
+              : QuillTheme.createThemeFromSeed(
                   darkColorScheme?.primary ?? widget.defaultSwatch,
                   .dark,
                   platform,
@@ -183,7 +183,7 @@ class const _WindowsTitleBarWrapper({required final Widget? child})
               child: SvgPicture.asset('assets/icon/icon.svg'),
             ),
             const SizedBox(width: 8),
-            const Text('Saber'),
+            const Text('Quill'),
           ],
         ),
         centerTitle: false,

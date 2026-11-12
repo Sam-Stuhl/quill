@@ -6,13 +6,13 @@ import 'dart:ui' show FragmentShader;
 
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/canvas/_asset_cache.dart';
-import 'package:saber/components/canvas/_stroke.dart';
-import 'package:saber/components/canvas/image/editor_image.dart';
-import 'package:saber/components/canvas/inner_canvas.dart';
-import 'package:saber/components/canvas/pencil_shader.dart';
-import 'package:saber/data/editor/editor_exporter.dart';
-import 'package:saber/data/tools/laser_pointer.dart';
+import 'package:quill/components/canvas/_asset_cache.dart';
+import 'package:quill/components/canvas/_stroke.dart';
+import 'package:quill/components/canvas/image/editor_image.dart';
+import 'package:quill/components/canvas/inner_canvas.dart';
+import 'package:quill/components/canvas/pencil_shader.dart';
+import 'package:quill/data/editor/editor_exporter.dart';
+import 'package:quill/data/tools/laser_pointer.dart';
 import 'package:sbn/has_size.dart';
 
 typedef CanvasKey = GlobalKey<State<InnerCanvas>>;

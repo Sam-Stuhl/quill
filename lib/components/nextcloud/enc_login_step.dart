@@ -6,11 +6,11 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:logging/logging.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/misc/faq.dart';
-import 'package:saber/data/nextcloud/errors.dart';
-import 'package:saber/data/nextcloud/nextcloud_client_extension.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/i18n/strings.g.dart';
+import 'package:quill/components/misc/faq.dart';
+import 'package:quill/data/nextcloud/errors.dart';
+import 'package:quill/data/nextcloud/nextcloud_client_extension.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/i18n/strings.g.dart';
 import 'package:sbn/font_fallbacks.dart';
 import 'package:yaru/yaru.dart';
 
@@ -74,13 +74,13 @@ class EncLoginStep extends HookWidget {
           style: textTheme.headlineSmall,
         ),
         const SizedBox(height: 4),
-        Text(t.login.encLoginStep.newToSaber),
+        Text(t.login.encLoginStep.newToQuill),
         const SizedBox(height: 16),
         TextField(
           controller: encPasswordController,
           style: const TextStyle(
             fontFamily: 'FiraMono',
-            fontFamilyFallback: saberMonoFontFallbacks,
+            fontFamilyFallback: quillMonoFontFallbacks,
           ),
           decoration: InputDecoration(
             labelText: t.login.encLoginStep.encPassword,

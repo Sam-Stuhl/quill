@@ -19,7 +19,7 @@ set -euo pipefail
 udid="${1:-00008101-000434103A47001E}"
 coredevice="${2:-D97107A5-B0A8-5681-A0C0-B42ABBFEA38B}"
 cd "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/.."
-derived="${SABER_DEVICE_BUILD_DIR:-/tmp/saber-device-dd}"
+derived="${QUILL_DEVICE_BUILD_DIR:-/tmp/quill-device-dd}"
 # A dependency builds Rust code through rustup, which lives in ~/.cargo/bin and
 # is not on a non-login shell's PATH.
 export PATH="$HOME/.cargo/bin:$PATH"

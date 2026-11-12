@@ -1,8 +1,8 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/home/sentry_consent_dialog.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/data/sentry/sentry_init.dart';
-import 'package:saber/i18n/strings.g.dart';
+import 'package:quill/components/home/sentry_consent_dialog.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/data/sentry/sentry_init.dart';
+import 'package:quill/i18n/strings.g.dart';
 
 class const SettingsSentryConsent({super.key}) extends StatelessWidget {
   String _getSubtitle() {

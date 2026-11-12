@@ -1,4 +1,4 @@
-name: saber
+name: quill
 description: A cross-platform libre notes app
 
 # The following line prevents the package from being accidentally published to
@@ -319,5 +319,5 @@ icons_launcher:
 sentry:
   upload_debug_symbols: true
   upload_source_maps: true
-  project: saber
+  project: quill
   org: saber-yf

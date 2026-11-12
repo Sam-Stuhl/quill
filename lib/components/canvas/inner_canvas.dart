@@ -2,16 +2,16 @@ import 'package:defer_pointer/defer_pointer.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:one_dollar_unistroke_recognizer/one_dollar_unistroke_recognizer.dart';
-import 'package:saber/components/canvas/_canvas_background_painter.dart';
-import 'package:saber/components/canvas/_canvas_painter.dart';
-import 'package:saber/components/canvas/_stroke.dart';
-import 'package:saber/components/canvas/canvas_image.dart';
-import 'package:saber/components/canvas/image/editor_image.dart';
-import 'package:saber/data/editor/editor_core_info.dart';
-import 'package:saber/data/extensions/color_extensions.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/data/tools/select.dart';
-import 'package:saber/i18n/strings.g.dart';
+import 'package:quill/components/canvas/_canvas_background_painter.dart';
+import 'package:quill/components/canvas/_canvas_painter.dart';
+import 'package:quill/components/canvas/_stroke.dart';
+import 'package:quill/components/canvas/canvas_image.dart';
+import 'package:quill/components/canvas/image/editor_image.dart';
+import 'package:quill/data/editor/editor_core_info.dart';
+import 'package:quill/data/extensions/color_extensions.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/data/tools/select.dart';
+import 'package:quill/i18n/strings.g.dart';
 import 'package:sbn/canvas_background_pattern.dart';
 import 'package:sbn/quill_styles.dart';
 
@@ -90,7 +90,7 @@ class _InnerCanvasState extends State<InnerCanvas> {
             controller:
                 widget.coreInfo.pages[widget.pageIndex].quill.controller,
             config: QuillEditorConfig(
-              customStyles: SaberQuillStyles.get(
+              customStyles: InkQuillStyles.get(
                 invert: invert,
                 secondary: colorScheme.secondary,
                 lineHeight: widget.coreInfo.lineHeight,

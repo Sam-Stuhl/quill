@@ -1,5 +1,5 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/components/theming/saber_theme.dart';
+import 'package:quill/components/theming/quill_theme.dart';
 
 class AdaptiveIcon extends StatelessWidget {
   const new({

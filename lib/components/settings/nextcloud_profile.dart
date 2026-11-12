@@ -3,16 +3,16 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:nextcloud/provisioning_api.dart';
-import 'package:saber/components/theming/adaptive_icon.dart';
-import 'package:saber/components/theming/adaptive_linear_progress_indicator.dart';
-import 'package:saber/data/file_manager/file_manager.dart';
-import 'package:saber/data/nextcloud/nextcloud_client_extension.dart';
-import 'package:saber/data/nextcloud/saber_syncer.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/data/quota.dart';
-import 'package:saber/data/routes.dart';
-import 'package:saber/i18n/strings.g.dart';
-import 'package:saber/pages/user/login.dart';
+import 'package:quill/components/theming/adaptive_icon.dart';
+import 'package:quill/components/theming/adaptive_linear_progress_indicator.dart';
+import 'package:quill/data/file_manager/file_manager.dart';
+import 'package:quill/data/nextcloud/nextcloud_client_extension.dart';
+import 'package:quill/data/nextcloud/quill_syncer.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/data/quota.dart';
+import 'package:quill/data/routes.dart';
+import 'package:quill/i18n/strings.g.dart';
+import 'package:quill/pages/user/login.dart';
 
 class const NextcloudProfile({super.key}) extends HookWidget {
   /// If non-null, this will be used instead of the actual login state.

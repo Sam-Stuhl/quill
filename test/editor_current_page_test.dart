@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/data/editor/page.dart';
-import 'package:saber/pages/editor/editor.dart';
+import 'package:quill/data/editor/page.dart';
+import 'package:quill/pages/editor/editor.dart';
 
 void main() {
   group('getPageIndexFromScrollPosition', () {

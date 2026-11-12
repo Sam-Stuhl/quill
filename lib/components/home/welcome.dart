@@ -1,6 +1,6 @@
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/i18n/strings.g.dart';
+import 'package:quill/i18n/strings.g.dart';
 
 class const Welcome({super.key}) extends StatelessWidget {
   @override

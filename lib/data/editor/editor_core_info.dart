@@ -9,16 +9,16 @@ import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:path/path.dart' as p;
-import 'package:saber/components/canvas/_asset_cache.dart';
-import 'package:saber/components/canvas/_stroke.dart';
-import 'package:saber/components/canvas/image/editor_image.dart';
-import 'package:saber/data/editor/page.dart';
-import 'package:saber/data/file_manager/file_manager.dart';
-import 'package:saber/data/flavor_config.dart';
-import 'package:saber/data/perf_bench.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/data/tools/stroke_properties.dart';
-import 'package:saber/pages/editor/editor.dart';
+import 'package:quill/components/canvas/_asset_cache.dart';
+import 'package:quill/components/canvas/_stroke.dart';
+import 'package:quill/components/canvas/image/editor_image.dart';
+import 'package:quill/data/editor/page.dart';
+import 'package:quill/data/file_manager/file_manager.dart';
+import 'package:quill/data/flavor_config.dart';
+import 'package:quill/data/perf_bench.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/data/tools/stroke_properties.dart';
+import 'package:quill/pages/editor/editor.dart';
 import 'package:sbn/canvas_background_pattern.dart';
 import 'package:sbn/has_size.dart';
 import 'package:sbn/read_only_reason.dart';
@@ -488,7 +488,7 @@ class EditorCoreInfo {
     return (json, assets);
   }
 
-  /// Converts the current note as an SBA (Saber Archive) file,
+  /// Converts the current note as an SBA (Quill Archive) file,
   /// which contains the main bson file and all the assets
   /// compressed into a zip file.
   ///

@@ -1,14 +1,14 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:one_dollar_unistroke_recognizer/one_dollar_unistroke_recognizer.dart';
 import 'package:onyxsdk_pen/onyxsdk_pen.dart';
-import 'package:saber/components/canvas/_stroke.dart';
-import 'package:saber/components/canvas/image/editor_image.dart';
-import 'package:saber/components/canvas/inner_canvas.dart';
-import 'package:saber/data/editor/editor_core_info.dart';
-import 'package:saber/data/editor/page.dart';
-import 'package:saber/data/tools/_tool.dart';
-import 'package:saber/data/tools/pen.dart';
-import 'package:saber/data/tools/select.dart';
+import 'package:quill/components/canvas/_stroke.dart';
+import 'package:quill/components/canvas/image/editor_image.dart';
+import 'package:quill/components/canvas/inner_canvas.dart';
+import 'package:quill/data/editor/editor_core_info.dart';
+import 'package:quill/data/editor/page.dart';
+import 'package:quill/data/tools/_tool.dart';
+import 'package:quill/data/tools/pen.dart';
+import 'package:quill/data/tools/select.dart';
 import 'package:sbn/tool_id.dart';
 
 class Canvas extends StatelessWidget {

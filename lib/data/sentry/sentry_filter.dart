@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/data/prefs.dart';
+import 'package:quill/data/prefs.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 abstract class SentryFilter {
@@ -9,11 +9,11 @@ abstract class SentryFilter {
   ///
   /// Note: When editing these, also update the server-side filters in
   /// https://saber-yf.sentry.io/settings/security-and-privacy/
-  /// so users on older versions of Saber still get their data scrubbed.
+  /// so users on older versions of Quill still get their data scrubbed.
   @visibleForTesting
   static final replacements = <Pattern, String>{
-    // SaberSyncFile(...)
-    RegExp(r'SaberSyncFile\(.+\)'): 'SaberSyncFile([redacted])',
+    // QuillSyncFile(...)
+    RegExp(r'QuillSyncFile\(.+\)'): 'QuillSyncFile([redacted])',
     // Remote file paths
     RegExp(r'[a-zA-Z0-9]+\.sbe'): 'abef1289.sbe',
     // Local file paths

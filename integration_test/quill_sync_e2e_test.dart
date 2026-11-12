@@ -12,14 +12,14 @@ import 'package:http/http.dart' as http;
 import 'package:integration_test/integration_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:pdfrx/pdfrx.dart';
-import 'package:saber/data/file_manager/file_manager.dart';
-import 'package:saber/data/flavor_config.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/data/quill_sync/quill_sync.dart';
-import 'package:saber/data/tools/pen.dart';
-import 'package:saber/data/tools/stroke_properties.dart';
-import 'package:saber/i18n/strings.g.dart';
-import 'package:saber/pages/editor/editor.dart';
+import 'package:quill/data/file_manager/file_manager.dart';
+import 'package:quill/data/flavor_config.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/data/quill_sync/quill_sync.dart';
+import 'package:quill/data/tools/pen.dart';
+import 'package:quill/data/tools/stroke_properties.dart';
+import 'package:quill/i18n/strings.g.dart';
+import 'package:quill/pages/editor/editor.dart';
 import 'package:worker_manager/worker_manager.dart';
 
 void main() {

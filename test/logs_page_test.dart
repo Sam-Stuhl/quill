@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:golden_screenshot/golden_screenshot.dart';
 import 'package:logging/logging.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/pages/logs.dart';
+import 'package:quill/pages/logs.dart';
 
 void main() {
   group('LogsPage', () {
@@ -22,7 +22,7 @@ void main() {
 
     testGoldens('with logs', (tester) async {
       final stackTrace = StackTrace.fromString(
-        '#0      main.<anonymous closure>.<anonymous closure> (file:///home/ahann/Documents/GitHub/saber/test/logs_page_test.dart:31:24)\n'
+        '#0      main.<anonymous closure>.<anonymous closure> (file:///home/ahann/Documents/GitHub/quill/test/logs_page_test.dart:31:24)\n'
         '#1      testGoldens.<anonymous closure> (package:golden_screenshot/src/test_goldens.dart:28:25)\n'
         '#2      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:193:29)\n'
         '<asynchronous suspension>\n'
@@ -72,7 +72,7 @@ class _LogsApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScreenshotApp.withConditionalTitlebar(
       device: GoldenSmallDevices.androidPhone.device,
-      title: 'Saber',
+      title: 'Quill',
       home: const LogsPage(),
     );
   }

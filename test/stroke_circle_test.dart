@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:saber/components/canvas/_circle_stroke.dart';
-import 'package:saber/components/canvas/_stroke.dart';
-import 'package:saber/data/editor/page.dart';
+import 'package:quill/components/canvas/_circle_stroke.dart';
+import 'package:quill/components/canvas/_stroke.dart';
+import 'package:quill/data/editor/page.dart';
 import 'package:sbn/has_size.dart';
 
 import 'utils/matches_points.dart';

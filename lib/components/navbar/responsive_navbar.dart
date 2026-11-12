@@ -2,13 +2,13 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:path_to_regexp/path_to_regexp.dart';
-import 'package:saber/components/navbar/bottom_navbar.dart';
-import 'package:saber/components/navbar/left_navbar.dart';
-import 'package:saber/components/navbar/top_adwaita_navbar.dart';
-import 'package:saber/data/prefs.dart';
-import 'package:saber/data/routes.dart';
-import 'package:saber/pages/home/home.dart';
-import 'package:saber/pages/home/whiteboard.dart';
+import 'package:quill/components/navbar/bottom_navbar.dart';
+import 'package:quill/components/navbar/left_navbar.dart';
+import 'package:quill/components/navbar/top_adwaita_navbar.dart';
+import 'package:quill/data/prefs.dart';
+import 'package:quill/data/routes.dart';
+import 'package:quill/pages/home/home.dart';
+import 'package:quill/pages/home/whiteboard.dart';
 import 'package:stow_codecs/stow_codecs.dart';
 
 class ResponsiveNavbar extends HookWidget {

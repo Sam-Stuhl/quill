@@ -1,4 +1,4 @@
-# <img src="https://github.com/saber-notes/saber/raw/main/assets/icon/icon.png" width="30" height="30" alt="Logo"> Saber
+# <img src="https://github.com/saber-notes/saber/raw/main/assets/icon/icon.png" width="30" height="30" alt="Logo"> Quill
 
 [<img src='https://github.com/saber-notes/saber/blob/main/assets_raw/badges/google-play-badge.svg'
     alt='Get it on Google Play'
@@ -33,19 +33,19 @@
 [Tiếng Việt](https://github.com/saber-notes/saber/blob/main/README-vi.md) |
 [Bahasa Indonesia](https://github.com/saber-notes/saber/blob/main/README-id.md)
 
-Als der Entwickler von Saber freue ich mich dir eine App vorzustellen, die deine Art Notizen zu erstellen revolutionieren soll. Saber ist die ultimative handschriftliche Notizen-App, designt um deine Erfahrung beim Erstellen von Notizen zu verbessern! Erfreue dich an der Kunst der Handschrift und lasse mit dieser funktionsreichen, von modernen Technologien unterstützten App deiner Kreativität freien Lauf. Sabers intuitives und modernes Interface macht es spielend leicht Notizen niederzuschreiben, Diagramme zu zeichnen oder PDFs zu kommentieren.
+Als der Entwickler von Quill freue ich mich dir eine App vorzustellen, die deine Art Notizen zu erstellen revolutionieren soll. Quill ist die ultimative handschriftliche Notizen-App, designt um deine Erfahrung beim Erstellen von Notizen zu verbessern! Erfreue dich an der Kunst der Handschrift und lasse mit dieser funktionsreichen, von modernen Technologien unterstützten App deiner Kreativität freien Lauf. Quills intuitives und modernes Interface macht es spielend leicht Notizen niederzuschreiben, Diagramme zu zeichnen oder PDFs zu kommentieren.
 
-Als ich anfing digitale Notizen zu machen, fand ich keine Open-Source-App die meinen Ansprüchen gerecht wurde und so landete ich erst bei einer proprietären App. Ich entschied mich dazu Saber zu erschaffen, um Menschen eine Open-Source-App als vertrauenswürdige Option zu schaffen. Saber ist komplett Open-Source, somit kann jede:r den Code auf Sicherheit und Datenschutz überprüfen. Saber verschlüsselt deine Daten und kann sie mit einem kompatiblen Server deiner Wahl synchronisieren, damit du die volle Kontrolle über deine Daten behälst. 
+Als ich anfing digitale Notizen zu machen, fand ich keine Open-Source-App die meinen Ansprüchen gerecht wurde und so landete ich erst bei einer proprietären App. Ich entschied mich dazu Quill zu erschaffen, um Menschen eine Open-Source-App als vertrauenswürdige Option zu schaffen. Quill ist komplett Open-Source, somit kann jede:r den Code auf Sicherheit und Datenschutz überprüfen. Quill verschlüsselt deine Daten und kann sie mit einem kompatiblen Server deiner Wahl synchronisieren, damit du die volle Kontrolle über deine Daten behälst. 
 
-Machst du lieber Notizen auf deinem Tablet und transferierst sie dann auf deinen Compoter oder bevorzugst du es Notizen auf deinem Laptop zu machen und auf deinem Tablet zu kommentieren? Egal wie dein Workflow aussieht, mit seinem Multi-Plattform-Support bietet Saber dir die Möglichkeit deine Notizen zu jeder Zeit, überall und auf jedem Gerät abzurufen. Saber ist verfügbar für Android, iOS, Windows, macOS und Linux, während deine Notizen automatisch auf all deinen Geräten synchronisiert werden. Falls du Offline bist, synchronisiert Saber deine Dateien automatisch sobald du wieder Online bist.
+Machst du lieber Notizen auf deinem Tablet und transferierst sie dann auf deinen Compoter oder bevorzugst du es Notizen auf deinem Laptop zu machen und auf deinem Tablet zu kommentieren? Egal wie dein Workflow aussieht, mit seinem Multi-Plattform-Support bietet Quill dir die Möglichkeit deine Notizen zu jeder Zeit, überall und auf jedem Gerät abzurufen. Quill ist verfügbar für Android, iOS, Windows, macOS und Linux, während deine Notizen automatisch auf all deinen Geräten synchronisiert werden. Falls du Offline bist, synchronisiert Quill deine Dateien automatisch sobald du wieder Online bist.
 
-Saber unterstützt den besten digitalen Marker den du jemals verwendet hast. Hast du jemals mehrere Zeilen markieren müssen und warst genervt, wie die verschiedenen Marker überlappen und ihre Farbe ändern? Um Überlappungen zu handhaben und Farbtreue zu gewährleisten, macht sich Saber fortgeschrittenes Graphic-Processing zu nutze, um deine Marker-Erfahrung besser als auf traditionellem Papier zu gestalten.
+Quill unterstützt den besten digitalen Marker den du jemals verwendet hast. Hast du jemals mehrere Zeilen markieren müssen und warst genervt, wie die verschiedenen Marker überlappen und ihre Farbe ändern? Um Überlappungen zu handhaben und Farbtreue zu gewährleisten, macht sich Quill fortgeschrittenes Graphic-Processing zu nutze, um deine Marker-Erfahrung besser als auf traditionellem Papier zu gestalten.
 
-Saber hat alles was du brauchst um deine Notizen zu organisieren. Erstelle Ordner innerhalb von Ordnern innerhalb von Ordnern nach Lust und Laune, mit keinem Limit an Verschachtelungen – egal in welchen Tiefen deiner Ordnerstrukturen eine Notiz abgespeichert wurde, kannst du sie ganz einfach über deine letzte Notizen, die immer auf dem Homescreen verfügbar sind, abrufen.
+Quill hat alles was du brauchst um deine Notizen zu organisieren. Erstelle Ordner innerhalb von Ordnern innerhalb von Ordnern nach Lust und Laune, mit keinem Limit an Verschachtelungen – egal in welchen Tiefen deiner Ordnerstrukturen eine Notiz abgespeichert wurde, kannst du sie ganz einfach über deine letzte Notizen, die immer auf dem Homescreen verfügbar sind, abrufen.
 
-Saber invertiert deine Notizen intelligent, sobald du den Dark Mode nutzt. Das bedeutet, dass du deine gesamte Notizen-Erfahrung, inklusive deiner Bilder, im Dark Mode genießen kannst, wodurch ein beruhigendes und schlüssiges Interface in dunklen Umgebungen gewährleistet wird.
+Quill invertiert deine Notizen intelligent, sobald du den Dark Mode nutzt. Das bedeutet, dass du deine gesamte Notizen-Erfahrung, inklusive deiner Bilder, im Dark Mode genießen kannst, wodurch ein beruhigendes und schlüssiges Interface in dunklen Umgebungen gewährleistet wird.
 
-Entdecke einen völlig neuen Weg um mit Saber deine Gedanken zu sammeln und zu organisieren. Egal ob du studierst, arbeitest oder kreativ bist, Saber ist dein vertrauenswürdiger Begleiter fürs digitale von Hand schreiben. Starte jetzt den Download und lass deinen Ideen freien Lauf!
+Entdecke einen völlig neuen Weg um mit Quill deine Gedanken zu sammeln und zu organisieren. Egal ob du studierst, arbeitest oder kreativ bist, Quill ist dein vertrauenswürdiger Begleiter fürs digitale von Hand schreiben. Starte jetzt den Download und lass deinen Ideen freien Lauf!
 
 [![Latest release](https://img.shields.io/github/v/release/saber-notes/saber)](https://github.com/saber-notes/saber/releases/latest)
 [![Flathub](https://img.shields.io/flathub/v/com.adilhanney.saber)](https://flathub.org/apps/details/com.adilhanney.saber)
@@ -71,19 +71,19 @@ Entdecke einen völlig neuen Weg um mit Saber deine Gedanken zu sammeln und zu o
 ## Features
 
 Bitte schaue dir
-[#1 Saber Progress][progress]
+[#1 Quill Progress][progress]
 an (derzeit nur in Englisch verfügbar).
 
 ## Installation
 
 Bitte schaue dir
-[Install Saber](https://github.com/saber-notes/saber/wiki/install)
+[Install Quill](https://github.com/saber-notes/saber/wiki/install)
 an (derzeit nur in Englisch verfügbar).
 
 ## Build from source
 
 Bitte schaue dir
-[Build Saber](https://github.com/saber-notes/saber/wiki/build)
+[Build Quill](https://github.com/saber-notes/saber/wiki/build)
 an (derzeit nur in Englisch verfügbar).
 
 ## Links
@@ -97,14 +97,14 @@ an (derzeit nur in Englisch verfügbar).
 
 Alle Übersetzungen stammen von unserer Community.
 
-Wenn du bei der Übersetzung von Saber mithelfen möchtest, besuche [Weblate](https://hosted.weblate.org/engage/saber-notes/)!
+Wenn du bei der Übersetzung von Quill mithelfen möchtest, besuche [Weblate](https://hosted.weblate.org/engage/saber-notes/)!
 
 [![Übersetzungsstatus](https://hosted.weblate.org/widget/saber-notes/multi-auto.svg)](https://hosted.weblate.org/engage/saber-notes/)
 
-## Saber unterstützen
+## Quill unterstützen
 
-Falls dir Saber gefällt, bitte denke darüber nach das Projekt wie folgt zu unterstützen:
-- Erzähle deinen Freund:innen von Saber!
+Falls dir Quill gefällt, bitte denke darüber nach das Projekt wie folgt zu unterstützen:
+- Erzähle deinen Freund:innen von Quill!
 - Gib dem Projekt auf Github einen Stern!
 - Unterstütze mich finanziell über [GitHub Sponsors](https://github.com/sponsors/adil192).
 - Spende über [PayPal](https://paypal.me/adilhanney).

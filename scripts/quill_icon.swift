@@ -3,7 +3,7 @@
 // ios/Runner/Assets.xcassets/AppIcon.appiconset, every size its Contents.json lists, in
 // the three variants iOS asks for (light, dark, tinted).
 //   swift scripts/quill_icon.swift
-// Saber's own icons stay under assets/icon (upstream merges untouched); only the iOS
+// Quill's own icons stay under assets/icon (upstream merges untouched); only the iOS
 // asset catalog is replaced.
 import CoreGraphics
 import Foundation

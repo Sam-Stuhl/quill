@@ -1,9 +1,9 @@
 import 'package:cupertino_ui/cupertino_ui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:path_to_regexp/path_to_regexp.dart';
-import 'package:saber/components/theming/adaptive_icon.dart';
-import 'package:saber/i18n/strings.g.dart';
-import 'package:saber/pages/home/home.dart';
+import 'package:quill/components/theming/adaptive_icon.dart';
+import 'package:quill/i18n/strings.g.dart';
+import 'package:quill/pages/home/home.dart';
 
 // workaround to assign strings as enum values
 abstract class RoutePaths {

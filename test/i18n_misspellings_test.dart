@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('Check that Saber isn\'t misspelled', () async {
+  test('Check that Quill isn\'t misspelled', () async {
     final List<File> files = [
       File('lib/i18n/_missing_translations.yaml'),
       ...Directory('lib/i18n').listSync().whereType<File>(),
@@ -28,7 +28,7 @@ void main() {
           expect(
             contents,
             isNot(contains('Sabre')),
-            reason: 'Saber is misspelled as Sabre in ${file.path}',
+            reason: 'Quill is misspelled as Sabre in ${file.path}',
           );
         }),
     ]);

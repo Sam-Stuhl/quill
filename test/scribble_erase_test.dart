@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:saber/data/scribble_erase.dart';
+import 'package:quill/data/scribble_erase.dart';
 
 /// Points along the polyline through [corners], one every ~[step] px.
 List<Offset> polyline(List<Offset> corners, {double step = 2}) {

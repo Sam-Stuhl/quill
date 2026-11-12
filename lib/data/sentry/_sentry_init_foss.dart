@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:material_ui/material_ui.dart';
-import 'package:saber/data/prefs.dart';
+import 'package:quill/data/prefs.dart';
 
 /// Whether the Sentry SDK is available for use.
 /// Also see [isSentryEnabled].

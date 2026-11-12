@@ -1,5 +1,5 @@
 name: sbn
-description: "Data handling of the sbn format for the Saber: Handwritten Notes app."
+description: "Data handling of the sbn format for the Quill: Handwritten Notes app."
 version: 0.0.1
 
 environment:

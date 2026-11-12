@@ -29,9 +29,9 @@ void setupMockPathProvider() {
   TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
       .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
         if (methodCall.method == 'getApplicationDocumentsDirectory') {
-          return '$tmpDir/saber-test-docs';
+          return '$tmpDir/quill-test-docs';
         } else if (methodCall.method == 'getTemporaryDirectory') {
-          return '$tmpDir/saber-test-tmp';
+          return '$tmpDir/quill-test-tmp';
         }
         return null;
       });
