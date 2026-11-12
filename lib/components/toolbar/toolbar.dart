@@ -706,13 +706,6 @@ class _ToolbarState extends State<Toolbar> {
         child: const FaIcon(FontAwesomeIcons.eraser, size: 18),
       ),
       _PillButton(
-        tooltip: t.editor.toolbar.text,
-        selected: widget.textEditing,
-        enabled: !widget.readOnly,
-        onPressed: widget.toggleTextEditing,
-        child: const Icon(Icons.text_fields),
-      ),
-      _PillButton(
         tooltip: t.editor.toolbar.select,
         selected: widget.currentTool is Select,
         enabled: !widget.readOnly,
@@ -738,6 +731,13 @@ class _ToolbarState extends State<Toolbar> {
     ];
     final moreTools = <Widget>[
       ?fingerDrawing,
+      _PillButton(
+        tooltip: t.editor.toolbar.text,
+        selected: widget.textEditing,
+        enabled: !widget.readOnly,
+        onPressed: widget.toggleTextEditing,
+        child: const Icon(Icons.text_fields),
+      ),
       _PillButton(
         tooltip: t.editor.pens.laserPointer,
         selected: widget.currentTool == LaserPointer.currentLaserPointer,
