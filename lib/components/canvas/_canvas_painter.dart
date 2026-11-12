@@ -15,9 +15,22 @@ import 'package:saber/data/tools/laser_pointer.dart';
 import 'package:saber/data/tools/select.dart';
 import 'package:saber/data/tools/shape_pen.dart';
 
+/// The page's foreground is drawn as two layers so that a pen move repaints
+/// only the stroke being drawn, not every stroke already on the page.
+enum CanvasLayer {
+  /// Finished strokes and the page indicator. Repaints when the page's strokes
+  /// change, not on every pen move.
+  strokes,
+
+  /// What changes while drawing: the current stroke, laser strokes, the
+  /// detected shape and the selection outline.
+  live,
+}
+
 class CanvasPainter extends CustomPainter {
   const new({
     super.repaint,
+    required this.layer,
     this.invert = false,
     required this.strokes,
     required this.laserStrokes,
@@ -32,6 +45,7 @@ class CanvasPainter extends CustomPainter {
     required this.defaultTextStyle,
   });
 
+  final CanvasLayer layer;
   final bool invert;
   final List<Stroke> strokes;
   final List<LaserStroke> laserStrokes;
@@ -49,22 +63,33 @@ class CanvasPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final canvasRect = Offset.zero & size;
 
-    _drawHighlighterStrokes(canvas, canvasRect);
-    _drawNonHighlighterStrokes(canvas);
-    for (final stroke in laserStrokes) _drawLaserStroke(canvas, stroke);
-    _drawCurrentStroke(canvas);
-    _drawDetectedShape(canvas);
-    _drawSelection(canvas);
-    _drawPageIndicator(canvas, size);
+    switch (layer) {
+      case .strokes:
+        _drawHighlighterStrokes(canvas, canvasRect);
+        _drawNonHighlighterStrokes(canvas);
+        _drawPageIndicator(canvas, size);
+      case .live:
+        for (final stroke in laserStrokes) _drawLaserStroke(canvas, stroke);
+        _drawCurrentStroke(canvas);
+        _drawDetectedShape(canvas);
+        _drawSelection(canvas);
+    }
   }
 
   @override
   bool shouldRepaint(CanvasPainter oldDelegate) {
+    if (layer == .live) {
+      return currentStroke != null ||
+          oldDelegate.currentStroke != null ||
+          laserStrokes.isNotEmpty ||
+          oldDelegate.laserStrokes.isNotEmpty ||
+          invert != oldDelegate.invert ||
+          currentSelection != oldDelegate.currentSelection ||
+          primaryColor != oldDelegate.primaryColor ||
+          page != oldDelegate.page ||
+          currentScale != oldDelegate.currentScale;
+    }
     return false ||
-        // Current stroke is being drawn, so always repaint if present
-        (currentStroke != null || oldDelegate.currentStroke != null) ||
-        // Laser strokes are always fading out, so always repaint if present
-        (laserStrokes.isNotEmpty || oldDelegate.laserStrokes.isNotEmpty) ||
         // Check for any other changes
         invert != oldDelegate.invert ||
         strokes.length != oldDelegate.strokes.length ||

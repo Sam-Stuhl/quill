@@ -269,7 +269,17 @@ class EditorPage extends ChangeNotifier implements HasSize {
   /// call [setState] instead.
   void redrawStrokes() {
     notifyListeners();
+    _live.ping();
   }
+
+  /// Redraws only what changes while drawing (the stroke being drawn, laser
+  /// strokes, the selection outline), not the strokes already on the page.
+  void redrawLive() => _live.ping();
+
+  final _live = _LiveLayerNotifier();
+
+  /// Notifies on [redrawStrokes] and [redrawLive].
+  Listenable get liveListenable => _live;
 
   /// Updates the `pageIndex` fields of this page's strokes/images.
   void updatePageIndex(int pageIndex) {
@@ -281,6 +291,7 @@ class EditorPage extends ChangeNotifier implements HasSize {
 
   @override
   void dispose() {
+    _live.dispose();
     quill.dispose();
     _pencilShader?.dispose();
     isRendered = false;
@@ -355,4 +366,8 @@ class QuillStruct {
     ),
     focusNode: FocusNode(debugLabel: 'Screenshot Quill Focus Node'),
   );
+}
+
+class _LiveLayerNotifier extends ChangeNotifier {
+  void ping() => notifyListeners();
 }

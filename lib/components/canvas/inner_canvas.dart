@@ -112,31 +112,12 @@ class _InnerCanvasState extends State<InnerCanvas> {
           )
         : null;
 
-    return RepaintBoundary(
-      child: CustomPaint(
-        painter: CanvasBackgroundPainter(
-          invert: invert,
-          backgroundColor: () {
-            if (page.backgroundImage != null) {
-              return Colors.white;
-            } else {
-              return backgroundColor;
-            }
-          }(),
-          backgroundPattern: () {
-            if (page.backgroundImage != null) {
-              return CanvasBackgroundPattern.none;
-            } else {
-              return widget.coreInfo.backgroundPattern;
-            }
-          }(),
-          lineHeight: widget.coreInfo.lineHeight,
-          lineThickness: widget.coreInfo.lineThickness,
-          primaryColor: primaryColor,
-          secondaryColor: secondaryColor,
-        ),
-        foregroundPainter: CanvasPainter(
-          repaint: widget.redrawPageListenable,
+    // Two layers: what is already on the page is drawn (and rasterised) once
+    // and reused while the pen moves; only the live layer above it repaints.
+    CanvasPainter foreground(CanvasLayer layer, Listenable? repaint) =>
+        CanvasPainter(
+          layer: layer,
+          repaint: repaint,
           invert: invert,
           strokes: page.strokes,
           laserStrokes: page.laserStrokes,
@@ -149,49 +130,87 @@ class _InnerCanvasState extends State<InnerCanvas> {
           totalPages: widget.coreInfo.pages.length,
           currentScale: widget.currentScale,
           defaultTextStyle: theme.textTheme.bodyMedium!,
-        ),
-        isComplex: true,
+        );
+
+    return RepaintBoundary(
+      child: CustomPaint(
         willChange: true,
-        child: SizedBox(
-          width: widget.width,
-          height: widget.height,
-          child: DeferredPointerHandler(
-            child: Stack(
-              children: [
-                if (page.backgroundImage != null)
-                  CanvasImage(
-                    filePath: widget.coreInfo.filePath,
-                    image: page.backgroundImage!,
-                    pageSize: Size(widget.width, widget.height),
-                    setAsBackground: null,
-                    isBackground: true,
-                    readOnly: true,
-                  ),
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  width: widget.width,
-                  height: widget.height,
-                  child: IgnorePointer(
-                    ignoring: widget.coreInfo.readOnly || !widget.textEditing,
-                    child: quillEditor,
-                  ),
+        foregroundPainter: foreground(
+          CanvasLayer.live,
+          widget.redrawPageListenable == null ? null : page.liveListenable,
+        ),
+        child: RepaintBoundary(
+          child: CustomPaint(
+            painter: CanvasBackgroundPainter(
+              invert: invert,
+              backgroundColor: () {
+                if (page.backgroundImage != null) {
+                  return Colors.white;
+                } else {
+                  return backgroundColor;
+                }
+              }(),
+              backgroundPattern: () {
+                if (page.backgroundImage != null) {
+                  return CanvasBackgroundPattern.none;
+                } else {
+                  return widget.coreInfo.backgroundPattern;
+                }
+              }(),
+              lineHeight: widget.coreInfo.lineHeight,
+              lineThickness: widget.coreInfo.lineThickness,
+              primaryColor: primaryColor,
+              secondaryColor: secondaryColor,
+            ),
+            foregroundPainter: foreground(
+              CanvasLayer.strokes,
+              widget.redrawPageListenable,
+            ),
+            isComplex: true,
+            child: SizedBox(
+              width: widget.width,
+              height: widget.height,
+              child: DeferredPointerHandler(
+                child: Stack(
+                  children: [
+                    if (page.backgroundImage != null)
+                      CanvasImage(
+                        filePath: widget.coreInfo.filePath,
+                        image: page.backgroundImage!,
+                        pageSize: Size(widget.width, widget.height),
+                        setAsBackground: null,
+                        isBackground: true,
+                        readOnly: true,
+                      ),
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      width: widget.width,
+                      height: widget.height,
+                      child: IgnorePointer(
+                        ignoring:
+                            widget.coreInfo.readOnly || !widget.textEditing,
+                        child: quillEditor,
+                      ),
+                    ),
+                    for (int i = 0; i < page.images.length; i++)
+                      CanvasImage(
+                        filePath: widget.coreInfo.filePath,
+                        image: page.images[i],
+                        pageSize: Size(widget.width, widget.height),
+                        setAsBackground: widget.setAsBackground,
+                        readOnly:
+                            widget.coreInfo.readOnly ||
+                            !widget.currentToolIsSelect,
+                        selected:
+                            widget.currentSelection?.images.contains(
+                              page.images[i],
+                            ) ??
+                            false,
+                      ),
+                  ],
                 ),
-                for (int i = 0; i < page.images.length; i++)
-                  CanvasImage(
-                    filePath: widget.coreInfo.filePath,
-                    image: page.images[i],
-                    pageSize: Size(widget.width, widget.height),
-                    setAsBackground: widget.setAsBackground,
-                    readOnly:
-                        widget.coreInfo.readOnly || !widget.currentToolIsSelect,
-                    selected:
-                        widget.currentSelection?.images.contains(
-                          page.images[i],
-                        ) ??
-                        false,
-                  ),
-              ],
+              ),
             ),
           ),
         ),
