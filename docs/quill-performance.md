@@ -30,9 +30,12 @@ iPad itself (release build). It does nothing unless asked.
 ## What it does
 
 Builds a 12-page note of 1800 strokes, then times: saving and loading it, opening
-it in the editor, 14 synthetic pen strokes (four points per frame, through the
-editor's own draw callbacks), the autosave that follows, scrolling 9000 px and
-zooming 1x to 3x. Per phase it records build and raster time per frame (Flutter's
+it in the editor, 14 synthetic pen strokes written with 400 ms pauses (four
+points per frame, through the editor's own draw callbacks), a 3 s pause long
+enough for the sync PDF render to start, 8 more strokes written while it runs,
+scrolling 9000 px and zooming 1x to 3x. It also records how late a 5 ms timer
+fires (`lag_*`: the main isolate's stalls, whatever the cause) and the time of
+each save's serialise and thumbnail steps and each PDF render (`timers_ms`). Per phase it records build and raster time per frame (Flutter's
 frame timings) and the gaps between frames seen from Dart. The test note is
 deleted when the run ends.
 
