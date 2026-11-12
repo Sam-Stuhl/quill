@@ -14,6 +14,7 @@ import 'package:saber/data/editor/editor_core_info.dart';
 import 'package:saber/data/editor/editor_exporter.dart';
 import 'package:saber/data/editor/page.dart';
 import 'package:saber/data/file_manager/file_manager.dart';
+import 'package:saber/data/pen_activity.dart';
 import 'package:saber/data/perf_bench.dart';
 import 'package:saber/pages/editor/editor.dart';
 
@@ -283,10 +284,14 @@ abstract class QuillImport {
           }
           return pw.MemoryImage(jpeg);
         },
-        beforePage: (i) => Future.wait([
-          for (final image in [?pages[i].backgroundImage, ...pages[i].images])
-            image.prerender(width: (pages[i].size.width * 2).round()),
-        ]),
+        beforePage: (i) async {
+          // A page's screenshot is main-thread work: wait out the pen.
+          await PenActivity.untilQuiet();
+          await Future.wait([
+            for (final image in [?pages[i].backgroundImage, ...pages[i].images])
+              image.prerender(width: (pages[i].size.width * 2).round()),
+          ]);
+        },
         afterPage: (i) {
           for (final image in [?pages[i].backgroundImage, ...pages[i].images]) {
             image.releasePrerender();

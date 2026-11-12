@@ -42,6 +42,7 @@ import 'package:saber/data/extensions/change_notifier_extensions.dart';
 import 'package:saber/data/extensions/matrix4_extensions.dart';
 import 'package:saber/data/file_manager/file_manager.dart';
 import 'package:saber/data/nextcloud/saber_syncer.dart';
+import 'package:saber/data/pen_activity.dart';
 import 'package:saber/data/perf_bench.dart';
 import 'package:saber/data/prefs.dart';
 import 'package:saber/data/scribble_erase.dart';
@@ -637,11 +638,8 @@ class EditorState extends State<Editor> {
 
   static const changePageThreshold = 50.0;
 
-  /// When the pen last moved, so background work (the thumbnail) waits for a pause.
-  var _lastDrawAt = DateTime(0);
-
   void onDrawStart(ScaleStartDetails details) {
-    _lastDrawAt = DateTime.now();
+    PenActivity.mark();
     final page = coreInfo.pages[dragPageIndex!];
     final position = page.renderBox!.globalToLocal(details.focalPoint);
     history.canRedo = false;
@@ -689,7 +687,7 @@ class EditorState extends State<Editor> {
   }
 
   void onDrawUpdate(ScaleUpdateDetails details) {
-    _lastDrawAt = DateTime.now();
+    PenActivity.mark();
     if (dragPageIndex == null) {
       return;
     }
@@ -864,7 +862,7 @@ class EditorState extends State<Editor> {
   }
 
   void onDrawEnd(ScaleEndDetails details) {
-    _lastDrawAt = DateTime.now();
+    PenActivity.mark();
     if (dragPageIndex == null) {
       return;
     }
@@ -963,6 +961,8 @@ class EditorState extends State<Editor> {
   }
 
   void onHovering() {
+    // A hovering Pencil is about to write: keep background work waiting.
+    PenActivity.mark();
     isHovering = true;
   }
 
@@ -1220,7 +1220,7 @@ class EditorState extends State<Editor> {
     _thumbnailTimer?.cancel();
     _thumbnailTimer = Timer(const Duration(seconds: 3), () async {
       if (!mounted || !_thumbnailPending) return;
-      if (DateTime.now().difference(_lastDrawAt) < const Duration(seconds: 2) ||
+      if (PenActivity.sinceLast < const Duration(seconds: 2) ||
           savingState.value == .saving) {
         return _scheduleThumbnail();
       }
