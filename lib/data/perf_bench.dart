@@ -217,10 +217,15 @@ class PerfBench {
 
   /// A note like a long lecture: [pages] pages, [strokesPerPage] strokes of
   /// about 120 points each, a mix of fountain pen, pencil and highlighter.
-  static Future<void> _makeHeavyNote({
-    int pages = 12,
-    int strokesPerPage = 150,
-  }) async {
+  static Future<void> _makeHeavyNote() async {
+    // A marker file containing "light" makes a note closer to a real one:
+    // 3 pages, 180 strokes in all.
+    final marker = File('${FileManager.documentsDirectory}/.quill-bench-light');
+    final light = marker.existsSync();
+    if (light) marker.deleteSync();
+    results['note_kind'] = light ? 'light' : 'heavy';
+    final pages = light ? 3 : 12;
+    final strokesPerPage = light ? 60 : 150;
     final rng = Random(7);
     // ignore: invalid_use_of_visible_for_testing_member
     final info = EditorCoreInfo(filePath: _notePath);
