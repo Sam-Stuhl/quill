@@ -23,6 +23,7 @@ class InnerCanvas extends StatefulWidget {
     required this.width,
     required this.height,
     this.showPageIndicator = true,
+    this.cacheStrokes = false,
     this.textEditing = false,
     required this.coreInfo,
     required this.currentStroke,
@@ -39,6 +40,9 @@ class InnerCanvas extends StatefulWidget {
   final double width;
   final double height;
   final bool showPageIndicator;
+
+  /// Draw finished strokes from a cached bitmap (the editor on screen).
+  final bool cacheStrokes;
   final bool textEditing;
   final EditorCoreInfo coreInfo;
   final Stroke? currentStroke;
@@ -117,6 +121,7 @@ class _InnerCanvasState extends State<InnerCanvas> {
     CanvasPainter foreground(CanvasLayer layer, Listenable? repaint) =>
         CanvasPainter(
           layer: layer,
+          cacheStrokes: widget.cacheStrokes,
           repaint: repaint,
           invert: invert,
           strokes: page.strokes,

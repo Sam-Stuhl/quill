@@ -118,6 +118,7 @@ class Canvas extends StatelessWidget {
                       key: page.innerCanvasKey,
                       pageIndex: pageIndex,
                       redrawPageListenable: page,
+                      cacheStrokes: true,
                       width: page.size.width,
                       height: page.size.height,
                       textEditing: textEditing,

@@ -410,7 +410,16 @@ class EditorState extends State<Editor> {
     );
   }
 
+  /// Undo and redo can change any page's strokes (moves keep the count), so
+  /// every page's cached stroke bitmap is dropped.
+  void _strokesChangedEverywhere() {
+    for (final page in coreInfo.pages) {
+      page.strokesRevision++;
+    }
+  }
+
   void undo([Historic? historic]) {
+    _strokesChangedEverywhere();
     if (historic == null) {
       if (!history.canUndo) return;
 
@@ -529,6 +538,7 @@ class EditorState extends State<Editor> {
   }
 
   void redo() {
+    _strokesChangedEverywhere();
     if (!history.canRedo) return;
     final historic = history.redo();
     undo(historic.reverse());
@@ -685,13 +695,15 @@ class EditorState extends State<Editor> {
       (currentTool as Pen).onDragUpdate(position, currentPressure);
       page.redrawLive();
     } else if (currentTool is Eraser) {
+      var erased = false;
       for (final stroke in (currentTool as Eraser).checkForOverlappingStrokes(
         position,
         page.strokes,
       )) {
         page.strokes.remove(stroke);
+        erased = true;
       }
-      page.redrawStrokes();
+      page.redrawStrokes(changed: erased);
       removeExcessPages();
     } else if (currentTool is Select) {
       final select = currentTool as Select;
@@ -918,7 +930,7 @@ class EditorState extends State<Editor> {
       } else if (currentTool is LaserPointer) {
         shouldSave = false;
         final newStroke = (currentTool as LaserPointer).onDragEnd(
-          page.redrawStrokes,
+          page.redrawLive,
           (Stroke stroke) {
             page.laserStrokes.remove(stroke);
           },

@@ -31,6 +31,7 @@ class CanvasPainter extends CustomPainter {
   const new({
     super.repaint,
     required this.layer,
+    this.cacheStrokes = false,
     this.invert = false,
     required this.strokes,
     required this.laserStrokes,
@@ -46,6 +47,11 @@ class CanvasPainter extends CustomPainter {
   });
 
   final CanvasLayer layer;
+
+  /// Draw the finished strokes from a bitmap kept on the page, redrawn only
+  /// when they change or the zoom needs a sharper one. Only for the editor
+  /// on screen: exports and previews draw the vectors.
+  final bool cacheStrokes;
   final bool invert;
   final List<Stroke> strokes;
   final List<LaserStroke> laserStrokes;
@@ -65,8 +71,10 @@ class CanvasPainter extends CustomPainter {
 
     switch (layer) {
       case .strokes:
-        _drawHighlighterStrokes(canvas, canvasRect);
-        _drawNonHighlighterStrokes(canvas);
+        if (!cacheStrokes || !_drawStrokesFromBitmap(canvas, size)) {
+          _drawHighlighterStrokes(canvas, canvasRect);
+          _drawNonHighlighterStrokes(canvas);
+        }
         _drawPageIndicator(canvas, size);
       case .live:
         for (final stroke in laserStrokes) _drawLaserStroke(canvas, stroke);
@@ -100,6 +108,77 @@ class CanvasPainter extends CustomPainter {
         pageIndex != oldDelegate.pageIndex ||
         totalPages != oldDelegate.totalPages ||
         currentScale != oldDelegate.currentScale;
+  }
+
+  /// Largest bitmap worth keeping per page, in pixels. Zoomed in past this,
+  /// the vectors are drawn instead (only the visible part is rasterised).
+  static const _maxBitmapPixels = 12e6;
+
+  /// Draws the finished strokes from [EditorPage.strokeBitmap], making it first
+  /// if needed. Returns false when the strokes must be drawn as vectors.
+  bool _drawStrokesFromBitmap(Canvas canvas, Size size) {
+    // While a selection is being moved, strokes change on every frame.
+    if (currentSelection != null && currentSelection!.strokes.isNotEmpty) {
+      return false;
+    }
+    if (strokes.isEmpty) return true;
+    final box = page.renderBox;
+    if (box == null || !box.attached || !box.hasSize) return false;
+
+    final dpr = ui.PlatformDispatcher.instance.views.first.devicePixelRatio;
+    final needed = box.getTransformTo(null).getMaxScaleOnAxis() * dpr;
+    if (needed <= 0 || !needed.isFinite) return false;
+    if (size.width * needed * size.height * needed > _maxBitmapPixels) {
+      return false;
+    }
+
+    // What the picture depends on, besides its resolution.
+    final key = (
+      page.strokesRevision,
+      strokes.length,
+      invert,
+      currentScale < _zoomThreshold,
+      currentScale >= 1.5,
+      currentScale >= 3,
+    );
+    final cached = page.strokeBitmap;
+    final usable =
+        cached != null &&
+        cached.key == key &&
+        cached.pixelsPerUnit >= needed * 0.9 &&
+        cached.pixelsPerUnit <= needed * 2.5;
+    if (!usable) {
+      final pixelsPerUnit = needed * 1.1;
+      final recorder = ui.PictureRecorder();
+      final c = Canvas(recorder)..scale(pixelsPerUnit);
+      _drawHighlighterStrokes(c, Offset.zero & size);
+      _drawNonHighlighterStrokes(c);
+      final picture = recorder.endRecording();
+      final image = picture.toImageSync(
+        (size.width * pixelsPerUnit).ceil(),
+        (size.height * pixelsPerUnit).ceil(),
+      );
+      picture.dispose();
+      cached?.image.dispose();
+      page.strokeBitmap = StrokeBitmap(
+        image,
+        key: key,
+        pixelsPerUnit: pixelsPerUnit,
+      );
+    }
+    final bitmap = page.strokeBitmap!;
+    canvas.drawImageRect(
+      bitmap.image,
+      Rect.fromLTWH(
+        0,
+        0,
+        bitmap.image.width.toDouble(),
+        bitmap.image.height.toDouble(),
+      ),
+      Offset.zero & size,
+      Paint()..filterQuality = FilterQuality.medium,
+    );
+    return true;
   }
 
   void _drawHighlighterStrokes(Canvas canvas, Rect canvasRect) {

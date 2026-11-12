@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 import 'dart:ui' show FragmentShader;
 
 import 'package:flutter_quill/flutter_quill.dart';
@@ -267,10 +268,23 @@ class EditorPage extends ChangeNotifier implements HasSize {
 
   /// Triggers a redraw of the strokes. If you need to redraw images,
   /// call [setState] instead.
-  void redrawStrokes() {
+  ///
+  /// Pass `changed: false` when the strokes themselves did not change (the
+  /// eraser moving over nothing), so the cached bitmap of the page is kept.
+  void redrawStrokes({bool changed = true}) {
+    if (changed) strokesRevision++;
     notifyListeners();
     _live.ping();
   }
+
+  /// Bumped whenever the finished strokes change, to know when
+  /// [strokeBitmap] is out of date.
+  int strokesRevision = 0;
+
+  /// The finished strokes drawn once into a bitmap, so scrolling and drawing
+  /// do not re-rasterise every stroke on every frame (see
+  /// [CanvasPainter] and docs/quill-performance.md).
+  StrokeBitmap? strokeBitmap;
 
   /// Redraws only what changes while drawing (the stroke being drawn, laser
   /// strokes, the selection outline), not the strokes already on the page.
@@ -291,6 +305,8 @@ class EditorPage extends ChangeNotifier implements HasSize {
 
   @override
   void dispose() {
+    strokeBitmap?.image.dispose();
+    strokeBitmap = null;
     _live.dispose();
     quill.dispose();
     _pencilShader?.dispose();
@@ -366,6 +382,19 @@ class QuillStruct {
     ),
     focusNode: FocusNode(debugLabel: 'Screenshot Quill Focus Node'),
   );
+}
+
+/// A page's finished strokes as an image, and what it was drawn for.
+class StrokeBitmap {
+  const new(this.image, {required this.key, required this.pixelsPerUnit});
+
+  final ui.Image image;
+
+  /// What the picture depends on besides its size; a different key means redraw.
+  final Object key;
+
+  /// Image pixels per page unit.
+  final double pixelsPerUnit;
 }
 
 class _LiveLayerNotifier extends ChangeNotifier {
