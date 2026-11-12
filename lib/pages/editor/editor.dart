@@ -42,6 +42,7 @@ import 'package:saber/data/extensions/change_notifier_extensions.dart';
 import 'package:saber/data/extensions/matrix4_extensions.dart';
 import 'package:saber/data/file_manager/file_manager.dart';
 import 'package:saber/data/nextcloud/saber_syncer.dart';
+import 'package:saber/data/perf_bench.dart';
 import 'package:saber/data/prefs.dart';
 import 'package:saber/data/scribble_erase.dart';
 import 'package:saber/data/tools/_tool.dart';
@@ -1162,10 +1163,12 @@ class EditorState extends State<Editor> {
     final savedChange = history.lastChange;
     _unsavedSince = null;
     coreInfo.assetCache.allowRemovingAssets = false;
+    final serializeTime = Stopwatch()..start();
     try {
       (bson, assets) = coreInfo.saveToBinary(
         currentPageIndex: currentPageIndex,
       );
+      PerfBench.time('save_serialize', serializeTime);
     } finally {
       coreInfo.assetCache.allowRemovingAssets = true;
     }
@@ -1199,6 +1202,7 @@ class EditorState extends State<Editor> {
     }
 
     if (!mounted) return;
+    final thumbnailTime = Stopwatch()..start();
     final page = coreInfo.pages.first;
     final previewHeight = page.previewHeight(lineHeight: coreInfo.lineHeight);
     final thumbnailSize = Size(720, 720 * previewHeight / page.size.width);
@@ -1218,6 +1222,7 @@ class EditorState extends State<Editor> {
       thumbnailPng!.buffer.asUint8List(),
       awaitWrite: true,
     );
+    PerfBench.time('save_thumbnail', thumbnailTime);
   }
 
   late final _filenameFormKey = GlobalKey<FormState>();

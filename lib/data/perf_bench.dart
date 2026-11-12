@@ -42,6 +42,36 @@ class PerfBench {
   static final _sinceMain = Stopwatch();
   static void markMain() => _sinceMain.start();
 
+  /// Durations of app work worth knowing about (a save's parts, a PDF
+  /// render), recorded by the code that does it. Does nothing outside a run.
+  static final _timers = <String, List<int>>{};
+  static bool _running = false;
+  static void time(String name, Stopwatch sw) {
+    if (_running) (_timers[name] ??= []).add(sw.elapsedMilliseconds);
+  }
+
+  /// How late a 5 ms timer fires: the main isolate's stalls, whatever the cause.
+  static Timer? _lagTimer;
+  static final _lags = <int>[];
+  static int _lastTick = 0;
+  static void _startLagProbe() {
+    _lastTick = _gapClock.elapsedMilliseconds;
+    _lagTimer = Timer.periodic(const Duration(milliseconds: 5), (_) {
+      final now = _gapClock.elapsedMilliseconds;
+      _lags.add(now - _lastTick - 5);
+      _lastTick = now;
+    });
+  }
+
+  static void _lagSummary(String name, int from) {
+    final lags = _lags.sublist(from);
+    results['lag_$name'] = {
+      'max_ms': lags.isEmpty ? 0 : lags.reduce(max),
+      'over_30ms': lags.where((l) => l > 30).length,
+      'over_100ms': lags.where((l) => l > 100).length,
+    };
+  }
+
   static final _frames = <FrameTiming>[];
   static final results = <String, Object?>{};
 
@@ -145,6 +175,8 @@ class PerfBench {
 
   static Future<void> run() async {
     SchedulerBinding.instance.addTimingsCallback(_onTimings);
+    _running = true;
+    _startLagProbe();
     try {
       await _stageDone('begin');
       await WidgetsBinding.instance.waitUntilFirstFrameRasterized;
@@ -175,6 +207,9 @@ class PerfBench {
       results['error'] = '$e\n$st';
     } finally {
       SchedulerBinding.instance.removeTimingsCallback(_onTimings);
+      _lagTimer?.cancel();
+      results['timers_ms'] = _timers;
+      _running = false;
       await _flush();
     }
   }
@@ -258,21 +293,32 @@ class PerfBench {
     await _summarise('editor_open', mark);
   }
 
+  static var _strokeCounter = 0;
+
   /// Synthetic pen: [strokes] strokes on page 0, four points per frame (an
   /// Apple Pencil reports at 240 Hz into a 60 Hz display), as the editor sees
-  /// them through its own draw callbacks.
-  static Future<void> _drawStrokes({int strokes = 14, int points = 160}) async {
+  /// them through its own draw callbacks, with [pause] between strokes as in
+  /// handwriting.
+  static Future<void> _write(
+    String name, {
+    required int strokes,
+    int points = 160,
+    Duration pause = const Duration(milliseconds: 400),
+  }) async {
     final editor = EditorState.benchInstance!;
     final page = editor.coreInfo.pages[0];
     final box = page.renderBox!;
     Offset global(double x, double y) => box.localToGlobal(Offset(x, y));
 
-    var mark = _mark();
+    final mark = _mark();
+    final lagFrom = _lags.length;
     final frameCosts = <double>[];
-    for (var s = 0; s < strokes; s++) {
+    for (var n = 0; n < strokes; n++) {
+      final s = _strokeCounter++;
       editor.dragPageIndex = 0;
-      final y0 = 120.0 + s * 70;
-      Offset at(int i) => global(80 + i * 4.5, y0 + sin(i / 8) * 30);
+      final y0 = 120.0 + (s % 18) * 70;
+      final x0 = 80.0 + (s ~/ 18) * 20;
+      Offset at(int i) => global(x0 + i * 4.5, y0 + sin(i / 8) * 30);
       editor.onDrawStart(
         ScaleStartDetails(focalPoint: at(0), localFocalPoint: at(0)),
       );
@@ -294,16 +340,29 @@ class PerfBench {
       }
       editor.onDrawEnd(ScaleEndDetails());
       await _frame();
+      final until = _gapClock.elapsed + pause;
+      while (_gapClock.elapsed < until) {
+        await _frame();
+      }
     }
-    await _summarise('draw_14_strokes', mark);
+    await _summarise(name, mark);
+    _lagSummary(name, lagFrom);
     frameCosts.sort();
-    results['draw_input_handler_ms_p90'] =
+    results['${name}_input_handler_ms_p90'] =
         frameCosts[(frameCosts.length * 0.9).floor()];
+  }
 
-    // The saves and syncing that follow the last stroke.
-    mark = _mark();
-    await Future<void>.delayed(const Duration(seconds: 6));
-    await _summarise('after_draw_6s_autosave', mark);
+  /// Writing, then a pause long enough for the PDF render to start (it waits
+  /// 2 s after the last save), then writing again while it runs.
+  static Future<void> _drawStrokes() async {
+    await _write('write_14_strokes', strokes: 14);
+    final lagFrom = _lags.length;
+    final mark = _mark();
+    await Future<void>.delayed(const Duration(milliseconds: 3200));
+    await _summarise('pause_3s_pdf_starts', mark);
+    _lagSummary('pause_3s_pdf_starts', lagFrom);
+    await _write('write_8_strokes_during_pdf', strokes: 8);
+    await Future<void>.delayed(const Duration(seconds: 8));
   }
 
   static Future<void> _scrollAndZoom() async {

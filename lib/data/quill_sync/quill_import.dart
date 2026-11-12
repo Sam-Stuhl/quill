@@ -14,6 +14,7 @@ import 'package:saber/data/editor/editor_core_info.dart';
 import 'package:saber/data/editor/editor_exporter.dart';
 import 'package:saber/data/editor/page.dart';
 import 'package:saber/data/file_manager/file_manager.dart';
+import 'package:saber/data/perf_bench.dart';
 import 'package:saber/pages/editor/editor.dart';
 
 /// Turns a file sent from the mini into a note, without the editor open.
@@ -205,6 +206,15 @@ abstract class QuillImport {
   /// Renders the note at [notePath] (no extension) to PDF bytes, headless.
   /// Returns null for a note with nothing on it.
   static Future<Uint8List?> renderPdf(String notePath) async {
+    final renderTime = Stopwatch()..start();
+    try {
+      return await _renderPdf(notePath);
+    } finally {
+      PerfBench.time('pdf_render', renderTime);
+    }
+  }
+
+  static Future<Uint8List?> _renderPdf(String notePath) async {
     final coreInfo = await EditorCoreInfo.loadFromFilePath(notePath);
     try {
       if (coreInfo.readOnlyReason == .corrupted) {
