@@ -63,3 +63,12 @@ its encoded points until they change (`_pointsJson`, cleared wherever the points
 change), which cut the encoding to about 10 ms, and the preview is made after a
 2 s pause in writing, or when the note is closed, instead of after every save.
 The BSON write is unchanged.
+
+## Background work waits for the pen
+
+While writing, the sync PDF render (about 26 renders in a 46 s handwriting run,
+1.2 to 2.4 s each) and the preview image stalled the main isolate between
+strokes: 13% of frames were slow against 2% for long strokes. `PenActivity`
+(`lib/data/pen_activity.dart`) records when the pen last wrote or hovered; the
+PDF render starts only after 3 s without it (`QuillSync.penQuiet`), pauses
+between pages while the pen is in use, and the preview waits for 2 s.
