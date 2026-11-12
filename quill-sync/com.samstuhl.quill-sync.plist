@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<!-- Quill sync (saber fork docs/quill-sync.md), sam account on the mini. Loopback only:
+<!-- Quill sync (quill docs/quill-sync.md), sam account on the mini. Loopback only:
      tailscale serve --bg --https=8796 http://127.0.0.1:8796 publishes it to the tailnet.
      Run through uv because uv holds the Full Disk Access grant that reading ~/school
      (a symlink into the NAS, for Cedar's course list) needs from a launchd job. -->
@@ -14,7 +14,7 @@
     <string>--no-project</string>
     <string>--</string>
     <string>/usr/local/bin/python3</string>
-    <string>/Users/sam/repos/saber/quill-sync/server.py</string>
+    <string>/Users/sam/repos/quill/quill-sync/server.py</string>
     <string>serve</string>
     <string>--host</string><string>127.0.0.1</string>
     <string>--port</string><string>8796</string>

@@ -1,4 +1,4 @@
-# Quill's PDFs into the vault (saber docs/quill-sync.md, "Into the vault").
+# Quill's PDFs into the vault (quill docs/quill-sync.md, "Into the vault").
 # A second instance of notasync's own router (image notasync:local, container
 # notasync-quill), reading ~/Quill/staging, which quill-stage fills from
 # ~sam/quill/Notes. Same vault, same companion notes, same routes as
