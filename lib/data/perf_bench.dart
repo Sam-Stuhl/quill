@@ -28,7 +28,16 @@ import 'package:sbn/tool_id.dart';
 /// `onDrawUpdate`, `onDrawEnd`, the transformation controller), so the numbers
 /// are the app's own: build and raster time per frame, as Flutter measures them.
 class PerfBench {
-  static bool get enabled => Platform.environment.containsKey('QUILL_BENCH');
+  /// Env var `QUILL_BENCH`, or a file named `.quill-bench` in the documents
+  /// folder (copied there with `devicectl device copy to`). The file is
+  /// removed when the run starts so it does not repeat.
+  static bool get enabled {
+    if (Platform.environment.containsKey('QUILL_BENCH')) return true;
+    final marker = File('${FileManager.documentsDirectory}/.quill-bench');
+    if (!marker.existsSync()) return false;
+    marker.deleteSync();
+    return true;
+  }
 
   static final _sinceMain = Stopwatch();
   static void markMain() => _sinceMain.start();
@@ -95,6 +104,7 @@ class PerfBench {
 
   static Future<void> _flush() async {
     final path = '${FileManager.documentsDirectory}/quill-bench.json';
+    results['path'] = path;
     await File(path).writeAsString(
       const JsonEncoder.withIndent('  ').convert(results),
     );
