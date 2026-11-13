@@ -74,7 +74,7 @@ flutter pub get
 # install, no build. The defines are removed from it again on exit.
 flutter build ios --release --config-only ${defines[@]+"${defines[@]}"}
 xcodebuild -workspace ios/Runner.xcworkspace -scheme Runner -configuration Release \
-  -destination "id=$udid" -derivedDataPath "$derived" -allowProvisioningUpdates \
+  -destination "${QUILL_DESTINATION:-id=$udid}" -derivedDataPath "$derived" -allowProvisioningUpdates \
   DEVELOPMENT_TEAM=W2X4GVG63F CODE_SIGN_STYLE=Automatic build
 # A build signed by a revoked certificate installs fine and then will not launch.
 app="$derived/Build/Products/Release-iphoneos/Runner.app"
@@ -83,7 +83,8 @@ if ! codesign --verify --deep --strict "$app"; then
   exit 1
 fi
 # Installing replaces the running app, closing it under Sam's pen:
-# QUILL_BUILD_ONLY=1 stops here so the install can wait for a pause.
+# QUILL_BUILD_ONLY=1 stops here (with QUILL_DESTINATION=generic/platform=iOS the
+# device need not be reachable from this Mac, for the mini) so the install can wait for a pause.
 if [ -n "${QUILL_BUILD_ONLY:-}" ]; then
   echo "built, not installed: $app"
   exit 0

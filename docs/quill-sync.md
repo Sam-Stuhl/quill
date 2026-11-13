@@ -259,8 +259,8 @@ What has gone wrong, and how it looks:
 | Quill opens with no notes, only the course folders | The app was deleted from the iPad (deleting it deletes its container), then installed again | Restore from the mini, below |
 
 When the iPad is on USB to the MacBook but not reachable from the mini: build on the
-mini with `-destination generic/platform=iOS` and `QUILL_BUILD_ONLY=1` (no device
-needed), copy `Runner.app` to the MacBook, and `xcrun devicectl device install app`
+mini with `QUILL_DESTINATION=generic/platform=iOS QUILL_BUILD_ONLY=1
+scripts/install-on-ipad.sh` (no device needed), copy `Runner.app` to the MacBook, and `xcrun devicectl device install app`
 there. The MacBook cannot sign, but installing a signed build needs no account.
 
 ### Restoring notes onto the iPad
