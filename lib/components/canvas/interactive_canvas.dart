@@ -38,6 +38,7 @@ class InteractiveCanvasViewer extends StatefulWidget {
     this.maxScale = 2.5,
     this.minScale = 0.8,
     this.isDrawGesture,
+    this.deferTouchGesture,
     this.interactionEndFrictionCoefficient = kDrag,
     this.onInteractionEnd,
     this.onDrawEnd,
@@ -85,6 +86,7 @@ class InteractiveCanvasViewer extends StatefulWidget {
     this.maxScale = 2.5,
     this.minScale = 0.8,
     this.isDrawGesture,
+    this.deferTouchGesture,
     this.interactionEndFrictionCoefficient = kDrag,
     this.onInteractionEnd,
     this.onDrawEnd,
@@ -336,6 +338,11 @@ class InteractiveCanvasViewer extends StatefulWidget {
 
   /// A function to distinguish a draw gesture and a pan/zoom gesture.
   final bool Function(ScaleStartDetails scaleDetails)? isDrawGesture;
+
+  /// While this returns true, pan and zoom updates are held back: the touches
+  /// have only just landed and may be a palm. The gesture catches up from where
+  /// it started once they are confirmed.
+  final bool Function()? deferTouchGesture;
 
   /// Called when any gesture ends.
   final GestureScaleEndCallback? onInteractionEnd;
@@ -769,6 +776,14 @@ class _InteractiveCanvasViewerState extends State<InteractiveCanvasViewer>
     if (!_gestureIsSupported(_gestureType) && !isCurrentGestureADrawGesture) {
       return;
     }
+    if (isCurrentGestureADrawGesture) {
+      // A stroke never moves the page. When a second pointer joins it (the pen
+      // arriving next to a palm that was drawing), the gesture turns into a
+      // zoom: ignore that instead of zooming the page.
+      if (_gestureType != _GestureType.pan) return;
+    } else if (widget.deferTouchGesture?.call() ?? false) {
+      return;
+    }
 
     switch (_gestureType!) {
       case _GestureType.scale:
@@ -776,6 +791,9 @@ class _InteractiveCanvasViewerState extends State<InteractiveCanvasViewer>
         // details.scale gives us the amount to change the scale as of the
         // start of this gesture, so calculate the amount to scale as of the
         // previous call to _onScaleUpdate.
+        // One pointer left (the other was cancelled): the span is 0 and there
+        // is no zoom to apply.
+        if (details.pointerCount < 2 || details.scale <= 0) return;
         final double desiredScale = _scaleStart! * details.scale;
         final double scaleChange = desiredScale / scale;
         _transformer.value = _matrixScale(_transformer.value, scaleChange);

@@ -31,4 +31,38 @@ void main() {
     palm.stylusEvent(10, down: true, up: false);
     expect(palm.touchDown(1), isFalse);
   });
+
+  test('a large contact radius is a palm and is rejected outright', () {
+    final palm = PalmRejection(holdMs: 800);
+    expect(palm.touchDown(1, radius: 10), isFalse);
+    expect(palm.touchDown(2, radius: 40), isTrue);
+    expect(palm.isRejected(2), isTrue);
+  });
+
+  test('a large radius is allowed when the setting is off', () {
+    final palm = PalmRejection(holdMs: 0);
+    expect(palm.touchDown(1, radius: 40), isFalse);
+  });
+
+  test('a new touch is unconfirmed until it has been down a moment', () async {
+    final palm = PalmRejection(holdMs: 800);
+    expect(palm.touchesConfirmed, isTrue);
+    palm.touchDown(1, radius: 10);
+    expect(palm.touchesConfirmed, isFalse);
+    await Future<void>.delayed(
+      const Duration(milliseconds: PalmRejection.confirmMs + 30),
+    );
+    expect(palm.touchesConfirmed, isTrue);
+    palm.touchDown(2, radius: 10);
+    expect(palm.touchesConfirmed, isFalse);
+    palm.touchEnded(2);
+    expect(palm.touchesConfirmed, isTrue);
+  });
+
+  test('clearing pending touches confirms nothing was waiting', () {
+    final palm = PalmRejection(holdMs: 800);
+    palm.touchDown(1, radius: 10);
+    palm.clearPending();
+    expect(palm.touchesConfirmed, isTrue);
+  });
 }
