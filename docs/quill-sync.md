@@ -228,7 +228,10 @@ side is under `lib/data/quill_sync/` and `lib/data/quill_defaults.dart`.
   writing a small s and a line): black on off-white in light, cream on
   near-black in dark, and a tinted form, drawn by `scripts/quill_icon.swift` (`swift
   scripts/quill_icon.swift`) into the iOS asset catalog only, so upstream's icons
-  under `assets/icon` merge untouched.
+  under `assets/icon` merge untouched. Upstream's Icon Composer icon
+  (`ios/Runner/AppIcon.icon`, Saber's yellow S) is kept on disk but taken out of the
+  Runner target: with the same name, Xcode builds it in place of the asset catalog's.
+  An upstream merge that adds it back to `project.pbxproj` brings the S back.
 - Tests: `/usr/bin/python3 -m unittest test_connect test_stage test_server`, and
   `flutter test test/quill_connect_test.dart` for the app side.
 
@@ -252,6 +255,27 @@ What has gone wrong, and how it looks:
 | The script sits silently at `flutter pub get` or `--config-only`, `dartvm` at 0% CPU in `_dyld_start` | A Gatekeeper prompt for Flutter's `dartvm` is open on the mini's screen (log: `ASP: Security policy would not allow process`). Homebrew's cask leaves the SDK quarantined. | Check the file is the SDK's (`codesign -dv`: FLUTTER.IO LLC, S8QB4VV633), then `xattr -dr com.apple.quarantine` on the Caskroom's `flutter/bin/cache`, and `pkill -9 -u sam -x CoreServicesUIAgent` to close the prompt. The next Flutter cask upgrade can bring it back. |
 | `CocoaPods not installed` on the mini | `brew install cocoapods` compiles Rust and LLVM on this Intel Mac | `GEM_HOME=~/.local/share/cocoapods-gems` and Homebrew's portable Ruby: `gem install cocoapods --no-document`. The script finds it there. |
 | `No Accounts` | That Mac's Xcode is signed out | Build on the other Mac, or sign in under Xcode, Settings, Accounts |
+| The home screen shows Saber's yellow S whatever the asset catalog holds | Upstream's Icon Composer icon `ios/Runner/AppIcon.icon` is in the Runner target; with the same name it is built instead of `AppIcon.appiconset` | Keep it out of the target (2026-11-12). Check a build with `xcrun assetutil --info Runner.app/Assets.car`: the icon renditions are `Icon-App-*.png`, not `AppIcon.iconstack` |
+| Quill opens with no notes, only the course folders | The app was deleted from the iPad (deleting it deletes its container), then installed again | Restore from the mini, below |
+
+When the iPad is on USB to the MacBook but not reachable from the mini: build on the
+mini with `-destination generic/platform=iOS` and `QUILL_BUILD_ONLY=1` (no device
+needed), copy `Runner.app` to the MacBook, and `xcrun devicectl device install app`
+there. The MacBook cannot sign, but installing a signed build needs no account.
+
+### Restoring notes onto the iPad
+
+`.quill/store` on the mini is a full mirror of the app's notes. Back it up
+(`tar czf ~/quill-store-backup-DATE.tgz -C ~/quill/.quill store`), copy it to the Mac
+the iPad is plugged into as a folder named `Saber`, close Quill
+(`devicectl device process terminate`), then:
+
+    xcrun devicectl device copy to --device <udid> --domain-type appDataContainer \
+      --domain-identifier com.samstuhl.saber --source Saber --destination Documents/Saber
+
+The destination must name `Documents/Saber`: with `--destination Documents` the
+folder's contents land in `Documents` itself, where the app does not look. Done
+this way on 2026-11-12 (344 notes).
 
 The installed build's certificate came from the mini on 2026-11-08 (SHA-1 `7CFF270A`).
 A signing run from a Mac with no valid identity makes a new certificate, so

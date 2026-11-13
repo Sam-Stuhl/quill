@@ -4,7 +4,8 @@
 // the three variants iOS asks for (light, dark, tinted).
 //   swift scripts/quill_icon.swift
 // Quill's own icons stay under assets/icon (upstream merges untouched); only the iOS
-// asset catalog is replaced.
+// asset catalog is replaced. Upstream's ios/Runner/AppIcon.icon (Icon Composer) is out of the
+// Runner target, since Xcode would build it instead of this catalog.
 import CoreGraphics
 import Foundation
 import ImageIO
