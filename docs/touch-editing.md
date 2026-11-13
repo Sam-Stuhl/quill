@@ -27,26 +27,32 @@ from the shelf, dismiss).
 
 ## Palm rejection
 
-While the Pencil is touching the screen, hovering over it, or was lifted less
-than a hold time ago, finger and palm touches are ignored: no panning, zooming,
-taps, press and hold or drawing. A palm that was already down when the Pencil
-arrived is cancelled. Settings, Gestures, Palm rejection sets the hold time (Off,
-Low 0.4 s, Medium 0.8 s by default, High 1.5 s). The logic is
-`lib/data/palm_rejection.dart`, applied in `canvas_gesture_detector.dart`.
+Settings, Gestures, Palm rejection (on by default). Built after how other apps
+do it (tldraw's pen mode, Xournal++, Notability) and tuned from an input trace
+of Sam's hand on his iPad (2026-11-13), not guessed:
 
-How the touch and pen input is arbitrated (2026-11-13). The 10th gen iPad has no Pencil hover, so the pen
-cannot be sensed before it touches: a palm that lands first is only known to be
-a palm once the pen arrives. So:
+- The Pencil only draws. Once a pen has been seen, finger drawing turns off, so
+  a touch can only scroll, zoom or tap.
+- While the Pencil is on the screen, every new touch is ignored.
+- A contact over 24 px radius is a palm and is always ignored. On the 10th gen
+  iPad a fingertip reports 15.7, a palm 36.5 and the Pencil 0.1.
+- A palm that was already down when the Pencil lands is cancelled, and what it
+  did is undone: the page goes back to where it was and its stroke is dropped.
+- Nothing is held back after the Pencil lifts, so a finger scrolls at once
+  after writing. (A 0.8 s block after each stroke and a 90 ms hold on every
+  scroll were tried first: the trace showed them eating scrolls and causing
+  the lag.)
+- A gesture made only of ignored touches neither draws nor pans. The gesture
+  recognizer sees a touch before palm rejection does, and used to take an
+  ignored finger for the pen it saw last, leaving a dot.
+- A stroke never moves the page, and a lone pen after a palm is never taken
+  for the tail of a pinch.
 
-- A touch with a contact radius over 24 px is a palm and is ignored outright
- .
-- A touch waits 90 ms before it may pan or zoom, and the page position from
-  before the touches landed is kept: when the Pencil arrives while those
-  touches are still down, the page snaps back and any stroke they drew is
-  dropped.
-- A stroke never moves the page. When the pen joined a palm's gesture it became
-  a zoom with scale 0 (a zoom collapse in release builds) and the pen's first
-  stroke was swallowed as the tail of a pinch. Both are fixed.
+The 10th gen iPad has no Pencil hover, so a palm that lands first can only be
+known for a palm once the pen arrives; on iPads with hover, a hovering pen
+counts as in use. The logic is `lib/data/palm_rejection.dart`, applied in
+`canvas_gesture_detector.dart`.
 
 Test: `flutter test integration_test/palm_rejection_test.dart -d <simulator>`.
 
+Input trace (for tuning): launch with the environment variable `QUILL_INPUT_TRACE` (`devicectl device process launch --environment-variables {"QUILL_INPUT_TRACE":"1"}`) or put a `.quill-input-trace` file in the documents folder. Every pointer event (kind, contact radius, pressure, time) and each draw or pan decision is appended to `input-trace.log` there. `lib/data/input_trace.dart`.

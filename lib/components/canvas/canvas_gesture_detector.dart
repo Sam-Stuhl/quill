@@ -12,6 +12,7 @@ import 'package:quill/components/canvas/interactive_canvas.dart';
 import 'package:quill/data/editor/page.dart';
 import 'package:quill/data/extensions/change_notifier_extensions.dart';
 import 'package:quill/data/extensions/matrix4_extensions.dart';
+import 'package:quill/data/input_trace.dart';
 import 'package:quill/data/palm_rejection.dart';
 import 'package:quill/data/prefs.dart';
 import 'package:quill/data/touch_gestures.dart';
@@ -336,7 +337,7 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
     setInitialTransform();
     widget._transformationController.addListener(onTransformChanged);
     _assignKeybindings();
-    stows.palmRejectionMs.addListener(_onPalmSettingChanged);
+    stows.palmRejection.addListener(_onPalmSettingChanged);
     super.initState();
   }
 
@@ -459,9 +460,18 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
     _longPressStart = null;
   }
 
-  late final _palm = PalmRejection(holdMs: stows.palmRejectionMs.value);
+  late final _palm = PalmRejection(enabled: stows.palmRejection.value);
 
-  void _onPalmSettingChanged() => _palm.holdMs = stows.palmRejectionMs.value;
+  void _onPalmSettingChanged() => _palm.enabled = stows.palmRejection.value;
+
+  /// The gesture recognizer sees a touch before palm rejection does, and
+  /// resolves a gesture when the ignored touch is cancelled. Such a gesture has
+  /// only ignored touches in it: it must neither draw nor pan (the input trace
+  /// showed it leaving a dot, 2026-11-13).
+  bool get _onlyRejectedTouchesDown =>
+      _touchesDown.isNotEmpty &&
+      _touchesDown.every(_palm.isRejected) &&
+      !_palm.penActive;
 
   /// Touch pointers currently down, so a palm that landed before the pen can be
   /// cancelled when the pen arrives.
@@ -473,14 +483,15 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
 
   void _undoPalmEffects() {
     if (_touchesDown.isEmpty) return;
+    InputTrace.log('pen arrived: undo palm ${_touchesDown.toList()}');
     final before = _transformBeforeTouch;
     if (before != null) widget._transformationController.value = before;
     _transformBeforeTouch = null;
-    _palm.clearPending();
     widget.onTouchCancelledByPen?.call();
   }
 
   void _cancelPointer(int pointer) {
+    // Out of the current event dispatch: cancelling inside it can re-enter.
     // Out of the current event dispatch: cancelling inside it can re-enter.
     scheduleMicrotask(() {
       if (mounted) GestureBinding.instance.cancelPointer(pointer);
@@ -490,6 +501,15 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
   /// Runs on every pointer event, before anything else looks at it.
   /// Returns true if the event is a touch that palm rejection swallowed.
   bool _palmRejects(PointerEvent event) {
+    final rejected = _palmRejectsInner(event);
+    if ((InputTrace.enabled || InputTrace.sink != null) &&
+        event is! PointerHoverEvent) {
+      InputTrace.pointer(rejected ? 'REJECT' : 'pass', event);
+    }
+    return rejected;
+  }
+
+  bool _palmRejectsInner(PointerEvent event) {
     final isStylus =
         event.kind == PointerDeviceKind.stylus ||
         event.kind == PointerDeviceKind.invertedStylus;
@@ -518,6 +538,8 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
       }
       _touchesDown.add(event.pointer);
       if (_palm.touchDown(event.pointer, radius: event.radiusMajor)) {
+        // So the editor never takes this touch for the pen it saw last.
+        widget.updatePointerData(PointerDeviceKind.touch, null);
         _cancelPointer(event.pointer);
         return true;
       }
@@ -700,7 +722,7 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
                   transformationController: widget._transformationController,
 
                   isDrawGesture: widget.isDrawGesture,
-                  deferTouchGesture: () => !_palm.touchesConfirmed,
+                  ignoreGesture: () => _onlyRejectedTouchesDown,
                   onInteractionEnd: widget.onInteractionEnd,
                   onDrawStart: widget.onDrawStart,
                   onDrawUpdate: widget.onDrawUpdate,
@@ -755,7 +777,7 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
     );
     widget._transformationController.removeListener(onTransformChanged);
     widget._transformationController.dispose();
-    stows.palmRejectionMs.removeListener(_onPalmSettingChanged);
+    stows.palmRejection.removeListener(_onPalmSettingChanged);
     _removeKeybindings();
     _cancelLongPress();
     _tapResolver.dispose();

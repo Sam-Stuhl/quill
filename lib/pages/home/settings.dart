@@ -573,20 +573,13 @@ class _SettingsPageState extends State<SettingsPage> {
                     );
                   },
                 ),
-                SettingsSelection<int>(
+                SettingsSwitch(
                   title: 'Palm rejection',
                   subtitle:
-                      'Ignore palm and finger touches while the Pencil is in '
-                      'use, and for a moment after it lifts',
+                      'Ignore your palm, and any touch while the Pencil is on '
+                      'the screen',
                   icon: Icons.back_hand,
-                  pref: stows.palmRejectionMs,
-                  optionsWidth: 64,
-                  options: const [
-                    ToggleButtonsOption(0, Text('Off')),
-                    ToggleButtonsOption(400, Text('Low')),
-                    ToggleButtonsOption(800, Text('Medium')),
-                    ToggleButtonsOption(1500, Text('High')),
-                  ],
+                  pref: stows.palmRejection,
                 ),
                 for (final gesture in TouchGesture.values)
                   SettingsDropdown<TouchAction>(

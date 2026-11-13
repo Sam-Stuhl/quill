@@ -2,67 +2,46 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:quill/data/palm_rejection.dart';
 
 void main() {
-  test('touches pass when the pen has not been used', () {
-    final palm = PalmRejection(holdMs: 800);
-    expect(palm.touchDown(1), isFalse);
+  test('a finger passes when the pen is not in use', () {
+    final palm = PalmRejection(enabled: true);
+    expect(palm.touchDown(1, radius: 15.7), isFalse);
   });
 
-  test('touches are rejected while the pen is down or hovering', () {
-    final palm = PalmRejection(holdMs: 800);
+  test('touches are ignored while the pen is down', () {
+    final palm = PalmRejection(enabled: true);
     palm.stylusEvent(10, down: true, up: false);
-    expect(palm.touchDown(1), isTrue);
+    expect(palm.touchDown(1, radius: 15.7), isTrue);
     expect(palm.isRejected(1), isTrue);
     palm.touchEnded(1);
     expect(palm.isRejected(1), isFalse);
   });
 
-  test('touches stay rejected for the hold time after the pen lifts', () async {
-    final palm = PalmRejection(holdMs: 100);
+  test('a finger works again as soon as the pen lifts', () {
+    final palm = PalmRejection(enabled: true);
     palm.stylusEvent(10, down: true, up: false);
     palm.stylusEvent(10, down: false, up: true);
-    expect(palm.penActive, isTrue);
-    await Future<void>.delayed(const Duration(milliseconds: 150));
     expect(palm.penActive, isFalse);
-    expect(palm.touchDown(2), isFalse);
+    expect(palm.touchDown(2, radius: 15.7), isFalse);
   });
 
-  test('a hold of 0 turns it off', () {
-    final palm = PalmRejection(holdMs: 0);
-    palm.stylusEvent(10, down: true, up: false);
-    expect(palm.touchDown(1), isFalse);
+  test('a palm-sized contact is always ignored', () {
+    final palm = PalmRejection(enabled: true);
+    expect(palm.touchDown(1, radius: 36.5), isTrue);
   });
 
-  test('a large contact radius is a palm and is rejected outright', () {
-    final palm = PalmRejection(holdMs: 800);
-    expect(palm.touchDown(1, radius: 10), isFalse);
-    expect(palm.touchDown(2, radius: 40), isTrue);
-    expect(palm.isRejected(2), isTrue);
-  });
-
-  test('a large radius is allowed when the setting is off', () {
-    final palm = PalmRejection(holdMs: 0);
-    expect(palm.touchDown(1, radius: 40), isFalse);
-  });
-
-  test('a new touch is unconfirmed until it has been down a moment', () async {
-    final palm = PalmRejection(holdMs: 800);
-    expect(palm.touchesConfirmed, isTrue);
-    palm.touchDown(1, radius: 10);
-    expect(palm.touchesConfirmed, isFalse);
+  test('hovering counts as the pen in use, briefly', () async {
+    final palm = PalmRejection(enabled: true);
+    palm.stylusEvent(10, down: false, up: false);
+    expect(palm.penActive, isTrue);
     await Future<void>.delayed(
-      const Duration(milliseconds: PalmRejection.confirmMs + 30),
+      const Duration(milliseconds: PalmRejection.hoverMs + 50),
     );
-    expect(palm.touchesConfirmed, isTrue);
-    palm.touchDown(2, radius: 10);
-    expect(palm.touchesConfirmed, isFalse);
-    palm.touchEnded(2);
-    expect(palm.touchesConfirmed, isTrue);
+    expect(palm.penActive, isFalse);
   });
 
-  test('clearing pending touches confirms nothing was waiting', () {
-    final palm = PalmRejection(holdMs: 800);
-    palm.touchDown(1, radius: 10);
-    palm.clearPending();
-    expect(palm.touchesConfirmed, isTrue);
+  test('off ignores nothing', () {
+    final palm = PalmRejection(enabled: false);
+    palm.stylusEvent(10, down: true, up: false);
+    expect(palm.touchDown(1, radius: 36.5), isFalse);
   });
 }

@@ -154,11 +154,12 @@ class Stows {
       ),
   };
 
-  /// Palm rejection: how long, in milliseconds, finger and palm touches stay
-  /// ignored after the pen was last on or over the screen. 0 turns it off.
-  final palmRejectionMs = PlainStow(
-    'palmRejectionMs',
-    800,
+  /// Palm rejection (lib/data/palm_rejection.dart): touches are ignored while
+  /// the pen is on the screen, palm-sized contacts always, and a palm that was
+  /// down when the pen arrived is undone.
+  final palmRejection = PlainStow(
+    'palmRejection',
+    true,
     volatile: !_isOnMainIsolate,
   );
 

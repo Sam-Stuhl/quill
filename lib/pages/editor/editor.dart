@@ -44,6 +44,7 @@ import 'package:quill/data/file_manager/file_manager.dart';
 import 'package:quill/data/nextcloud/quill_syncer.dart';
 import 'package:quill/data/pen_activity.dart';
 import 'package:quill/data/perf_bench.dart';
+import 'package:quill/data/input_trace.dart';
 import 'package:quill/data/prefs.dart';
 import 'package:quill/data/scribble_erase.dart';
 import 'package:quill/data/tools/_tool.dart';
@@ -571,6 +572,15 @@ class EditorState extends State<Editor> {
   PointerDeviceKind? currentPointerKind;
   double? currentPressure;
   bool isDrawGesture(ScaleStartDetails details) {
+    final result = _isDrawGesture(details);
+    InputTrace.log(
+      'scaleStart pointers=${details.pointerCount} kind=${currentPointerKind?.name} '
+      'draw=$result lastSeen=$lastSeenPointerCount',
+    );
+    return result;
+  }
+
+  bool _isDrawGesture(ScaleStartDetails details) {
     if (coreInfo.readOnly) return false;
 
     CanvasImage.activeListener
@@ -666,6 +676,10 @@ class EditorState extends State<Editor> {
     _drawInProgress = true;
     _discardDraw = false;
     _drawStartedByTouch = currentPointerKind == PointerDeviceKind.touch;
+    InputTrace.log(
+      'drawStart kind=${currentPointerKind?.name} pointers=${details.pointerCount} '
+      'tool=${currentTool.runtimeType} finger=${stows.editorFingerDrawing.value}',
+    );
     final page = coreInfo.pages[dragPageIndex!];
     final position = page.renderBox!.globalToLocal(details.focalPoint);
     history.canRedo = false;
@@ -890,6 +904,7 @@ class EditorState extends State<Editor> {
   void onDrawEnd(ScaleEndDetails details) {
     PenActivity.mark();
     final discard = _discardDraw;
+    InputTrace.log('drawEnd discard=$discard');
     _drawInProgress = false;
     _discardDraw = false;
     if (dragPageIndex == null) {
