@@ -255,7 +255,6 @@ What has gone wrong, and how it looks:
 | The script sits silently at `flutter pub get` or `--config-only`, `dartvm` at 0% CPU in `_dyld_start` | A Gatekeeper prompt for Flutter's `dartvm` is open on the mini's screen (log: `ASP: Security policy would not allow process`). Homebrew's cask leaves the SDK quarantined. | Check the file is the SDK's (`codesign -dv`: FLUTTER.IO LLC, S8QB4VV633), then `xattr -dr com.apple.quarantine` on the Caskroom's `flutter/bin/cache`, and `pkill -9 -u sam -x CoreServicesUIAgent` to close the prompt. The next Flutter cask upgrade can bring it back. |
 | `CocoaPods not installed` on the mini | `brew install cocoapods` compiles Rust and LLVM on this Intel Mac | `GEM_HOME=~/.local/share/cocoapods-gems` and Homebrew's portable Ruby: `gem install cocoapods --no-document`. The script finds it there. |
 | `No Accounts` | That Mac's Xcode is signed out | Build on the other Mac, or sign in under Xcode, Settings, Accounts |
-
 | The home screen shows Saber's yellow S whatever the asset catalog holds | Upstream's Icon Composer icon `ios/Runner/AppIcon.icon` is in the Runner target; with the same name it is built instead of `AppIcon.appiconset` | Keep it out of the target (2026-11-12). Check a build with `xcrun assetutil --info Runner.app/Assets.car`: the icon renditions are `Icon-App-*.png`, not `AppIcon.iconstack` |
 | Quill opens with no notes, only the course folders | The app was deleted from the iPad (deleting it deletes its container), then installed again | Restore from the mini, below |
 
