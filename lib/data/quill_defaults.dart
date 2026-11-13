@@ -13,7 +13,7 @@ import 'package:sbn/tool_id.dart';
 /// To change a taste: edit the value here and raise [version].
 abstract class QuillDefaults {
   /// Raise to apply the values below again on the next launch.
-  static const version = 2;
+  static const version = 3;
 
   /// Ink blue, the icon's colour (scripts/quill_icon.swift).
   static const accent = Color(0xFF3454A0);
@@ -36,8 +36,8 @@ abstract class QuillDefaults {
     // resting palm, instead of Quill's bottom bar that gets tapped by accident.
     stows.editorToolbarAlignment.value = AxisDirection.up;
 
-    // Paper: college ruled, white, for new notes.
-    stows.lastBackgroundPattern.value = CanvasBackgroundPattern.collegeLtr;
+    // Paper: a reMarkable-style graph (grid), white, for new notes.
+    stows.lastBackgroundPattern.value = CanvasBackgroundPattern.remarkableGraph;
 
     // Pens: a fine black fountain pen to start with, a blue ballpoint for
     // marking up, a slim yellow highlighter, a soft gray pencil.

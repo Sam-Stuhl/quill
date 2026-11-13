@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:quill/components/canvas/canvas_background_preview.dart';
 import 'package:quill/components/canvas/canvas_image_dialog.dart';
 import 'package:quill/components/canvas/inner_canvas.dart';
+import 'package:quill/data/custom_patterns.dart';
 import 'package:quill/data/editor/editor_core_info.dart';
 import 'package:quill/data/editor/page.dart';
 import 'package:quill/data/extensions/list_extensions.dart';
@@ -236,6 +237,59 @@ class _EditorBottomSheetState extends State<EditorBottomSheet> {
                 },
               ),
             ),
+            if (CustomPattern.all.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              Text('Custom patterns', style: TextTheme.of(context).titleMedium),
+              SizedBox(
+                height: previewSize.height,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: CustomPattern.all.length,
+                  separatorBuilder: (_, _) => const SizedBox(width: 8),
+                  itemBuilder: (context, index) {
+                    final custom = CustomPattern.all[index];
+                    return InkWell(
+                      borderRadius: const .all(.circular(8)),
+                      onTap: () => setState(() {
+                        widget.setBackgroundPattern(custom.pattern);
+                        widget.setLineHeight(custom.lineHeight);
+                        widget.setLineThickness(custom.lineThickness);
+                      }),
+                      child: Stack(
+                        children: [
+                          CanvasBackgroundPreview(
+                            selected:
+                                widget.coreInfo.backgroundPattern ==
+                                    custom.pattern &&
+                                widget.coreInfo.lineHeight ==
+                                    custom.lineHeight &&
+                                widget.coreInfo.lineThickness ==
+                                    custom.lineThickness,
+                            invert: widget.invert,
+                            backgroundColor:
+                                widget.coreInfo.backgroundColor ??
+                                InnerCanvas.defaultBackgroundColor,
+                            backgroundPattern: custom.pattern,
+                            backgroundImage: null,
+                            pageSize: pageSize,
+                            lineHeight: custom.lineHeight,
+                            lineThickness: custom.lineThickness,
+                          ),
+                          Positioned(
+                            bottom: previewSize.height * 0.1,
+                            left: 0,
+                            right: 0,
+                            child: Center(
+                              child: _PermanentTooltip(text: custom.name),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
             const SizedBox(height: 16),
             Text(
               t.editor.menu.lineHeight,

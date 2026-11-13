@@ -48,6 +48,13 @@ enum CanvasBackgroundPattern(
   /// reMarkable "Grid" template. Ignores the line height setting.
   remarkableGraph('remarkable-graph', requiresClipping: true);
 
+  /// Whether the line height and thickness settings change how this looks
+  /// (the reMarkable patterns ignore them).
+  bool get usesLineHeight => switch (this) {
+    none || remarkableLined || remarkableGraph => false,
+    _ => true,
+  };
+
   static CanvasBackgroundPattern fromName(String? name) {
     return values.firstWhere(
       (pattern) => pattern.name == name,

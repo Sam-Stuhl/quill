@@ -2389,7 +2389,6 @@ class EditorState extends State<Editor> {
         if (coreInfo.readOnly) return;
         final previous = coreInfo.backgroundPattern;
         coreInfo.backgroundPattern = pattern;
-        stows.lastBackgroundPattern.value = pattern;
         history.recordChange(
           HistoricBackgroundPatternChange(
             pageIndex: currentPageIndex,
@@ -2401,13 +2400,11 @@ class EditorState extends State<Editor> {
       setLineHeight: (lineHeight) => setState(() {
         if (coreInfo.readOnly) return;
         coreInfo.lineHeight = lineHeight;
-        stows.lastLineHeight.value = lineHeight;
         autosaveAfterDelay();
       }),
       setLineThickness: (lineThickness) => setState(() {
         if (coreInfo.readOnly) return;
         coreInfo.lineThickness = lineThickness;
-        stows.lastLineThickness.value = lineThickness;
         autosaveAfterDelay();
       }),
       removeBackgroundImage: () => setState(() {

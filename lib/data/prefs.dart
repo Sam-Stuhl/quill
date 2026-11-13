@@ -334,10 +334,20 @@ class Stows {
     0,
     volatile: !_isOnMainIsolate,
   );
+
+  /// The paper for new notes (set in settings, Paper). Despite the name it is
+  /// not overwritten when a note's pattern changes in the editor.
   final lastBackgroundPattern = PlainStow(
     'lastBackgroundPattern',
-    CanvasBackgroundPattern.none,
+    CanvasBackgroundPattern.remarkableGraph,
     codec: const EnumCodec(CanvasBackgroundPattern.values),
+    volatile: !_isOnMainIsolate,
+  );
+
+  /// Saved papers, one JSON string each (see CustomPattern).
+  final customBackgroundPatterns = PlainStow(
+    'customBackgroundPatterns',
+    <String>[],
     volatile: !_isOnMainIsolate,
   );
   static const defaultLineHeight = 40;

@@ -217,7 +217,7 @@ side is under `lib/data/quill_sync/` and `lib/data/quill_defaults.dart`.
 - **His defaults.** `lib/data/quill_defaults.dart`, applied once at first launch and
   again only when its `version` is raised, so upstream's defaults stay as they are
   and a later change in the app sticks: system light or dark in ink blue (accent
-  `#3454A0`), college ruled paper, a fine black fountain pen (size 3), a blue
+  `#3454A0`), reMarkable graph (grid) paper for new notes (changed in Settings, Paper, where custom patterns are saved too; `lib/data/custom_patterns.dart`), a fine black fountain pen (size 3), a blue
   ballpoint (`#1B3B8C`, 2.5), a slim yellow highlighter (30), a gray pencil, and the
   toolbar along the top, laid out like Notability's (a back pill, a floating tools
   pill (hideable) with the colour row and pen options in a pill under it (shown and hidden by tapping the active tool), an undo, redo, more, share and pages pill at the

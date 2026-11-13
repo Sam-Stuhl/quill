@@ -13,6 +13,7 @@ import 'package:quill/components/settings/settings_button.dart';
 import 'package:quill/components/settings/settings_color.dart';
 import 'package:quill/components/settings/settings_directory_selector.dart';
 import 'package:quill/components/settings/settings_dropdown.dart';
+import 'package:quill/components/settings/settings_paper.dart';
 import 'package:quill/components/settings/settings_selection.dart';
 import 'package:quill/components/settings/settings_sentry.dart';
 import 'package:quill/components/settings/settings_subtitle.dart';
@@ -419,6 +420,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     );
                   },
                 ),
+
+                const SettingsSubtitle(subtitle: 'Paper'),
+                const SettingsPaper(),
 
                 SettingsSubtitle(subtitle: t.settings.prefCategories.editor),
                 SettingsSelection(
