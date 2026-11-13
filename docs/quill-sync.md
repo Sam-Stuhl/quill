@@ -256,6 +256,28 @@ What has gone wrong, and how it looks:
 | `CocoaPods not installed` on the mini | `brew install cocoapods` compiles Rust and LLVM on this Intel Mac | `GEM_HOME=~/.local/share/cocoapods-gems` and Homebrew's portable Ruby: `gem install cocoapods --no-document`. The script finds it there. |
 | `No Accounts` | That Mac's Xcode is signed out | Build on the other Mac, or sign in under Xcode, Settings, Accounts |
 
+| The home screen shows Saber's yellow S whatever the asset catalog holds | Upstream's Icon Composer icon `ios/Runner/AppIcon.icon` is in the Runner target; with the same name it is built instead of `AppIcon.appiconset` | Keep it out of the target (2026-11-12). Check a build with `xcrun assetutil --info Runner.app/Assets.car`: the icon renditions are `Icon-App-*.png`, not `AppIcon.iconstack` |
+| Quill opens with no notes, only the course folders | The app was deleted from the iPad (deleting it deletes its container), then installed again | Restore from the mini, below |
+
+When the iPad is on USB to the MacBook but not reachable from the mini: build on the
+mini with `-destination generic/platform=iOS` and `QUILL_BUILD_ONLY=1` (no device
+needed), copy `Runner.app` to the MacBook, and `xcrun devicectl device install app`
+there. The MacBook cannot sign, but installing a signed build needs no account.
+
+### Restoring notes onto the iPad
+
+`.quill/store` on the mini is a full mirror of the app's notes. Back it up
+(`tar czf ~/quill-store-backup-DATE.tgz -C ~/quill/.quill store`), copy it to the Mac
+the iPad is plugged into as a folder named `Saber`, close Quill
+(`devicectl device process terminate`), then:
+
+    xcrun devicectl device copy to --device <udid> --domain-type appDataContainer \
+      --domain-identifier com.samstuhl.saber --source Saber --destination Documents/Saber
+
+The destination must name `Documents/Saber`: with `--destination Documents` the
+folder's contents land in `Documents` itself, where the app does not look. Done
+this way on 2026-11-12 (344 notes).
+
 The installed build's certificate came from the mini on 2026-11-08 (SHA-1 `7CFF270A`).
 A signing run from a Mac with no valid identity makes a new certificate, so
 one Mac's build does not depend on the other's.
