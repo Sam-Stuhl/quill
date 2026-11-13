@@ -577,7 +577,16 @@ class EditorState extends State<Editor> {
         .notifyListenersPlease(); // un-select active image
 
     _lastSeenPointerCountTimer?.cancel();
-    if (lastSeenPointerCount >= 2) {
+    final penAlone =
+        details.pointerCount == 1 &&
+        (currentPointerKind == PointerDeviceKind.stylus ||
+            currentPointerKind == PointerDeviceKind.invertedStylus);
+    if (penAlone) {
+      // The pen is the only thing on the screen: a palm that rested next to it
+      // was cancelled, and the two-pointer gesture it briefly formed with the
+      // pen is not a zoom that should swallow the pen's stroke.
+      lastSeenPointerCount = 1;
+    } else if (lastSeenPointerCount >= 2) {
       // was a zoom gesture, ignore
       lastSeenPointerCount = lastSeenPointerCount;
       return false;
@@ -638,8 +647,25 @@ class EditorState extends State<Editor> {
 
   static const changePageThreshold = 50.0;
 
+  /// Whether the stroke being drawn was started by a finger or palm.
+  var _drawStartedByTouch = false;
+  var _drawInProgress = false;
+
+  /// Set when the Pencil arrives while a touch is drawing: that touch was a
+  /// palm, so its stroke is dropped when the gesture ends instead of saved.
+  var _discardDraw = false;
+
+  /// Drops the stroke a finger or palm is drawing, if any. The gesture ends a
+  /// moment later (its pointer is cancelled) and [onDrawEnd] throws it away.
+  void discardTouchDraw() {
+    if (_drawInProgress && _drawStartedByTouch) _discardDraw = true;
+  }
+
   void onDrawStart(ScaleStartDetails details) {
     PenActivity.mark();
+    _drawInProgress = true;
+    _discardDraw = false;
+    _drawStartedByTouch = currentPointerKind == PointerDeviceKind.touch;
     final page = coreInfo.pages[dragPageIndex!];
     final position = page.renderBox!.globalToLocal(details.focalPoint);
     history.canRedo = false;
@@ -863,10 +889,27 @@ class EditorState extends State<Editor> {
 
   void onDrawEnd(ScaleEndDetails details) {
     PenActivity.mark();
+    final discard = _discardDraw;
+    _drawInProgress = false;
+    _discardDraw = false;
     if (dragPageIndex == null) {
       return;
     }
     final page = coreInfo.pages[dragPageIndex!];
+    if (discard) {
+      // A palm's stroke: end the tool's stroke without keeping it.
+      _draggingSelection = false;
+      setState(() {
+        if (currentTool is Pen) {
+          (currentTool as Pen).onDragEnd();
+        } else if (currentTool is Eraser) {
+          (currentTool as Eraser).onDragEnd();
+        }
+      });
+      page.redrawStrokes();
+      page.redrawLive();
+      return;
+    }
     bool shouldSave = true;
     _draggingSelection = false;
     setState(() {
@@ -2057,6 +2100,7 @@ class EditorState extends State<Editor> {
       undo: undo,
       redo: redo,
       onTouchAction: performTouchAction,
+      onTouchCancelledByPen: discardTouchDraw,
       onLongPress: onLongPress,
       onTap: onTouchTap,
       pages: coreInfo.pages,

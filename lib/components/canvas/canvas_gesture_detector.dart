@@ -34,6 +34,7 @@ class CanvasGestureDetector extends StatefulWidget {
     required this.undo,
     required this.redo,
     required this.onTouchAction,
+    this.onTouchCancelledByPen,
     this.onLongPress,
     this.onTap,
     required this.pages,
@@ -66,6 +67,10 @@ class CanvasGestureDetector extends StatefulWidget {
 
   /// Called when a mapped tap gesture (Settings, Gestures) is performed.
   final ValueChanged<TouchAction> onTouchAction;
+
+  /// The Pencil arrived while a finger or palm was already down: drop any
+  /// stroke that touch was drawing.
+  final VoidCallback? onTouchCancelledByPen;
 
   /// A single finger held still on the canvas (global position).
   final ValueChanged<Offset>? onLongPress;
@@ -159,6 +164,9 @@ class CanvasGestureDetector extends StatefulWidget {
 
 class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
   late var containerBounds = const BoxConstraints();
+
+  @visibleForTesting
+  Matrix4 get transform => widget._transformationController.value;
 
   /// If zooming is locked, this is the zoom level.
   /// Otherwise, this is null.
@@ -459,6 +467,19 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
   /// cancelled when the pen arrives.
   final Set<int> _touchesDown = {};
 
+  /// Page position when the first touch of the current set landed, so a pan a
+  /// palm caused before the pen arrived can be taken back.
+  Matrix4? _transformBeforeTouch;
+
+  void _undoPalmEffects() {
+    if (_touchesDown.isEmpty) return;
+    final before = _transformBeforeTouch;
+    if (before != null) widget._transformationController.value = before;
+    _transformBeforeTouch = null;
+    _palm.clearPending();
+    widget.onTouchCancelledByPen?.call();
+  }
+
   void _cancelPointer(int pointer) {
     // Out of the current event dispatch: cancelling inside it can re-enter.
     scheduleMicrotask(() {
@@ -481,6 +502,7 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
       );
       if (!wasActive && _palm.penActive) {
         // The pen just arrived: whatever is already touching is a palm.
+        _undoPalmEffects();
         for (final pointer in _touchesDown.toList()) {
           _palm.rejected.add(pointer);
           _cancelPointer(pointer);
@@ -491,8 +513,11 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
     if (event.kind != PointerDeviceKind.touch) return false;
 
     if (event is PointerDownEvent) {
+      if (_touchesDown.isEmpty) {
+        _transformBeforeTouch = widget._transformationController.value.clone();
+      }
       _touchesDown.add(event.pointer);
-      if (_palm.touchDown(event.pointer)) {
+      if (_palm.touchDown(event.pointer, radius: event.radiusMajor)) {
         _cancelPointer(event.pointer);
         return true;
       }
@@ -501,6 +526,7 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
     final rejected = _palm.isRejected(event.pointer);
     if (event is PointerUpEvent || event is PointerCancelEvent) {
       _touchesDown.remove(event.pointer);
+      if (_touchesDown.isEmpty) _transformBeforeTouch = null;
       _palm.touchEnded(event.pointer);
     }
     return rejected;
@@ -674,6 +700,7 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
                   transformationController: widget._transformationController,
 
                   isDrawGesture: widget.isDrawGesture,
+                  deferTouchGesture: () => !_palm.touchesConfirmed,
                   onInteractionEnd: widget.onInteractionEnd,
                   onDrawStart: widget.onDrawStart,
                   onDrawUpdate: widget.onDrawUpdate,
