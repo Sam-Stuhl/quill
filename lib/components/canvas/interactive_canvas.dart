@@ -39,7 +39,7 @@ class InteractiveCanvasViewer extends StatefulWidget {
     this.maxScale = 2.5,
     this.minScale = 0.8,
     this.isDrawGesture,
-    this.deferTouchGesture,
+    this.ignoreGesture,
     this.interactionEndFrictionCoefficient = kDrag,
     this.onInteractionEnd,
     this.onDrawEnd,
@@ -87,7 +87,7 @@ class InteractiveCanvasViewer extends StatefulWidget {
     this.maxScale = 2.5,
     this.minScale = 0.8,
     this.isDrawGesture,
-    this.deferTouchGesture,
+    this.ignoreGesture,
     this.interactionEndFrictionCoefficient = kDrag,
     this.onInteractionEnd,
     this.onDrawEnd,
@@ -340,10 +340,9 @@ class InteractiveCanvasViewer extends StatefulWidget {
   /// A function to distinguish a draw gesture and a pan/zoom gesture.
   final bool Function(ScaleStartDetails scaleDetails)? isDrawGesture;
 
-  /// While this returns true, pan and zoom updates are held back: the touches
-  /// have only just landed and may be a palm. The gesture catches up from where
-  /// it started once they are confirmed.
-  final bool Function()? deferTouchGesture;
+  /// Checked when a gesture starts: true if every pointer in it is a touch
+  /// that palm rejection ignored. Such a gesture does nothing until it ends.
+  final bool Function()? ignoreGesture;
 
   /// Called when any gesture ends.
   final GestureScaleEndCallback? onInteractionEnd;
@@ -730,7 +729,15 @@ class _InteractiveCanvasViewerState extends State<InteractiveCanvasViewer>
 
   // Handle the start of a gesture. All of pan, scale, and rotate are handled
   // with GestureDetector's scale gesture.
+  /// Set by [InteractiveCanvasViewer.ignoreGesture] for the current gesture.
+  bool _ignoringGesture = false;
+
   void _onScaleStart(ScaleStartDetails details) {
+    _ignoringGesture = widget.ignoreGesture?.call() ?? false;
+    if (_ignoringGesture) {
+      InputTrace.log('scaleStart ignored: only rejected touches');
+      return;
+    }
     if (_controller.isAnimating) {
       _controller.stop();
       _controller.reset();
@@ -782,8 +789,7 @@ class _InteractiveCanvasViewerState extends State<InteractiveCanvasViewer>
       // arriving next to a palm that was drawing), the gesture turns into a
       // zoom: ignore that instead of zooming the page.
       if (_gestureType != _GestureType.pan) return;
-    } else if (widget.deferTouchGesture?.call() ?? false) {
-      InputTrace.log('scaleUpdate deferred');
+    } else if (_ignoringGesture) {
       return;
     }
 
@@ -869,6 +875,11 @@ class _InteractiveCanvasViewerState extends State<InteractiveCanvasViewer>
       'scaleEnd draw=$isCurrentGestureADrawGesture type=$_gestureType '
       'v=${details.velocity.pixelsPerSecond.distance.toStringAsFixed(0)}',
     );
+    if (_ignoringGesture) {
+      _ignoringGesture = false;
+      widget.onInteractionEnd?.call(details);
+      return;
+    }
     widget.onInteractionEnd?.call(details);
 
     if (isCurrentGestureADrawGesture) {

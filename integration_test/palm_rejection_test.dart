@@ -29,7 +29,7 @@ void main() {
     await workerManager.init(isolatesCount: 1);
     pdfrxFlutterInitialize();
     stows.editorFingerDrawing.value = true;
-    stows.palmRejectionMs.value = 800;
+    stows.palmRejection.value = true;
 
     await tester.pumpWidget(
       TranslationProvider(
@@ -75,6 +75,44 @@ void main() {
       lessThan(baseY - 50),
       reason: 'a finger scroll no longer pans',
     );
+    // pointers 100 and up, so they never repeat the ones below
+    var nextId = 100;
+    // 2. write, then scroll with a finger right away: it scrolls, no dot
+    final strokesBeforeWrite = page.strokes.length;
+    final write = await tester.startGesture(
+      start + const Offset(-100, 0),
+      kind: PointerDeviceKind.stylus,
+      pointer: nextId++,
+    );
+    for (var i = 1; i <= 6; i++) {
+      await write.moveBy(const Offset(12, 2));
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+    await write.up();
+    await tester.pump(const Duration(milliseconds: 150));
+    final yBeforeScroll = detector.transform.getTranslation().y;
+    final scroll = await tester.startGesture(
+      start,
+      kind: PointerDeviceKind.touch,
+      pointer: nextId++,
+    );
+    for (var i = 1; i <= 6; i++) {
+      await scroll.moveBy(const Offset(0, -30));
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+    await scroll.up();
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(
+      page.strokes.length,
+      strokesBeforeWrite + 1,
+      reason: 'the finger left a dot, or the pen stroke was lost',
+    );
+    expect(
+      detector.transform.getTranslation().y,
+      lessThan(yBeforeScroll - 50),
+      reason: 'a finger right after writing did not scroll',
+    );
+
     // a palm lands, slides far, then the pen lands: nothing may remain
     var pointerId = 10;
     Future<void> palmThenPen() async {
@@ -102,7 +140,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 1000));
     }
 
-    // 2. finger drawing off: the palm would pan the page
+    // 3. finger drawing off: the palm would pan the page
     editor.currentTool = Pen.currentPen;
     final yBeforePalm = detector.transform.getTranslation().y;
     await palmThenPen();
@@ -112,10 +150,52 @@ void main() {
       reason: 'the palm moved the page',
     );
 
-    // 3. finger drawing on: the palm would draw
+    // 4. finger drawing on: the palm would draw
     stows.editorFingerDrawing.value = true;
     final strokesBefore = page.strokes.length;
     await palmThenPen();
     expect(page.strokes.length, strokesBefore, reason: 'palm left a stroke');
+
+    // the cancels below never reach the app under the test harness (they
+    // do on the iPad), so the cancelled pointers linger: keep this last
+    // 5. a finger that lands while the pen is down does nothing, and leaves
+    // no dot when it lifts after the pen
+    final strokesBefore4 = page.strokes.length;
+    final y4 = detector.transform.getTranslation().y;
+    final pen4 = await tester.startGesture(
+      start + const Offset(-100, 100),
+      kind: PointerDeviceKind.stylus,
+      pointer: pointerId++,
+    );
+    await pen4.moveBy(const Offset(20, 0));
+    await tester.pump(const Duration(milliseconds: 16));
+    final finger4 = await tester.startGesture(
+      start,
+      kind: PointerDeviceKind.touch,
+      pointer: pointerId++,
+    );
+    await tester.pump(const Duration(milliseconds: 16));
+    await pen4.moveBy(const Offset(20, 0));
+    await tester.pump(const Duration(milliseconds: 16));
+    await pen4.up();
+    await tester.pump(const Duration(milliseconds: 50));
+    for (var i = 1; i <= 4; i++) {
+      await finger4.moveBy(const Offset(0, -30));
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+    await finger4.up();
+    await tester.pump(const Duration(milliseconds: 500));
+    // at most the pen's own stroke (the lingering pointers can swallow even
+    // that here), never a dot from the finger
+    expect(
+      page.strokes.length,
+      lessThanOrEqualTo(strokesBefore4 + 1),
+      reason: 'stray dot',
+    );
+    expect(
+      detector.transform.getTranslation().y,
+      closeTo(y4, 0.5),
+      reason: 'a touch that landed while the pen was down moved the page',
+    );
   });
 }

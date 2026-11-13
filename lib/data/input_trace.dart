@@ -20,14 +20,19 @@ abstract final class InputTrace {
   static final _buffer = StringBuffer();
   static Timer? _flushTimer;
 
+  /// Tests send the trace here instead of to the file.
+  static void Function(String line)? sink;
+
   static void log(String message) {
+    final sink = InputTrace.sink;
+    if (sink != null) return sink('${_clock.elapsedMilliseconds} $message');
     if (!enabled) return;
     _buffer.writeln('${_clock.elapsedMilliseconds} $message');
     _flushTimer ??= Timer(const Duration(seconds: 1), _flush);
   }
 
   static void pointer(String where, PointerEvent e) {
-    if (!enabled) return;
+    if (!enabled && sink == null) return;
     final type = switch (e) {
       PointerDownEvent() => 'down',
       PointerMoveEvent() => 'move',
