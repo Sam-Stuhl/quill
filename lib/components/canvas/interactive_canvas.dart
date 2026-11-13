@@ -17,6 +17,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/physics.dart';
 import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:quill/data/input_trace.dart';
 import 'package:vector_math/vector_math_64.dart' show Matrix4, Quad, Vector3;
 
 typedef InteractiveCanvasViewerWidgetBuilder = Widget Function(
@@ -782,6 +783,7 @@ class _InteractiveCanvasViewerState extends State<InteractiveCanvasViewer>
       // zoom: ignore that instead of zooming the page.
       if (_gestureType != _GestureType.pan) return;
     } else if (widget.deferTouchGesture?.call() ?? false) {
+      InputTrace.log('scaleUpdate deferred');
       return;
     }
 
@@ -863,6 +865,10 @@ class _InteractiveCanvasViewerState extends State<InteractiveCanvasViewer>
   // Handle the end of a gesture of _GestureType. All of pan, scale, and rotate
   // are handled with GestureDetector's scale gesture.
   void _onScaleEnd(ScaleEndDetails details) {
+    InputTrace.log(
+      'scaleEnd draw=$isCurrentGestureADrawGesture type=$_gestureType '
+      'v=${details.velocity.pixelsPerSecond.distance.toStringAsFixed(0)}',
+    );
     widget.onInteractionEnd?.call(details);
 
     if (isCurrentGestureADrawGesture) {

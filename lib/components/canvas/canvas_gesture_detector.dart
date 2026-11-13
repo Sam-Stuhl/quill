@@ -12,6 +12,7 @@ import 'package:quill/components/canvas/interactive_canvas.dart';
 import 'package:quill/data/editor/page.dart';
 import 'package:quill/data/extensions/change_notifier_extensions.dart';
 import 'package:quill/data/extensions/matrix4_extensions.dart';
+import 'package:quill/data/input_trace.dart';
 import 'package:quill/data/palm_rejection.dart';
 import 'package:quill/data/prefs.dart';
 import 'package:quill/data/touch_gestures.dart';
@@ -473,6 +474,7 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
 
   void _undoPalmEffects() {
     if (_touchesDown.isEmpty) return;
+    InputTrace.log('pen arrived: undo palm ${_touchesDown.toList()}');
     final before = _transformBeforeTouch;
     if (before != null) widget._transformationController.value = before;
     _transformBeforeTouch = null;
@@ -490,6 +492,14 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
   /// Runs on every pointer event, before anything else looks at it.
   /// Returns true if the event is a touch that palm rejection swallowed.
   bool _palmRejects(PointerEvent event) {
+    final rejected = _palmRejectsInner(event);
+    if (InputTrace.enabled && event is! PointerHoverEvent) {
+      InputTrace.pointer(rejected ? 'REJECT' : 'pass', event);
+    }
+    return rejected;
+  }
+
+  bool _palmRejectsInner(PointerEvent event) {
     final isStylus =
         event.kind == PointerDeviceKind.stylus ||
         event.kind == PointerDeviceKind.invertedStylus;
