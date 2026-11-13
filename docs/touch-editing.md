@@ -50,3 +50,5 @@ a palm once the pen arrives. So:
 
 Test: `flutter test integration_test/palm_rejection_test.dart -d <simulator>`.
 
+
+Input trace (for tuning): launch with the environment variable `QUILL_INPUT_TRACE` (`devicectl device process launch --environment-variables {"QUILL_INPUT_TRACE":"1"}`) or put a `.quill-input-trace` file in the documents folder. Every pointer event (kind, contact radius, pressure, time) and each draw or pan decision is appended to `input-trace.log` there. `lib/data/input_trace.dart`.
