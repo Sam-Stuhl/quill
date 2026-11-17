@@ -237,6 +237,11 @@ side is under `lib/data/quill_sync/` and `lib/data/quill_defaults.dart`.
 
 ## Building and installing
 
+**Superseded 2026-11-17:** merges to main now ship to TestFlight with cloud signing
+and no local certificate (`docs/ship-ios.md`, once its setup is done); until the
+pipeline's first upload, the by-hand route below still applies. The table's
+Gatekeeper and CocoaPods rows still apply to the mini's build.
+
 `scripts/install-on-ipad.sh`, on a Mac whose Xcode is signed in as the team, in a
 session that can read the login keychain: on the mini, a window of the `mini-host`
 tmux; on the MacBook, a Terminal window on its desktop. The iPad has to be on USB
