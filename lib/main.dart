@@ -260,9 +260,17 @@ class const App({super.key}) extends StatefulWidget {
       ),
       GoRoute(
         path: RoutePaths.edit,
-        builder: (context, state) => Editor(
-          path: state.uri.queryParameters['path'],
-          pdfPath: state.uri.queryParameters['pdfPath'],
+        // Not a MaterialPage: on iOS its Cupertino transition adds a swipe-back
+        // gesture on the left ~20 px that swallows pen and touch input there
+        // (a stroke in the far left box of a page was ignored, 2026-11-17).
+        pageBuilder: (context, state) => CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: Editor(
+            path: state.uri.queryParameters['path'],
+            pdfPath: state.uri.queryParameters['pdfPath'],
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+              FadeTransition(opacity: animation, child: child),
         ),
       ),
       GoRoute(
