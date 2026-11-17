@@ -1,0 +1,31 @@
+# Every merge to main reaches the iPad and iPhone through TestFlight.
+#
+# Deliberately thin: the work is scripts/ship-ios.sh (docs/ship-ios.md). It runs
+# on a self-hosted runner under `sam` on the mini, labelled `quill-ios`, in
+# its own clone, ~/repos/quill-ship, so a build never disturbs a working tree (Flutter, CocoaPods and the sync token live there; GitHub's
+# hosted runners have none of them). Signing is Apple's cloud signing through an
+# App Store Connect API key, so no certificate on the mini can break it.
+name: ship-ios
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ship-ios
+  # Never cancel a build midway; a newer push waits its turn and ships then.
+  cancel-in-progress: false
+
+jobs:
+  ship:
+    runs-on: [self-hosted, quill-ios]
+    timeout-minutes: 60
+    steps:
+      # No actions/checkout: the clone persists, so pods and build caches stay warm.
+      - name: ship to TestFlight
+        run: |
+          cd ~/repos/quill-ship
+          git fetch origin main
+          git checkout --detach "${{ github.sha }}"
+          scripts/ship-ios.sh
