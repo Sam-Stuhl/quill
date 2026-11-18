@@ -169,19 +169,11 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
   @visibleForTesting
   Matrix4 get transform => widget._transformationController.value;
 
-  /// If zooming is locked, this is the zoom level.
-  /// Otherwise, this is null.
-  late double? zoomLockedValue = stows.lastZoomLock.value
-      ? widget._transformationController.value.approxScale
-      : null;
-
-  /// Whether single-finger panning is locked.
-  /// Two-finger panning is always enabled.
-  late bool singleFingerPanLock = stows.lastSingleFingerPanLock.value;
-
-  /// Whether panning is locked to being horizontal or vertical.
-  /// Otherwise, panning can be done in any (i.e. diagonal) direction.
-  late bool axisAlignedPanLock = stows.lastAxisAlignedPanLock.value;
+  /// The gesture-lock buttons were removed from the canvas, so zoom, single-finger
+  /// pan and axis-aligned pan are never locked (this also ignores any saved lock).
+  final zoomLockedValue = null as double?;
+  final singleFingerPanLock = false;
+  final axisAlignedPanLock = false;
 
   void zoomIn() => widget._transformationController.value =
       setZoom(
@@ -366,9 +358,6 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
     if (transformCacheItem != null) {
       // if we're opening the same note, restore the last transform
       widget._transformationController.value = transformCacheItem.transform;
-      if (zoomLockedValue != null) {
-        zoomLockedValue = transformCacheItem.transform.approxScale;
-      }
     } else if (widget.initialPageIndex != null) {
       // if we're opening a different note, scroll to the last recorded page
       CanvasGestureDetector.scrollToPage(
@@ -745,24 +734,7 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
         Positioned.fill(
           child: CanvasHud(
             transformationController: widget._transformationController,
-            zoomLock: zoomLockedValue != null,
-            setZoomLock: (bool zoomLock) => setState(() {
-              zoomLockedValue = zoomLock
-                  ? widget._transformationController.value.approxScale
-                  : null;
-              stows.lastZoomLock.value = zoomLock;
-            }),
-            resetZoom: zoomLockedValue != null ? null : resetZoom,
-            singleFingerPanLock: singleFingerPanLock,
-            setSingleFingerPanLock: (bool singleFingerPanLock) => setState(() {
-              this.singleFingerPanLock = singleFingerPanLock;
-              stows.lastSingleFingerPanLock.value = singleFingerPanLock;
-            }),
-            axisAlignedPanLock: axisAlignedPanLock,
-            setAxisAlignedPanLock: (bool axisAlignedPanLock) => setState(() {
-              this.axisAlignedPanLock = axisAlignedPanLock;
-              stows.lastAxisAlignedPanLock.value = axisAlignedPanLock;
-            }),
+            resetZoom: resetZoom,
           ),
         ),
       ],

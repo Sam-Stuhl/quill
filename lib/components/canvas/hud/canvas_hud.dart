@@ -1,34 +1,19 @@
 import 'dart:async';
 
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:quill/components/canvas/hud/canvas_gesture_lock_btn.dart';
 import 'package:quill/components/canvas/hud/canvas_zoom_indicator.dart';
 import 'package:quill/data/extensions/matrix4_extensions.dart';
-import 'package:quill/i18n/strings.g.dart';
 
 class CanvasHud extends HookWidget {
   const new({
     super.key,
     required this.transformationController,
-    required this.zoomLock,
-    required this.setZoomLock,
     required this.resetZoom,
-    required this.singleFingerPanLock,
-    required this.setSingleFingerPanLock,
-    required this.axisAlignedPanLock,
-    required this.setAxisAlignedPanLock,
   });
 
   final TransformationController transformationController;
-  final bool zoomLock;
-  final ValueChanged<bool> setZoomLock;
   final VoidCallback? resetZoom;
-  final bool singleFingerPanLock;
-  final ValueChanged<bool> setSingleFingerPanLock;
-  final bool axisAlignedPanLock;
-  final ValueChanged<bool> setAxisAlignedPanLock;
 
   @override
   Widget build(BuildContext context) {
@@ -57,46 +42,6 @@ class CanvasHud extends HookWidget {
         duration: const Duration(milliseconds: 200),
         child: Stack(
           children: [
-            Positioned(
-              top: 5,
-              left: 0,
-              child: CanvasGestureLockBtn(
-                lock: zoomLock,
-                setLock: setZoomLock,
-                icon: zoomLock ? Icons.lock : Icons.lock_open,
-                tooltip: zoomLock
-                    ? t.editor.hud.unlockZoom
-                    : t.editor.hud.lockZoom,
-              ),
-            ),
-            Positioned(
-              top: 50,
-              left: 0,
-              child: CanvasGestureLockBtn(
-                lock: singleFingerPanLock,
-                setLock: setSingleFingerPanLock,
-                icon: singleFingerPanLock ? Icons.pinch : Icons.swipe_up,
-                tooltip: singleFingerPanLock
-                    ? t.editor.hud.unlockSingleFingerPan
-                    : t.editor.hud.lockSingleFingerPan,
-              ),
-            ),
-            Positioned(
-              top: 95,
-              left: 0,
-              child: CanvasGestureLockBtn(
-                lock: axisAlignedPanLock,
-                setLock: setAxisAlignedPanLock,
-                tooltip: axisAlignedPanLock
-                    ? t.editor.hud.unlockAxisAlignedPan
-                    : t.editor.hud.lockAxisAlignedPan,
-                child: AnimatedRotation(
-                  duration: const Duration(milliseconds: 200),
-                  turns: axisAlignedPanLock ? 0 : 1 / 8,
-                  child: const Icon(Symbols.drag_pan),
-                ),
-              ),
-            ),
             Positioned(
               top: 5,
               right: 5,
