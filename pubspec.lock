@@ -341,11 +341,11 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "ref!/migrate-to-standalone-material_ui"
-      resolved-ref: c6e0948fae47c0d905fcb3156903c3ded90dfda3
+      ref: main
+      resolved-ref: c0dbcded48b80383a23965b14a1de8dbf605e5f2
       url: "https://github.com/adil192/dynamic_yaru.git"
     source: git
-    version: "0.2.0"
+    version: "0.3.0"
   dynamite_runtime:
     dependency: transitive
     description:
