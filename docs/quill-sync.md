@@ -14,6 +14,20 @@ Status: plan written and implemented 2026-11-06. Measurements are at the end.
   imported PDFs, one file each) and a thumbnail `<path>.sbn2.p` (PNG). They live
   under the app's documents directory, `Quill/`, in the same folder tree Sam
   sees in the app. `.sba` is a zip of one note and its assets.
+- **Previews.** The file browser shows each note's `.sbn2.p`, and "No preview
+  available" when there is none. Only the editor wrote one, a few seconds after
+  an edit, so every note that was never opened and edited had none: the 339 from
+  Notability (`import_notability.py` and the restore from `.quill/store` copy
+  `.sbn2` files only), anything dropped in `Inbox/`, and any note written before
+  thumbnails existed (2026-11-20: 13 of 350 notes in `.quill/store` had one).
+  Thumbnails do sync back (they are uploaded like any note file, so the mirror
+  holds them), but the mini cannot draw one, since only the app renders strokes.
+  Fixed in the app (2026-11-20): `QuillImport.writeThumbnail` draws the first
+  page the editor's way, headless; an inbox import calls it right after the note
+  is written, and every reconcile (start and resume) draws a preview for each
+  note that lacks one, one at a time in the background. The drawn `.p` is
+  uploaded to the mini like the rest, and the file browser card refreshes when it
+  lands (`.sbn2.p` writes now count as a change to the note).
 - **Saving.** The editor saves `autosaveDelay` after the last change (10 s by
   default), never while the pen is down, and on leaving the note. It does not
   save when the app goes to the background.

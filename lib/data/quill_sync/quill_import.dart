@@ -134,6 +134,12 @@ abstract class QuillImport {
         );
       }
       await FileManager.writeFile(filePath, bson, awaitWrite: true);
+      try {
+        await writeThumbnail(notePath);
+      } catch (e) {
+        // The backfill on the next start tries again.
+        debugPrint('No thumbnail for $notePath: $e');
+      }
       return notePath;
     } finally {
       await pdfDocument?.dispose();
@@ -202,6 +208,56 @@ abstract class QuillImport {
       out = 'Imported ${DateTime.now().toIso8601String().substring(0, 10)}';
     }
     return out;
+  }
+
+  /// Writes the note's preview image (`<note>.sbn2.p`, what the file browser
+  /// shows) the way the editor does, headless, for a note that has none:
+  /// imported notes, restored ones and anything written before Quill made
+  /// thumbnails. Returns false when there was nothing to draw.
+  static Future<bool> writeThumbnail(String notePath) async {
+    final coreInfo = await EditorCoreInfo.loadFromFilePath(notePath);
+    try {
+      if (coreInfo.readOnlyReason == .corrupted || coreInfo.pages.isEmpty) {
+        return false;
+      }
+      final page = coreInfo.pages.first;
+      // PDF pages only load when a PdfPageView asks for them.
+      final images = [?page.backgroundImage, ...page.images];
+      await Future.wait([
+        for (final image in images)
+          if (image is PdfEditorImage)
+            () async {
+              final document = await coreInfo.assetCache.pdfDocumentCache.load(
+                image.pdfFile?.path ?? 'inline_pdf_${image.id}.pdf',
+                pdfBytes: image.pdfBytes,
+              );
+              await document.loadPagesProgressively();
+            }(),
+      ]);
+      await Future.wait([
+        for (final image in images) image.loadIn().then((_) => image.loadIn()),
+      ]);
+      await PenActivity.untilQuiet();
+      final previewHeight = page.previewHeight(lineHeight: coreInfo.lineHeight);
+      final thumbnail = await EditorExporter.screenshotPage(
+        coreInfo: coreInfo,
+        pageIndex: 0,
+        rasterizeAllStrokes: true,
+        targetSize: Size(720, 720 * previewHeight / page.size.width),
+        cropHeight: previewHeight,
+        pixelRatio: 1,
+      );
+      final png = await thumbnail.toByteData(format: ui.ImageByteFormat.png);
+      thumbnail.dispose();
+      await FileManager.writeFile(
+        '$notePath${Editor.extension}.p',
+        png!.buffer.asUint8List(),
+        awaitWrite: true,
+      );
+      return true;
+    } finally {
+      coreInfo.dispose();
+    }
   }
 
   /// Renders the note at [notePath] (no extension) to PDF bytes, headless.

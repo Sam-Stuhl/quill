@@ -123,6 +123,7 @@ void main() {
       required String name,
     })?
     importer,
+    Future<bool> Function(String)? thumbnailer,
   }) => QuillSync(
     baseUrl: Uri.parse('http://quill.test'),
     token: 't',
@@ -133,6 +134,7 @@ void main() {
       return Uint8List.fromList(utf8.encode('%PDF $note'));
     },
     importBytes: importer ?? QuillImport.importBytes,
+    writeThumbnail: thumbnailer ?? (_) async => false,
     pdfDebounce: const Duration(milliseconds: 10),
     pollWait: const Duration(seconds: 1),
   );
@@ -201,6 +203,26 @@ void main() {
     },
   );
 
+  test(
+    'notes with no preview image get one at start, others are left',
+    () async {
+      await FileManager.writeFile('/a.sbn2', [1], awaitWrite: true);
+      await FileManager.writeFile('/b.sbn2', [1], awaitWrite: true);
+      await FileManager.writeFile('/b.sbn2.p', [9], awaitWrite: true);
+      final drawn = <String>[];
+      sync = QuillSync.instance = makeSync(
+        thumbnailer: (note) async {
+          drawn.add(note);
+          return true;
+        },
+      );
+      await sync.start();
+      await until(() => drawn.isNotEmpty);
+      await Future.delayed(const Duration(milliseconds: 500));
+      expect(drawn, ['/a']);
+    },
+  );
+
   test('a burst of saves is coalesced per path', () async {
     sync = QuillSync.instance = makeSync();
     await sync.start();
@@ -259,6 +281,8 @@ void main() {
       await until(() => server.acks.containsKey('aaaa'));
       expect(server.acks['aaaa'], '/Inbox test/photo');
       expect(imported, ['/Inbox test/photo']);
+      // The file browser needs a preview image; an imported note has one.
+      expect(FileManager.doesFileExist('/Inbox test/photo.sbn2.p'), isTrue);
 
       final coreInfo = await EditorCoreInfo.loadFromFilePath(
         '/Inbox test/photo',
@@ -382,6 +406,8 @@ void main() {
       );
       expect(note, '/Pdfs/hw 3');
       expect(FileManager.getFile('/Pdfs/hw 3.sbn2.0').readAsBytesSync(), bytes);
+      // An imported note has a preview straight away, not only after an edit.
+      expect(FileManager.doesFileExist('/Pdfs/hw 3.sbn2.p'), isTrue);
 
       final coreInfo = await EditorCoreInfo.loadFromFilePath(note);
       expect(coreInfo.pages, hasLength(3));

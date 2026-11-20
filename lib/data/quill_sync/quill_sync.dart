@@ -29,6 +29,7 @@ class QuillSync {
     http.Client? client,
     this.renderPdf = QuillImport.renderPdf,
     this.importBytes = QuillImport.importBytes,
+    this.writeThumbnail = QuillImport.writeThumbnail,
     this.pdfDebounce = const Duration(seconds: 2),
     this.pollWait = const Duration(seconds: 25),
   }) : _client = client ?? http.Client();
@@ -72,6 +73,7 @@ class QuillSync {
     required String name,
   })
   importBytes;
+  final Future<bool> Function(String notePath) writeThumbnail;
   final Duration pdfDebounce;
   final Duration pollWait;
 
@@ -367,6 +369,7 @@ class QuillSync {
 
       final root = FileManager.documentsDirectory;
       var queued = 0;
+      final notes = <String>{}, thumbnails = <String>{};
       await for (final entity in Directory(root).list(recursive: true)) {
         if (entity is! File) continue;
         final path = entity.path
@@ -381,8 +384,10 @@ class QuillSync {
             queued++;
           }
         }
+        if (path.endsWith('${Editor.extension}.p')) thumbnails.add(path);
         if (path.endsWith(Editor.extension)) {
           final note = path.substring(0, path.length - Editor.extension.length);
+          notes.add(note);
           final pdfMtime = pdfMtimes[note] as int?;
           if (pdfMtime == null || pdfMtime < mtime) {
             pdfs.add(note);
@@ -395,8 +400,40 @@ class QuillSync {
         await _save();
         _kick();
       }
+      unawaited(
+        _backfillThumbnails([
+          for (final note in notes)
+            if (!thumbnails.contains('$note${Editor.extension}.p')) note,
+        ]),
+      );
     } catch (e) {
       log.warning('Reconcile failed (will retry on resume): $e');
+    }
+  }
+
+  var _backfilling = false;
+
+  /// Draws the preview image of every note in [notes] that has none (the file
+  /// browser says "No preview available" without one): the editor only writes
+  /// one after an edit, so imported and restored notes never got any. One at a
+  /// time; a failure is skipped until the next start.
+  Future<void> _backfillThumbnails(List<String> notes) async {
+    if (_backfilling || notes.isEmpty) return;
+    _backfilling = true;
+    try {
+      log.info('Drawing ${notes.length} missing previews');
+      for (final note in notes) {
+        if (!_running) break;
+        if (FileManager.doesFileExist('$note${Editor.extension}.p')) continue;
+        try {
+          await writeThumbnail(note);
+        } catch (e) {
+          log.warning('No preview for $note: $e');
+        }
+        await Future<void>.delayed(const Duration(milliseconds: 200));
+      }
+    } finally {
+      _backfilling = false;
     }
   }
 
