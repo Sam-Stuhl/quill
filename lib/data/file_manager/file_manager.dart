@@ -177,8 +177,10 @@ class FileManager {
   static void broadcastFileWrite(FileOperationType type, String path) async {
     if (!fileWriteStream.hasListener) return;
 
-    // remove extension
-    if (path.endsWith(Editor.extension)) {
+    // remove extension (a note's preview, .sbn2.p, is a change to the note)
+    if (path.endsWith('${Editor.extension}.p')) {
+      path = path.substring(0, path.length - Editor.extension.length - 2);
+    } else if (path.endsWith(Editor.extension)) {
       path = path.substring(0, path.length - Editor.extension.length);
     } else if (path.endsWith(Editor.extensionOldJson)) {
       path = path.substring(0, path.length - Editor.extensionOldJson.length);
