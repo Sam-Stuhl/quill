@@ -202,11 +202,11 @@ dependency_overrides:
       url: https://github.com/adil192/yaru.dart.git
       ref: feat!/migrate-to-material_ui
 
-  # material_ui support: https://github.com/adil192/dynamic_yaru/pull/1
+  # material_ui support: merged upstream, so track main (the PR branch was deleted)
   dynamic_yaru:
     git:
       url: https://github.com/adil192/dynamic_yaru.git
-      ref: ref!/migrate-to-standalone-material_ui
+      ref: main
 
   # material_ui support: no pull request yet
   flutter_quill:
