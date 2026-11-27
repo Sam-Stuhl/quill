@@ -42,7 +42,7 @@ vault as "<note> (handwriting).md" beside the note's PDF, wherever that PDF is
 since moved it), so Obsidian's search finds what Sam wrote. The vault's own
 companion note is untouched. It waits until the PDF has a place in the vault.
 
-    stage.py [--once] [--interval 0.25]
+    stage.py [--once] [--interval 1.0]
 
 Python 3.9 compatible (console's /usr/bin/python3). Standard library only.
 """
@@ -451,7 +451,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--once", action="store_true")
-    ap.add_argument("--interval", type=float, default=0.25)
+    ap.add_argument("--interval", type=float, default=1.0)
     args = ap.parse_args()
     stager = Stager()
     if args.once:
