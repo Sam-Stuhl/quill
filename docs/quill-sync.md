@@ -122,7 +122,7 @@ into its week folder.
 ```
 ~sam/quill/Notes ──quill-stage──► ~console/Quill/staging ──notasync-quill──► vault ingest ──► LiveSync
  (quill-sync)     (console agent,   (mtime kept,          (notasync's image,     (container,
-                   every 0.25 s)     never deletes)        second instance)       I6)
+                   every 1 s)        never deletes)        second instance)       I6)
 ```
 
 - `stage.py` is a LaunchAgent in the `console` account, because the router is a
@@ -403,7 +403,9 @@ upload p50 0.13 s, 200 kB PDF p50 0.19 s.
 Into the vault (2026-11-07, a PDF uploaded through the server's API on the
 mini, four runs): in the vault ingest folder with its companion note 1.9 to
 2.3 s later (3.9 s before quill-stage went to 0.25 s and the router to 1 s
-polls and settle), in the vault bridge's export 5.8 to 7.4 s later. The rest is
+polls and settle; quill-stage went back to 1 s on 2026-11-27, adding about
+0.4 s on average, because walking the notes four times a second cost 21% of a
+core around the clock on a mini that was swapping), in the vault bridge's export 5.8 to 7.4 s later. The rest is
 the bridge noticing the new file about 4 s after it lands, its own watcher,
 shared with Notability and not changed here. Pen up to the vault is about 4 s,
 to Obsidian about 8 s plus the device's own sync.
